@@ -3,6 +3,10 @@
 # this code is getting pretty hairy, so it'd be smart to clean up some
 
 #we need mongo, nokogiri for parsing, and mechanize to make things smoother
+ENV['RACK_ENV'] ||= 'scrape'
+require 'bundler'
+Bundler.require :default, ENV['RACK_ENV'].to_sym
+
 require 'mechanize'
 require 'nokogiri'
 require 'mongo'
