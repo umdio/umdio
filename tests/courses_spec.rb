@@ -1,7 +1,6 @@
 # spec/features/root_spec.rb
 # we need to add tests to get coverage of all the features we have
 
-
 require_relative '../tests/spec_helper'
 
 describe 'Version 0' do

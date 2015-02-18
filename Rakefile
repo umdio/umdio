@@ -6,7 +6,7 @@ task :database_up => ['database_down'] do
   sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongodb.log'
 end
 
-desc "shutdown mongo database server"
+desc "Shutdown mongo database server"
 task :database_down do
   mongo_pid = `pgrep mongod`
   if(!mongo_pid.empty?) then
@@ -42,7 +42,8 @@ end
 
 task :setup => ['database_up','scrape']
 
-RSpec::Core::RakeTask.new :specs do |task|
+desc "Run tests in /tests that look like *_spec.rb" #should prepare a database clone, probably
+RSpec::Core::RakeTask.new :specs => ['database_up']do |task|
   task.pattern = Dir['tests/**/*_spec.rb']
 end
 

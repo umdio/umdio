@@ -1,7 +1,7 @@
 #Gemfile
 source 'https://rubygems.org'
 
-group :default do  
+group :default do
   gem 'sinatra'
   gem 'mongo'
   gem 'bson_ext', '~> 1.12.0'
