@@ -4,8 +4,7 @@
 Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage.
 
 ##TODO:
-- Testing - write more comprehensive tests 
-  - levels and types of tests: Smoke, Sanity, CRUD, Positive/Negative, Boundary(corner cases), Security 
+- Testing - write more comprehensive tests
 - Implement: 
 	- courses/search 
 	- courses/<dep_number>
