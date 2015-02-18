@@ -1,5 +1,9 @@
 #umdio api core application. brings in other dependencies as needed.
-require 'bundler/setup'
+ENV['RACK_ENV'] ||= 'development'
+ 
+require 'bundler'
+Bundler.require :default, ENV['RACK_ENV'].to_sym
+
 require 'sinatra/base'
 require 'sinatra/reloader'
 require 'sinatra/json'
@@ -41,5 +45,4 @@ class UMDIO < Sinatra::Base
   register Sinatra::UMDIO::Routing::Courses
   register Sinatra::UMDIO::Routing::Root
 
-  run! if app_file == $0
 end

@@ -1,12 +1,16 @@
 #Gemfile
 source 'https://rubygems.org'
 
-gem 'sinatra'
-gem 'mongo'
-gem 'bson_ext', '~> 1.12.0'
-gem 'sinatra-contrib'
+group :default do  
+  gem 'sinatra'
+  gem 'mongo'
+  gem 'bson_ext', '~> 1.12.0'
+  gem 'sinatra-contrib'
+  gem 'rake'
+end
 
 group :development do
+  gem 'rspec'
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
 end
 
