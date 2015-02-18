@@ -1,6 +1,7 @@
-An API for UMD data - development is under way!
+#An API for UMD data 
+####Development is under way!
 
-Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage
+Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage.
 
 ##TODO:
 Testing - write more comprehensive tests
@@ -9,28 +10,28 @@ sanitize queries & return meaningful errors on malformed queries (currently retu
 add parameter capability (e.g. /courses/ENES100?semester=201501)
   allow limits and filters -- projection stuff
 paginate responses (just for searches?)
-add database config to the rakefile, so we're really easy to duplicate
 
 push to repo!
 create live site with docs + api
 
-Add to the design specs, documentation 
+Add to the design specs, documentation, api
+
+Meta: find developers and projects, eat more databases, build core team
 
 ##Contributing: Getting Started
-(install homebrew)
-install git
-install rvm
-rvm use 2.1.1
-[install and run mongodb](http://docs.mongodb.org/manual/installation/)
-git clone this repo
-bundle install
-bundle exec rake database_up
-bundle exec rake scrape
-bundle exec rake server_up
-bundle exec rake
+(mac) install [xcode command line tools](https://developer.apple.com/xcode/) (or `xcode-select --install` from the command line)
+(mac) install [homebrew](http://brew.sh/)
+install [git](http://git-scm.com/) (or `brew git`)
+install [rvm](https://rvm.io/rvm/install) 
+install ruby 2.1.1 and switch rubies `rvm use 2.1.1`
+install [mongodb](http://docs.mongodb.org/manual/installation/)
+git clone this repo (you can rename the folder) `git clone https://github.com/umdio/umdio my_umdio_app_folder`
+install and build all the dependencies `bundle install`
+build the database `bundle exec rake setup`
+start a local server `bundle exec rake server_up`
+run the test suite `bundle exec rake`
 check development at localhost:4567
-terminate server with bundle exec rake server_down
-
+terminate server with `bundle exec rake server_down`
 
 ##Contributing:Development Workflow
 design the endpoint you want to create, i.e /bus
@@ -39,11 +40,15 @@ create a bus folder with bus.rb and bus_helpers.rb, using the module structure f
 require and register your module in server.rb
 add routes of the form "app.get '/<endpoint>'""  to the module
 add hello world code, hello world tests should pass
-write tests <--> add functionality
+write tests --> add functionality --> make tests pass --> write tests
 
 ##Contributing:Read more
-You'll probably be referencing the docs for sinatra as well as the ruby-mongo driver a lot, especially at first, on top of the api design doc.
-Also how to test with rack
+[Design doc](https://docs.google.com/document/d/11uslF3ftvQ3It-NRXs7iRgI34S0MxvqV2S1jioXPcL0/edit?usp=sharing)
+[Sinatra](http://www.sinatrarb.com/)
+[Rack](http://rack.github.io/)
+[MongoDB](http://www.mongodb.org/)
+[RSpec](http://rspec.info/)
+
 
 ###Notes:
 

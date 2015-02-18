@@ -1,10 +1,6 @@
 # rakefile
 require 'rspec/core/rake_task'
  
-RSpec::Core::RakeTask.new :specs do |task|
-  task.pattern = Dir['tests/**/*_spec.rb']
-end
- 
 desc "Build Database"
 task :database_up => ['database_down'] do
   sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongodb.log'
@@ -42,6 +38,12 @@ task :server_down do #seems like a bad name for this...
   else
     puts "No rack instances running"
   end
+end
+
+task :setup => ['database_up','scrape']
+
+RSpec::Core::RakeTask.new :specs do |task|
+  task.pattern = Dir['tests/**/*_spec.rb']
 end
 
 task :default => ['specs']
