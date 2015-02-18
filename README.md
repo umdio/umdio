@@ -24,10 +24,13 @@ rvm use 2.1.1
 [install and run mongodb](http://docs.mongodb.org/manual/installation/)
 git clone this repo
 bundle install
-bundle exec rake database
-bundle exec rake 
-bundle exec rake server
-check development at localhost:4567, terminate with crtl+c
+bundle exec rake database_up
+bundle exec rake scrape
+bundle exec rake server_up
+bundle exec rake
+check development at localhost:4567
+terminate server with bundle exec rake server_down
+
 
 ##Contributing:Development Workflow
 design the endpoint you want to create, i.e /bus

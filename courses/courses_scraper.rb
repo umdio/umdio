@@ -1,6 +1,4 @@
 #script for adding umd testudo courses to a mongodb database using mechanize and nokogiri
-#Rob Cobb
-# this code is getting pretty hairy, so it'd be smart to clean up some
 
 #we need mongo, nokogiri for parsing, and mechanize to make things smoother
 ENV['RACK_ENV'] ||= 'scrape'
