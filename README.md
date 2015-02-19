@@ -4,18 +4,23 @@
 Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage.
 
 ##TODO:
-- Testing - write more comprehensive tests
-- Implement: 
-	- courses/search 
-	- courses/<dep_number>
-	- sanitize queries
-	- return meaningful errors on malformed queries (currently returning null, as malformed queries miss the database)
-	- add parameter capability (e.g. /courses/ENES100?semester=201501)
-	- allow limits and filters -- projection stuff
+- Testing - write more comprehensive tests (aka, Who Can Break The Most Things!?)
+  - more specific examples
+  - negative tests (should get nothing)
+  - need coverage for: root, bad url catcher route
+  - current tests do not cover lots of non-implemented parts of API-niceness, e.g. helping out when the developer types /Sections instead of /sections
+  - possible that we could test methods individually and smoke test the abstract levels - when the test suite runs too long. (stories are told of 30-minute test suites, so we aren't there yet, at 2.5s)
+- Implement:
+  - sanitize queries
+  - return meaningful errors on malformed queries (currently returning null, as malformed queries miss the database)
+  - add parameter capability (e.g. /courses/ENES100?semester=201501)
+  - allow limits and filters -- projection stuff
+	- courses/search
+	- courses/<dep>
 paginate responses (just for searches?)
-- Push to repo!
 - Create live site with docs + api
 - Add to the design specs, documentation, api
+- optimizations: gzip and cache responses (eventually, we might move to metadata + pagination)
 
 Meta: find developers and projects, eat more databases, build core team, think about long term (license, technology, team structure)
 
@@ -24,11 +29,11 @@ Depending on where you are starting from, should take between 10 minutes and for
 
 -  (mac) install [xcode command line tools](https://developer.apple.com/xcode/) (or `xcode-select --install` from the command line)
 - (mac) install [homebrew](http://brew.sh/)
-- install [git](http://git-scm.com/) (or `brew git`)
-- install [rvm](https://rvm.io/rvm/install) 
+- install [git](http://git-scm.com/) (or `brew install git`)
+- install [rvm](https://rvm.io/rvm/install)
 - install ruby 2.1.1 and switch rubies `rvm use 2.1.1`
 - install [mongodb](http://docs.mongodb.org/manual/installation/)
-- git clone this repo (you can rename the folder) `git clone https://github.com/umdio/umdio my_umdio_app_folder`
+- git clone this repo `git clone https://github.com/umdio/umdio my_umdio_app_folder`
 - install and build all the dependencies `bundle install`
 
 Warning! If you are running other mongodb databases or rack servers, don't use the rake commands
@@ -38,6 +43,8 @@ Warning! If you are running other mongodb databases or rack servers, don't use t
 - run the test suite `bundle exec rake`
 - check development at localhost:4567
 - terminate server with `bundle exec rake server_down`
+
+If you get sick of typing `bundle exec rake` all the time, alias it to something short like `r`.
 
 ##Contributing:Development Workflow
 - Design the endpoint you want to create, e.g. /bus

@@ -42,7 +42,7 @@ module Sinatra
 
           #Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
-            course = "#{params[:course_id]}" # needs further sanitization
+            course = "#{params[:course_id]}".upcase # needs further sanitization
             section_numbers = "#{params[:section_id]}".upcase.split(',') #still more sanitization to do
             section_ids = section_numbers.map {|number| "#{course}-#{number}"}
             json find_sections section_ids, section_coll
@@ -50,7 +50,7 @@ module Sinatra
 
           #Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
-            query = "#{params[:course_id]}" # needs further sanitization
+            query = "#{params[:course_id]}".upcase # needs further sanitization
             course = course_coll.find({course_id: query},{fields:{_id:0, 'sections._id' => 0}}).to_a
             section_ids = course[0]['sections'].map { |e| e['section_id'] }
             json find_sections section_ids,section_coll
@@ -78,7 +78,9 @@ module Sinatra
           #returns a list of courses, just like /courses/list
           #do we need to put a limit on here? How do we do pagination/default limiting?
           app.get '/v0/courses' do
-            json find_all_courses course_coll
+            courses = find_all_courses_full course_coll
+            courses.each{|course| course['sections'] = flatten_sections course['sections']}
+            json courses
           end
            
         end

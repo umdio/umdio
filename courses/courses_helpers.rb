@@ -4,17 +4,21 @@ module Sinatra
     module Helpers
 
       #helper method for printing json-formatted sections based on a sections collection and a list of section_ids
-      def find_sections section_ids, sections
+      def find_sections section_ids, section_coll
         if section_ids.length > 1
-          sections.find({section_id: { '$in' => section_ids } },{fields: {_id: 0}}).to_a
+          section_coll.find({section_id: { '$in' => section_ids } },{fields: {_id: 0}}).to_a
         else
-          sections.find({section_id: section_ids[0]}, {fields: {_id: 0}}).to_a[0] 
+          section_coll.find({section_id: section_ids[0]}, {fields: {_id: 0}}).to_a[0] 
           # is returning the single object without [] weird? should we return the array without []?
         end
       end
 
-      def find_all_courses courses
-        courses.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{|e|e} #less memory-intensive than .to_a
+      def find_all_courses course_coll
+        course_coll.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{|e|e} #less memory-intensive than .to_a
+      end
+
+      def find_all_courses_full course_coll
+        course_coll.find({},{:fields =>{:_id => 0}}).map{|e|e} #less memory-intensive than .to_a
       end
 
       def flatten_sections sections_array
@@ -24,8 +28,6 @@ module Sinatra
     end
   end
 end
-
-
 
 
 # Haven't found occassion to use these helpers yet, but when I need them, they are here!

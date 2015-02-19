@@ -43,8 +43,9 @@ end
 task :setup => ['database_up','scrape']
 
 desc "Run tests in /tests that look like *_spec.rb" #should prepare a database clone, probably
-RSpec::Core::RakeTask.new :specs => ['database_up']do |task|
+RSpec::Core::RakeTask.new :specs do |task|
   task.pattern = Dir['tests/**/*_spec.rb']
+  task.rspec_opts = "--format documentation" #default to verbose testing, comment for silence
 end
 
 task :default => ['specs']

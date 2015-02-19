@@ -16,6 +16,7 @@ end
 
 group :test do
   gem 'rack-test', :require => 'rack/test'
+  gem 'simplecov', :require => false
 end
 
 group :scrape do #the gems needed for the courses scraper, and likely for other scrapers
