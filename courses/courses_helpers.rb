@@ -37,7 +37,7 @@ end
       #   #this is a complicated-looking pattern. It matches strings like enes100, enes, Enes100 ENES, ENGL398b, and ENES100-0101.
       #   #capture groups are as follows: 1 - full course code, 2 - dep code, 3 - course number, 4 - unused letter specifier, 5 - section number
       #   #we'll still need to sanitize them, because the database doesn't like
-      # pattern = /(([a-zA-Z]{4})(\d{3}([a-zA-Z])?)?)-?(\d{4})?/
+      # pattern = /(([A-Z]{4})(\d{3}([A-Z])?)?)-?(\d{4})?/i
       #   pattern.match(string)
       # end
 

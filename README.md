@@ -5,18 +5,18 @@ Status: script scrapes schedule data from testudo and inserts into a mongodb dat
 
 ##TODO:
 - Testing - write more comprehensive tests (aka, Who Can Break The Most Things!?)
-  - more specific examples
   - negative tests (should get nothing)
   - need coverage for: root, bad url catcher route
   - current tests do not cover lots of non-implemented parts of API-niceness, e.g. helping out when the developer types /Sections instead of /sections
   - possible that we could test methods individually and smoke test the abstract levels - when the test suite runs too long. (stories are told of 30-minute test suites, so we aren't there yet, at 2.5s)
 - Implement:
-  - sanitize queries
+  - sanitize queries - case insensitive, only 'allowed' url characters, smart catching close things
   - return meaningful errors on malformed queries (currently returning null, as malformed queries miss the database)
   - add parameter capability (e.g. /courses/ENES100?semester=201501)
   - allow limits and filters -- projection stuff
 	- courses/search
 	- courses/<dep>
+  - api root - object list of endpoints, with some metadata?
 paginate responses (just for searches?)
 - Create live site with docs + api
 - Add to the design specs, documentation, api
@@ -64,7 +64,10 @@ write tests --> add functionality --> make tests pass --> write tests
 - [MongoDB](http://www.mongodb.org/)
 - [RSpec](http://rspec.info/)
 
-
 ###Notes:
-
-- It's worth looking into whether we should be configuring with Rack - would probably make versioning easy as pie, and make it pretty clean to serve the docs and the api, as well as probably making it possible to use different frameworks to serve different endpoints - e.g. courses on Sinatra and buses on Flask
+- Security: 
+  - In production, we probably shouldn't have a rake task running mongo - it should be a separate user with only those permissions
+  - We should set up the server firewall to only accept certain connections
+  - We should use strong passwords and keep them secure
+  - We should thoroughly test our system's security from the beginning, and have evidence that we are secure - that way, more people can trust us with their data.
+  - Eventually, a single API for UMD data is much less vulnerable than a thousand separate databases everywhere - do it right once, enforce it strictly, then you only have one thing to worry about. Defense in depth, lock everything tight. Open is more secure than closed, because you have more eyes on it.
