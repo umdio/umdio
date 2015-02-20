@@ -41,7 +41,7 @@ puts "found #{dep_urls.length} departments"
 dep_urls.each do |dep_url|
   dep_home = agent.get(base_url + dep_url)
   department = dep_home.search('span.course-prefix-name').text.strip
-  dep_abbr = dep_home.search('span.course-prefix-abbr').text.strip
+  dept_id = dep_home.search('span.course-prefix-abbr').text.strip
   puts "searching the #{department} department"
 
   #iterate through the courses in the department
@@ -72,8 +72,8 @@ dep_urls.each do |dep_url|
       :also_offered_as => /Also offered as[^.]+/.match(description).to_a
     }
 
-    #we need to think more about how we figure out what other semesters a class is offered, and how we find out
-    semesters_offered = [semester]
+    # TODO: we need to think more about how we figure out what other semesters a class is offered, and how we find out
+    #semesters_offered = [semester]
 
 
     ###############################################################
@@ -105,34 +105,35 @@ dep_urls.each do |dep_url|
         building = meeting.search('span.building-code').text
         room = meeting.search('span.class-room').text
         classtype = meeting.search('span.class-type').text
-        if classtype.empty? then classtype = "Lecture" end
 
-        #actually add the meeting to the array
+        classtype = "Lecture" if classtype.empty?
+
+        # actually add the meeting to the array
         meetings << {
-                      :days => days,
-                      :start_time => start_time,
-                      :end_time => end_time,
-                      :building => building,
-                      :room => room,
-                      :classtype => classtype
+          :days => days,
+          :start_time => start_time,
+          :end_time => end_time,
+          :building => building,
+          :room => room,
+          :classtype => classtype
         }
       end
 
       #add the section info into the sections collection on the database
       _id = sect_coll.insert({
-                               :section_id => section_id,
-                               :course => course_id,
-                               :number => number,
-                               :instructors => instructors,
-                               :seats  => seats,
-                               :semester => semester,
-                               :meetings => meetings
+        :section_id => section_id,
+        :course => course_id,
+        :number => number,
+        :instructors => instructors,
+        :seats  => seats,
+        :semester => semester,
+        :meetings => meetings
       })
 
       #add the section to the sections array for the course
       sections << {
-                    :section_id => section_id,
-                    :_id => _id       #we may use this to , but we shouldn't return it to users!
+        :section_id => section_id,
+        :_id => _id       #we may use this to , but we shouldn't return it to users!
       }
 
     end
@@ -147,18 +148,18 @@ dep_urls.each do |dep_url|
     puts "adding #{course_id}"
     #add the course to the database!
     coll.insert({
-                  :course_id => course_id,
-                  :name => name,
-                  :dep_abbr => dep_abbr,
-                  :department => department,
-                  :semester => semester,
-                  :credits => credits,
-                  :grading_method => grading_method,
-                  :core => core,
-                  :gen_ed => gen_ed,
-                  :description => description,
-                  :course_relationships => course_relationships,
-                  :sections => sections
+      :course_id => course_id,
+      :name => name,
+      :dept_id => dept_id,
+      :department => department,
+      :semester => semester,
+      :credits => credits,
+      :grading_method => grading_method,
+      :core => core,
+      :gen_ed => gen_ed,
+      :description => description,
+      :relationships => course_relationships,
+      :sections => sections
     })
     
   end

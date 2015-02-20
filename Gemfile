@@ -1,17 +1,18 @@
-#Gemfile
 source 'https://rubygems.org'
 
-group :default do
-  gem 'sinatra'
-  gem 'mongo'
-  gem 'bson_ext', '~> 1.12.0'
-  gem 'sinatra-contrib'
-  gem 'rake'
-end
+gem 'sinatra'
+gem 'mongo'
+gem 'bson_ext', '~> 1.12.0'
+gem 'sinatra-contrib'
+gem 'rake'
+gem 'dotenv'
+gem 'rack-rewrite', '~> 1.5.0'
 
 group :development do
   gem 'rspec'
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
+  gem 'pry'
+  gem 'shotgun'
 end
 
 group :test do
@@ -19,7 +20,8 @@ group :test do
   gem 'simplecov', :require => false
 end
 
-group :scrape do #the gems needed for the courses scraper, and likely for other scrapers
+# the gems needed for the courses scraper, and likely for other scrapers
+group :scrape do
   gem 'mechanize'
   gem 'nokogiri'
 end

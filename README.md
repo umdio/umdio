@@ -21,6 +21,7 @@ paginate responses (just for searches?)
 - Create live site with docs + api
 - Add to the design specs, documentation, api
 - optimizations: gzip and cache responses (eventually, we might move to metadata + pagination)
+- [Nginx to remove trailing slashes](http://www.nginxtips.com/add-trailing-slash-nginx/) or [Rack](https://github.com/jtrupiano/rack-rewrite)
 
 Meta: find developers and projects, eat more databases, build core team, think about long term (license, technology, team structure)
 
@@ -67,4 +68,3 @@ write tests --> add functionality --> make tests pass --> write tests
 ###Notes:
 
 - It's worth looking into whether we should be configuring with Rack - would probably make versioning easy as pie, and make it pretty clean to serve the docs and the api, as well as probably making it possible to use different frameworks to serve different endpoints - e.g. courses on Sinatra and buses on Flask
-- Should we be using Rspec and/or Cucumber? BDD seems legit, but also, we've got a codebase already... Maybe worth it to start from scratch for v1 and build it actually using BDD

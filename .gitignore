@@ -1,3 +1,10 @@
+Gemfile.lock
+
 # exclude database
 /data/*
 coverage
+
+# temporary files
+*.sass-cache
+*.swp
+.DS_Store
