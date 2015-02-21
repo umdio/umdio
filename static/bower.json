@@ -1,0 +1,20 @@
+{
+  "name": "umdio",
+  "version": "0.0.1",
+  "authors": [
+    "Nick Aversano <nick23hi@gmail.com>"
+  ],
+  "description": "Frontend dependencies",
+  "main": "bower.json",
+  "license": "MIT",
+  "homepage": "http://umd.io",
+  "private": true,
+  "dependencies": {
+    "bourbon": "~4.2.0",
+    "html5shiv": "~3.7.2",
+    "neat": "~1.7.1",
+    "normalize-scss": "~3.0.2",
+    "highlightjs": "~8.4.0",
+    "jquery": "~2.1.3"
+  }
+}

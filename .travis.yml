@@ -1,2 +1,9 @@
+# TODO: implement controller tests and API endpoint tests
+# when tests are run in the test environment, they should ping the umd.io/api directly
+# so travis doesn't have to constantly re-build the courses database every push
 language: ruby
 rvm: 2.1.1
+services:
+  - mongodb
+#before_script:
+#  - 'bundle exec rake scrape db:up'

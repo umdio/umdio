@@ -1,9 +1,9 @@
 require 'rspec/core/rake_task'
 #require File.expand_path('../config/application', __FILE__)
  
-namespace :database do
+namespace :db do
   desc "Build Database"
-  task :up => ['database:down'] do
+  task :up => ['db:down'] do
     sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongodb.log'
   end
 
@@ -20,10 +20,10 @@ namespace :database do
 end
 
 desc "Scrape testudo to fill the database"
-task :scrape => ['database:up'] do
+task :scrape => ['db:up'] do
   ruby 'courses/courses_scraper.rb'
 end
-task :setup => ['database:up','scrape']
+task :setup => ['db:up','scrape']
 
 desc "Start the web server"
 task :up do

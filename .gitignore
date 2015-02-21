@@ -1,4 +1,6 @@
 Gemfile.lock
+bower_components
+static/public/css
 
 # exclude database
 /data/*

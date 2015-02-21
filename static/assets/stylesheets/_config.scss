@@ -1,0 +1,13 @@
+// colors
+$red: #d6192f;
+$light-gray: #eee;
+$gray: #4f4f4f;
+$dark-gray: #221e1f;
+//$code-bg: #342f30;
+$code-bg: #2D2929;
+$code-color: mix($red, $light-gray, 12%);
+
+// fonts
+$body-font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$header-font: 'Source Sans Pro', sans-serif;
+$code-font: Monaco, Consolas, 'Lucida Console', monospace;
