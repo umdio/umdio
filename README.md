@@ -1,7 +1,7 @@
 #An API for UMD data 
 ####Development is under way!
 
-Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage.
+Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage. Nginx will live on the server, serve the static files for the docs, remove trailing slashes, and serving cached responses. nginx config will live on the server, so that's not here. You don't need to worry about it to develop though.
 
 ##TODO:
 - Testing - write more comprehensive tests (aka, Who Can Break The Most Things!?)
