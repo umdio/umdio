@@ -40,12 +40,13 @@ Depending on where you are starting from, should take between 10 minutes and for
 Warning! If you are running other mongodb databases or rack servers, don't use the rake commands
 
 - build the database `bundle exec rake setup`
-- start a local server `bundle exec rake server_up`
+- start a local server `bundle exec rake up`
 - run the test suite `bundle exec rake`
-- check development at localhost:4567
-- terminate server with `bundle exec rake server_down`
+- check development at localhost:3000
 
 If you get sick of typing `bundle exec rake` all the time, alias it to something short like `r`.
+
+- Stop and start the database with `bundle exec rake database:down` and `bundle exec rake database:up`
 
 ##Contributing:Development Workflow
 - Design the endpoint you want to create, e.g. /bus

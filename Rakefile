@@ -23,7 +23,8 @@ desc "Scrape testudo to fill the database"
 task :scrape => ['db:up'] do
   ruby 'courses/courses_scraper.rb'
 end
-task :setup => ['db:up','scrape']
+
+task :setup => ['scrape']
 
 desc "Start the web server"
 task :up do
