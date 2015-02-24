@@ -2,7 +2,6 @@
 hljs.initHighlightingOnLoad();
 
 $(document).ready(function(){
-  $('#languages').stick_in_parent();
   $('#menu').stick_in_parent({parent: '#docs'});
   
   // toggle active menu classes on click
@@ -16,6 +15,7 @@ $(document).ready(function(){
     })( $($items[i]) );
   };
   
+  /*$('#languages').stick_in_parent();
   // language toogle active class
   $languages = $('#languages a');
   for (var i=0, n=$languages.length; i<n; i++) {
@@ -23,7 +23,7 @@ $(document).ready(function(){
       $languages.removeClass('active');
       $(e.target).addClass('active');
     });
-  };
+  };*/
 });
 
 /*

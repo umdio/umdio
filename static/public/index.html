@@ -18,11 +18,32 @@
 <body data-spy="scroll" data-target="#menu">
   <div class="page">
     <header>
-      <a href="#" class="wrap">
-        <div class="logo">
-          <img src="images/umdio-logo@2x.png" alt="umd.io" />
+      <div class="container">
+        <div class="header-section col-2 header-section-logo">
+          <a href="#" class="wrap">
+            <div class="logo">
+              <img src="images/umdio-logo@2x.png" alt="umd.io" />
+            </div>
+          </a>
         </div>
-      </a>
+        <div class="col-8">
+          <div class="method">
+            <div class="header-section-description description">
+            </div>
+            <div class="header-section-example example">
+              <div id="languages">
+                <div class="languages">
+                  <!--<a href="javascript:void(0)" class="active">http</a>
+                  <a href="javascript:void(0)">ruby</a>
+                  <a href="javascript:void(0)">python</a>
+                  <a href="javascript:void(0)">php</a>
+                  <a href="javascript:void(0)">node</a>-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
     <div id="docs" class="container">
       <div id="toggle" class="menu-link"><a href="#"><span></span></a></div>
@@ -30,7 +51,7 @@
         <div id="menu">
           <nav>
             <p class="ref-title">API</p>
-            <ul class="ref-section active">
+            <ul class="ref-section">
               <li class="active"><a href="#intro">Introduction</a></li>
               <li><a href="#pagination">Pagination</a></li>
               <li><a href="#versions">Versioning</a></li>
@@ -53,15 +74,6 @@
         </div>
       </div>
       <div class="methods col-8">
-        <div id="languages">
-          <div class="languages">
-            <a href="javascript:void(0)" class="active">http</a>
-            <a href="javascript:void(0)">ruby</a>
-            <a href="javascript:void(0)">python</a>
-            <a href="javascript:void(0)">php</a>
-            <a href="javascript:void(0)">node</a>
-          </div>
-        </div>
         <section id="intro" class="method">
            <div class="description">
              <h1>API Reference</h1>
@@ -69,7 +81,7 @@
            </div>
            <div class="example">
              <h3>API Endpoint</h3>
-             <code>http://api.umd.io/</code>
+             <pre><code>http://api.umd.io/</code></pre>
            </div>
         </section>
         <section id="pagination" class="method">
