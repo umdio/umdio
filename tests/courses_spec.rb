@@ -1,4 +1,5 @@
-# spec/features/root_spec.rb
+# TODO: implement controller tests and API endpoint tests
+# TODO: when tests are run in the test environment, they should ping the umd.io/api directly
 
 require_relative '../tests/spec_helper'
 
