@@ -7,6 +7,7 @@ gem 'sinatra-contrib'
 gem 'rake'
 gem 'dotenv'
 gem 'rack-rewrite', '~> 1.5.0'
+gem 'jekyll'
 
 group :development do
   gem 'rspec'

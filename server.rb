@@ -25,11 +25,8 @@ class UMDIO < Sinatra::Base
   end
 
   configure :development do
-    # This is just to get the ability to make changes here and see them live without reloading the server
-    # Still not quite working for reloading other files, not sure what the issue is there...
-    register Sinatra::Reloader
   end
-  
+
   # load in the other files
   require './app/controllers/courses_controller.rb'
   require './app/helpers/courses_helpers.rb'
