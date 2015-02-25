@@ -31,8 +31,8 @@ class UMDIO < Sinatra::Base
   end
   
   # load in the other files
-  require './courses/courses.rb'
-  require './courses/courses_helpers.rb'
+  require './app/controllers/courses_controller.rb'
+  require './app/helpers/courses_helpers.rb'
   require './root.rb'
 
   # register the helpers
