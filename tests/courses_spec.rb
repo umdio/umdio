@@ -16,6 +16,14 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     end
   end
 
+  shared_examples_for 'bad status' do |url|
+    before {head url}
+    it 'responds with 4xx' do
+      expect(last_response.status).to be > 399
+      expect(last_response.status).to be < 500
+    end
+  end
+
   describe 'Listing courses' do
     shared_examples_for 'get course list' do |url|
       before { get url }
@@ -58,6 +66,13 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior "gets enes100", url + '/ENES100' 
     end
 
+    describe 'returns error on misformed urls' do
+      it_has_behavior 'bad status', url + '/ene12'
+      it_has_behavior 'bad status', url + '/enes13'
+      it_has_behavior 'bad status', url + '/enes100-0101'
+      it_has_behavior 'bad status', url + '/enes100,enes132,BMGT22'
+    end
+
     #tests for case insensitivity can just check status (so long as bad tests give bad status!)
     describe 'Case insensitive' do
       it_has_behavior "good status", url + '/ENES100' 
@@ -67,6 +82,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
 
     describe 'get multiple courses' do
       it_has_behavior 'good status', url + '/ENES100,ENES102' #doesn't check return, could very well make a good corner case
+      it_has_behavior 'good status', url + '/ENES100,ENES102,bmgt220'
     end
   end
 
@@ -85,7 +101,12 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior 'good status', url + '/enes100/sections'
       it_has_behavior 'good status', url + '/Enes100/sections'
     end
-    
+      
+    describe 'returns error on misformed urls' do
+      it_has_behavior 'bad status', url + '/ene12/sections'
+      it_has_behavior 'bad status', url + '/enes1000/sections'
+    end
+
   end
 
   describe 'GET /courses/<course_id>/sections/<section_id>' do
@@ -110,6 +131,14 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       end
     end
 
+    describe 'returns error on misformed urls' do
+      it_has_behavior 'bad status', url + '/ene12/sections/0101'
+      it_has_behavior 'bad status', url + '/enes13/sections/01'
+      it_has_behavior 'bad status', url + '/enes13/sections/01011'
+      it_has_behavior 'bad status', url + '/enes100/sections/enes100-0101'
+      it_has_behavior 'bad status', url + '/enes100/sections/0101,0102,02'
+    end
+
   end
 
   describe 'GET /courses/sections/<section_id>' do
@@ -132,5 +161,16 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
         expect(last_response.body).to be == enes100_sections_list
       end          
     end
+
+    describe 'returns error on misformed urls' do
+      it_has_behavior 'bad status', url + '/sections/enes100'
+      it_has_behavior 'bad status', url + '/sections/enes100-010'
+      it_has_behavior 'bad status', url + '/sections/enes1000101'
+      it_has_behavior 'bad status', url + '/sections/enes10-0101'
+      it_has_behavior 'bad status', url + '/sections/ene100-0101'
+      it_has_behavior 'bad status', url + '/sections/enes100-0101,enes102-010'
+    end
+
+
   end
 end

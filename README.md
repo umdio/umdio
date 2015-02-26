@@ -4,24 +4,29 @@
 Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage. Nginx will live on the server, serve the static files for the docs, remove trailing slashes, and serving cached responses. nginx config will live on the server, so that's not here. You don't need to worry about it to develop though.
 
 ##TODO:
-- Testing - write more comprehensive tests (aka, Who Can Break The Most Things!?)
+###Testing: Who Can Break The Most Things?
   - negative tests (should get nothing)
-  - need coverage for: root, bad url catcher route
-  - current tests do not cover lots of non-implemented parts of API-niceness, e.g. helping out when the developer types /Sections instead of /sections
-  - possible that we could test methods individually and smoke test the abstract levels - when the test suite runs too long. (stories are told of 30-minute test suites, so we aren't there yet, at 2.5s)
-- Implement:
-  - sanitize queries - case insensitive, only 'allowed' url characters, smart catching close things
-  - return meaningful errors on malformed queries (currently returning null, as malformed queries miss the database)
-  - add parameter capability (e.g. /courses/ENES100?semester=201501)
+  - Unit tests for methods - particularly helpers
+  - break tests out into features - the files for each endpoint are unwieldy
+###Implement:
+  - sanitize url parameters
+  - return meaningful errors on malformed urls
+  - error on null, i.e. database misses?
+  - add query capability (e.g. /courses/ENES100?semester=201501)
   - allow limits and filters -- projection stuff
 	- courses/search
-	- courses/<dep>
-  - api root - object list of endpoints, with some metadata?
-paginate responses (just for searches?)
-- Create live site with docs + api
-- Add to the design specs, documentation, api
-- optimizations: gzip and cache responses (eventually, we might move to metadata + pagination)
-- [Nginx to remove trailing slashes](http://www.nginxtips.com/add-trailing-slash-nginx/) or [Rack](https://github.com/jtrupiano/rack-rewrite)
+    - paginate responses
+	  - courses/<dep>
+  - api root - object list of endpoints, with some metadata
+  - namespace the routes or use a controller scheme
+###Future Endpoints:
+  - Buses
+  - Maps
+  - Budget
+  - Finals
+- Add Jekyll docs
+- Go live via Digital Ocean
+- optimizations: cache responses (eventually, we might move to metadata + pagination)
 
 Meta: find developers and projects, eat more databases, build core team, think about long term (license, technology, team structure)
 

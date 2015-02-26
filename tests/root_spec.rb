@@ -24,8 +24,8 @@ describe 'UMDIO API Version 0' do  # Probably should be moved higher up the test
   end
 
   describe 'v0' do
-    it_has_behavior'good status', (url + '/v0')
-    before {get url}
+    it_has_behavior'good status', (url + 'v0')
+    before {get url + 'v0'}
     it 'returns v0 message' do
       expect(last_response.body).to be == version_message
     end

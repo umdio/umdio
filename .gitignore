@@ -7,6 +7,10 @@ tmp
 /data/*
 coverage
 
+#exclude config
+nginx.conf
+mime.types
+
 # temporary files
 *.sass-cache
 *.swp

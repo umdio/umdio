@@ -4,7 +4,7 @@ require 'rspec/core/rake_task'
 namespace :db do
   desc "Build Database"
   task :up => ['db:down'] do
-    sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongodb.log'
+    sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongo/mongodb.log'
   end
 
   desc "Shutdown mongo database server"

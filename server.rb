@@ -7,7 +7,10 @@ Bundler.require :default, ENV['RACK_ENV'].to_sym
 require 'sinatra/base'
 require 'sinatra/reloader'
 require 'sinatra/json'
+require 'sinatra/param'
+require 'sinatra/namespace'
 require 'mongo'
+require 'json'
 
 include Mongo
 
@@ -34,6 +37,7 @@ class UMDIO < Sinatra::Base
 
   # register the helpers
   helpers Sinatra::UMDIO::Helpers
+  helpers Sinatra::Param
 
   # register the routes
   register Sinatra::UMDIO::Routing::Courses

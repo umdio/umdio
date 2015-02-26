@@ -25,6 +25,17 @@ module Sinatra
         sections_array.map { |e| e['section_id'] }
       end
 
+      def is_course? string
+        /^[A-Z]{4}\d{3}$/.match string #if the string is of this particular format
+      end
+
+      def is_section? string
+        /^\d{4}$/.match string #if the string is of this particular format
+      end
+
+      def is_full_section_id? string
+        /^[A-Z]{4}\d{3}-\d{4}$/.match string
+      end
     end
   end
 end

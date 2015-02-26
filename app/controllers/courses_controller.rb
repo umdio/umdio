@@ -12,13 +12,18 @@ module Sinatra
           # set the collections by accessing the db variable we attached to the app's settings
           course_coll = app.settings.db.collection('courses')
           section_coll = app.settings.db.collection('sections')
+          badUrlMessage = {error_code: 404, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
+
+          #We should be using a namespace and before to set the content type to json
+          # before do
+          #   content_type 'application/json'
+          # end
 
           # Returns sections of courses by their id
           app.get '/v0/courses/sections/:section_id' do
-            # get the parameters
-            query = "#{params[:section_id]}"
-            # separate into an array on commas, turn it into uppercase for the database (should be in the sanitization)
-            section_ids = query.upcase.split(",")
+            # separate into an array on commas, turn it into uppercase
+            section_ids = "#{params[:section_id]}".upcase.split(",")
+            section_ids.each {|section_id| halt 400, badUrlMessage unless is_full_section_id? section_id}
             json find_sections section_ids, section_coll #using helper method
           end
 
@@ -35,16 +40,19 @@ module Sinatra
 
           # Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
-            course = "#{params[:course_id]}".upcase # needs further sanitization
-            section_numbers = "#{params[:section_id]}".upcase.split(',') #still more sanitization to do
-            section_ids = section_numbers.map {|number| "#{course}-#{number}"}
+            course_id = "#{params[:course_id]}".upcase
+            halt 400, badUrlMessage unless is_course? course_id
+            section_numbers = "#{params[:section_id]}".upcase.split(',')
+            section_numbers.each{|number| halt 400, badUrlMessage unless is_section? number} 
+            section_ids = section_numbers.map {|number| "#{course_id}-#{number}"}
             json find_sections section_ids, section_coll
           end
 
           # Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
-            query = "#{params[:course_id]}".upcase # needs further sanitization
-            course = course_coll.find({course_id: query},{fields:{_id:0, 'sections._id' => 0}}).to_a
+            course_id = "#{params[:course_id]}".upcase
+            halt 400, badUrlMessage unless is_course? course_id
+            course = course_coll.find({course_id: course_id},{fields:{_id:0, 'sections._id' => 0}}).to_a
             section_ids = course[0]['sections'].map { |e| e['section_id'] }
             json find_sections section_ids,section_coll
           end
@@ -53,9 +61,9 @@ module Sinatra
           # MAYBE     if a section_id is specified, returns sections info as well
           # MAYBE     if only a department is specified, acts as a shortcut to search with ?dept=<param>
           app.get '/v0/courses/:course_id' do
-
-            query = "#{params[:course_id]}"
-            course_ids = query.upcase.split(',')
+            course_ids = "#{params[:course_id]}".upcase.split(',')
+            #
+            course_ids.each {|id| halt 400, badUrlMessage unless is_course? id }
 
             if course_ids.length > 1
               courses = course_coll.find({course_id: { '$in' => course_ids}},{fields:{_id:0, 'sections._id' => 0}}).to_a
@@ -76,7 +84,7 @@ module Sinatra
             courses.each{|course| course['sections'] = flatten_sections course['sections']}
             json courses
           end
-           
+
         end
 
       end
