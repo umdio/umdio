@@ -9,8 +9,6 @@ Status: script scrapes schedule data from testudo and inserts into a mongodb dat
   - Unit tests for methods - particularly helpers
   - break tests out into features - the files for each endpoint are unwieldy
 ###Implement:
-  - sanitize url parameters
-  - return meaningful errors on malformed urls
   - error on null, i.e. database misses?
   - add query capability (e.g. /courses/ENES100?semester=201501)
   - allow limits and filters -- projection stuff
@@ -27,7 +25,7 @@ Status: script scrapes schedule data from testudo and inserts into a mongodb dat
 - Add Jekyll docs
 - Go live via Digital Ocean
 - optimizations: cache responses (eventually, we might move to metadata + pagination)
-
+- Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files) 
 Meta: find developers and projects, eat more databases, build core team, think about long term (license, technology, team structure)
 
 ##Contributing: Getting Started
@@ -37,12 +35,13 @@ Depending on where you are starting from, should take between 10 minutes and for
 - (mac) install [homebrew](http://brew.sh/)
 - install [git](http://git-scm.com/) (or `brew install git`)
 - install [rvm](https://rvm.io/rvm/install)
-- install ruby 2.1.1 and switch rubies `rvm use 2.1.1`
+- install ruby 2.2.0 and switch rubies `rvm use 2.2.0`
 - install [mongodb](http://docs.mongodb.org/manual/installation/)
 - git clone this repo `git clone https://github.com/umdio/umdio my_umdio_app_folder`
+- install bundler to manage dependencies `gem install bundler`
 - install and build all the dependencies `bundle install`
 
-Warning! If you are running other mongodb databases or rack servers, don't use the rake commands
+Warning! If you are running other mongodb databases or rack servers, don't use the rake commands. Or, if you are on a system (i.e. production server) where you ought to run mongo independently, do that instead of using rake.
 
 - build the database `bundle exec rake setup`
 - start a local server `bundle exec rake up`

@@ -1,6 +1,4 @@
 # Module for the courses endpoint is defined. Relies on helpers in courses_helpers.rb
-# TODO: need to sanitize parameters
-# TODO: return meaningful errors (such as on mixed queries)
 
 module Sinatra
   module UMDIO
@@ -12,12 +10,11 @@ module Sinatra
           # set the collections by accessing the db variable we attached to the app's settings
           course_coll = app.settings.db.collection('courses')
           section_coll = app.settings.db.collection('sections')
-          badUrlMessage = {error_code: 404, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
+          badUrlMessage = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
 
-          #We should be using a namespace and before to set the content type to json
-          # before do
-          #   content_type 'application/json'
-          # end
+          app.before do
+            content_type 'application/json'
+          end
 
           # Returns sections of courses by their id
           app.get '/v0/courses/sections/:section_id' do
@@ -78,7 +75,6 @@ module Sinatra
           end
 
           # returns a list of courses, just like /courses/list
-          # do we need to put a limit on here? How do we do pagination/default limiting?
           app.get '/v0/courses' do
             courses = find_all_courses_full course_coll
             courses.each{|course| course['sections'] = flatten_sections course['sections']}
