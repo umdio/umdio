@@ -10,8 +10,8 @@ $max-width: em(1140);
 @import "utils";
 
 // device sizes
-$desktop: new-breakpoint(min-width 1341px 10);
-$tablet: new-breakpoint(max-width 1340px 8);
+$desktop: new-breakpoint(min-width 1141px 10);
+$tablet: new-breakpoint(max-width 1140px 8);
 $large-tablet: new-breakpoint(min-width 861px 8);
 $small-tablet: new-breakpoint(max-width 860px 8);
 $not-mobile: new-breakpoint(min-width 701px 4);
@@ -75,19 +75,16 @@ header {
   
   .logo {
     width: 104px;
-    height: 52px;
+    height: 64px;
     background: $red;
     position: relative;
     
     // retina image
     img {
       padding: 6px 10px;
-      /*@include transform(scale(0.5));
-      @include transform-origin(left center);
-      */
       width: 100%;
       position: absolute;
-      top: 5px;
+      top: 14px;
     }
   }
   
@@ -105,10 +102,6 @@ header {
     }
   }
   
-  .header-section-logo {
-    background: $red;
-  }
-  
   .method {
     .header-section-description, .header-section-example {
       padding: 0;
@@ -116,7 +109,6 @@ header {
 
     .header-section-description {
       height: 52px;
-      border-left: 1px solid $red;
       background: none;
     }
     .header-section-example {
@@ -146,28 +138,6 @@ header {
   }
 }
 
-/*.header-nav {
-  font-family: $header-font;
-  font-size: 1.3em;
-  font-weight: 400;
-  padding-top: 21px;
-  
-  li {
-    &.active {
-      color: $red;
-    }
-    a {
-      padding: 12px;
-      @include transition(background .3s);
-      
-      &:hover {
-        text-decoration: none;
-        background: $light-gray;
-      }
-    }
-  }
-}*/
-
 @include media($desktop) {
   .page {
     padding: 0 60px;
@@ -177,13 +147,11 @@ header {
 // reference menu
 .menu {
   font-family: $header-font;
-  font-size: 0.95em;
+  font-size: 0.92em;
   position: relative;
   z-index: 999;
   overflow-y: auto;
   overflow-x: hidden;
-  //background: $light-gray;
-  //border-right: 1px solid $light-gray;
   
   @include media($small-tablet) {
     margin-left: -400px;
@@ -197,7 +165,6 @@ header {
 }
 
 #menu {
-  //background:$light-gray;
   margin-top: 52px;
 }
 
@@ -250,9 +217,7 @@ nav .ref-title {
 
 .methods {
   position: relative;
-  //padding: 50px 0;
   background: $code-bg;
-  border-left: 1px solid $light-gray;
   
   // ??
   .lang-wrapper {
@@ -368,7 +333,7 @@ div.container > .methods {
       font-family: $body-font;
       line-height: 1.9em;
       color: $gray;
-      font-size: 0.95em;
+      font-size: 0.92em;
     }
     
     code {
@@ -386,7 +351,7 @@ div.container > .methods {
     position: relative;
     background: $code-bg;
     color: $light-gray;
-    font-size: 1em;
+    font-size: 0.95em;
     padding: $gutter;
     padding-top: $gutter*2;
     border-bottom: 1px solid darken($code-bg, 10%);
