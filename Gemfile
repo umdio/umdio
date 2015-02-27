@@ -6,7 +6,6 @@ gem 'bson_ext', '~> 1.12.0'
 gem 'sinatra-contrib'
 gem 'rake'
 gem 'dotenv'
-gem 'rack-rewrite', '~> 1.5.0'
 gem 'jekyll'
 gem 'sinatra-param', '~> 1.3'
 

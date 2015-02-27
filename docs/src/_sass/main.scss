@@ -1,13 +1,14 @@
-@import "bourbon";
+@import "bourbon/bourbon";
 // Grid settings
-@import "neat-helpers";
+@import "neat/neat-helpers";
 $grid-columns: 10;
 $gutter: em(40);
 $max-width: em(1140);
-@import "neat";
-@import "normalize";
+@import "neat/neat";
+@import "normalize/normalize";
 @import "config";
 @import "utils";
+@import "syntax-highlighting";
 
 // device sizes
 $desktop: new-breakpoint(min-width 1141px 10);

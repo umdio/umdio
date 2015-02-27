@@ -4,12 +4,8 @@
         "assets/stylesheets/main.scss": {
             "sass.enabled": true,
             "sass.options": {
-                "includePaths": [
-                    "../../bower_components/bourbon/app/assets/stylesheets/",
-                    "../../bower_components/neat/app/assets/stylesheets/",
-                    "../../bower_components/normalize-scss/"
-                ],
-                "outputDir": "../../public/css/",
+                "includePaths": [],
+                "outputDir": "../../css/",
                 "imagePath": null,
                 "sourceComments": false,
                 "outputStyle": "nested"
