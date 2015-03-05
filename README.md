@@ -1,15 +1,19 @@
 #An API for UMD data 
-####Development is under way!
 
-Status: script scrapes schedule data from testudo and inserts into a mongodb database, sinatra serves courses endpoint. Bundler and rake manage the tasks, and rspec testing has limited coverage. Nginx will live on the server, serve the static files for the docs, remove trailing slashes, and serving cached responses. nginx config will live on the server, so that's not here. You don't need to worry about it to develop though.
+Status: We are live at [umd.io](http://umd.io)! 
 
 ##TODO:
 ###Testing: Who Can Break The Most Things?
   - negative tests (should get nothing)
   - Unit tests for methods - particularly helpers
   - break tests out into features - the files for each endpoint are unwieldy
+
+###Docs:
+  - Footer: contact info, git repo
+  - Errors section is strange
+  - Courses methods full documentation
+
 ###Implement:
-  - error on null, i.e. database misses?
   - add query capability (e.g. /courses/ENES100?semester=201501)
   - allow limits and filters -- projection stuff
 	- courses/search
@@ -17,15 +21,15 @@ Status: script scrapes schedule data from testudo and inserts into a mongodb dat
 	  - courses/<dep>
   - api root - object list of endpoints, with some metadata
   - namespace the routes or use a controller scheme
+
 ###Future Endpoints:
   - Buses
   - Maps
   - Budget
   - Finals
-- Add Jekyll docs
-- Go live via Digital Ocean
 - optimizations: cache responses (eventually, we might move to metadata + pagination)
-- Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files) 
+- Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files)
+
 Meta: find developers and projects, eat more databases, build core team, think about long term (license, technology, team structure)
 
 ##Contributing: Getting Started
@@ -35,6 +39,7 @@ Depending on where you are starting from, should take between 10 minutes and for
 - (mac) install [homebrew](http://brew.sh/)
 - install [git](http://git-scm.com/) (or `brew install git`)
 - install [rvm](https://rvm.io/rvm/install)
+- install [node and npm](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
 - install ruby 2.2.0 and switch rubies `rvm use 2.2.0`
 - install [mongodb](http://docs.mongodb.org/manual/installation/)
 - git clone this repo `git clone https://github.com/umdio/umdio my_umdio_app_folder`
@@ -52,15 +57,23 @@ If you get sick of typing `bundle exec rake` all the time, alias it to something
 
 - Stop and start the database with `bundle exec rake database:down` and `bundle exec rake database:up`
 
+If you are working on the documentation, move into the docs folder with `cd docs` and `make`. Then, to serve the docs locally, use `jekyll serve` and view on [port 3000](localhost:3000).
+
 ##Contributing:Development Workflow
 - Design the endpoint you want to create, e.g. /bus
-- Write initial 'hello world' tests, they should fail
+- Write initial 'hello world' tests in the tests/ folder in a file named something like buses_spec.rb
+- Run the tests with `bundle exec rake` (alias it to `r`, you'll need it a lot). Your initial tests should fail.
 - Create a bus folder with bus.rb and bus_helpers.rb, using the module structure from similar files (see courses)
 - require and register your module in server.rb
 - add routes of the form "app.get '/<endpoint>'""  to the module
 - add hello world code, hello world tests should pass
 
 write tests --> add functionality --> make tests pass --> write tests
+
+- document the new functionality.
+- Add a folder to the docs/src/ directory with the name of your endpoint. Put method documentation in a \_posts folder inside it. Look at the documentation for courses in src/courses/\_posts for examples.
+- Add a page for the endpoint in the docs/src folder named something like buses.md
+- write the introduction to your endpoint in the <endpoint>.md file, and the methods in the _posts folder.
 
 ##Contributing:Read more
 - [Design doc](https://docs.google.com/document/d/11uslF3ftvQ3It-NRXs7iRgI34S0MxvqV2S1jioXPcL0/edit?usp=sharing)

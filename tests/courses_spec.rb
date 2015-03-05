@@ -75,6 +75,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior "good status", url + '/ENES100' 
       it_has_behavior "good status", url + '/enes100'
       it_has_behavior "good status", url + '/Enes100'
+      it_has_behavior "good status", url + '/cmsc132h'
     end
 
     describe 'get multiple courses' do
@@ -167,7 +168,6 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior 'bad status', url + '/sections/ene100-0101'
       it_has_behavior 'bad status', url + '/sections/enes100-0101,enes102-010'
     end
-
 
   end
 end
