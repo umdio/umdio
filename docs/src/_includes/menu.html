@@ -1,0 +1,28 @@
+<div id="menu">
+  <nav>
+    <p class="ref-title">API</p>
+    {% assign api_posts = site.posts | where: "category", "api" %}
+    <ul class="ref-section">
+      <li><a href="/#intro">Introduction</a></li>
+    {% for post in api_posts %}
+      <li><a href="/#{{ post.slug }}">{{ post.title }}</a></li>
+    {% endfor %}
+    </ul>
+    <p class="ref-title">METHODS</p>
+    <ul class="ref-section">
+    {% for p in site.pages %}
+      {% if p.layout == 'page' and p.category != 'api' %}
+      <li>
+        <a href="{{ p.permalink | prepend: site.baseurl }}">{{ p.title }}</a>
+        <ul class="ref-methods">
+        {% assign posts = site.posts | where: "category", p.category %}
+        {% for post in posts %}
+          <li><a href="{{ p.permalink }}#{{ post.slug }}">{{ post.title }}</a></li>
+        {% endfor %}
+        </ul>
+      </li>
+      {% endif %}
+    {% endfor %}
+    </ul>
+  </nav>
+</div>

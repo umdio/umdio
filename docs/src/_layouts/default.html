@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
   {% include head.html %}
-
-  <body>
-
-    {% include header.html %}
-
-    <div class="page-content">
-      <div class="wrapper">
-        {{ content }}
+  <body data-spy="scroll" data-target="#menu">
+    <div class="page">
+      {% include header.html %}
+      <div id="docs" class="container">
+        <div id="toggle" class="menu-link"><a href="#"><span></span></a></div>
+        <div class="menu col-2">
+          {% include menu.html %}
+        </div>
+        <div class="methods col-8">
+          {{ content }}
+        </div>
       </div>
+      {% include footer.html %}
     </div>
-
-    {% include footer.html %}
-
   </body>
-
 </html>

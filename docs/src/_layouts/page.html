@@ -1,14 +1,24 @@
 ---
 layout: default
 ---
-<div class="post">
-
-  <header class="post-header">
-    <h1 class="post-title">{{ page.title }}</h1>
-  </header>
-
-  <article class="post-content">
-    {{ content }}
-  </article>
-
-</div>
+<section id="{{ page.slug }}" class="method">
+  <div class="description">
+    <h1>{{ page.title }}</h1>
+    {{ content | description }}
+  </div>
+  <div class="example">
+    {{ content | example }}
+  </div>
+</section>
+<!-- PAGE CAT = {{ page.category }} --> 
+{% for post in site.categories[page.category] %}
+<section id="{{ post.slug }}" class="method">
+  <div class="description">
+    <h2>{{ post.title }}</h2>
+    {{ post.content | description }}
+  </div>
+  <div class="example">
+    {{ post.content | example }}
+  </div>
+</section>
+{% endfor %}
