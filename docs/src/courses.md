@@ -10,7 +10,7 @@ This endpoint lets you get data about university courses and their sections. You
 
 <!-- EXAMPLE -->
 
-**Courses Root URL:**
+### Courses Endpoint
 
 `http://api.umd.io/v0/courses`
 

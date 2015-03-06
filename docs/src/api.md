@@ -14,7 +14,7 @@ The API is in version 0. We are adding, changing, and breaking things all the ti
 
 <!-- EXAMPLE -->
 
-## API Root URL
+## API Endpoint
 ```
 http://api.umd.io/
 ```
