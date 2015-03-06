@@ -8,6 +8,7 @@ gem 'rake'
 gem 'dotenv'
 gem 'jekyll'
 gem 'sinatra-param', '~> 1.3'
+gem 'rouge'
 
 group :development do
   gem 'rspec'

@@ -1,6 +1,6 @@
 #An API for UMD data 
 
-Status: We are live at [umd.io](http://umd.io)! 
+Status: We are live at [umd.io](http://umd.io)
 
 ##TODO:
 ###Testing: Who Can Break The Most Things?
@@ -9,11 +9,14 @@ Status: We are live at [umd.io](http://umd.io)!
   - break tests out into features - the files for each endpoint are unwieldy
 
 ###Docs:
-  - Footer: contact info, git repo
-  - Errors section is strange
+  - Footer: contact info, git repo, license and copyright?, contribute
   - Courses methods full documentation
+  - Tutorials for using the API in different languages
+  - Styling: font-size, code highlighting, width of description and examples sections, nav float on pages, list styles in description section
+  - listing sections in nav
 
 ###Implement:
+  - Turn numbers in database into real numbers, not strings!
   - add query capability (e.g. /courses/ENES100?semester=201501)
   - allow limits and filters -- projection stuff
 	- courses/search

@@ -375,6 +375,7 @@ div.container > .methods {
       text-shadow: 1px 1px 1px darken($code-bg, 10%);
       line-height: 1.2em;
       font-style: normal;
+      font-size: small;
       
       .prompt:after {
         content: '$ ';
@@ -382,7 +383,6 @@ div.container > .methods {
     }
     
     p {
-      font-style: italic;
       line-height: 1.25em;
     }
   }
