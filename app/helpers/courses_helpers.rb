@@ -26,7 +26,7 @@ module Sinatra
       end
 
       def is_course? string
-        /^[A-Z]{4}\d{3}$/.match string #if the string is of this particular format
+        /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
       end
 
       def is_section? string
@@ -34,7 +34,7 @@ module Sinatra
       end
 
       def is_full_section_id? string
-        /^[A-Z]{4}\d{3}-\d{4}$/.match string
+        /^[A-Z]{4}\d{3}[A-Z]?-\d{4}$/.match string
       end
     end
   end

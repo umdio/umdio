@@ -24,6 +24,7 @@ Status: We are live at [umd.io](http://umd.io)
 	  - courses/<dep>
   - api root - object list of endpoints, with some metadata
   - namespace the routes or use a controller scheme
+  - expand query parameter that expands returned ID's into their full objects
 
 ###Future Endpoints:
   - Buses
