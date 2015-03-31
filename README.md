@@ -7,6 +7,7 @@ Status: We are live at [umd.io](http://umd.io)
   - negative tests (should get nothing)
   - Unit tests for methods - particularly helpers
   - break tests out into features - the files for each endpoint are unwieldy
+  - production tests
 
 ###Docs:
   - Footer: contact info, git repo, license and copyright?, contribute
@@ -27,10 +28,10 @@ Status: We are live at [umd.io](http://umd.io)
   - expand query parameter that expands returned ID's into their full objects
 
 ###Future Endpoints:
-  - Buses
-  - Maps
-  - Budget
-  - Finals
+  - [Buses](http://api-portal.anypoint.mulesoft.com/nextbus/api/nextbus-api)
+  - [Maps + Buildings](http://maps.umd.edu/arcgis/rest/services)
+  - Budget - this is kinda hard
+  - Finals + Semesters for Courses
 - optimizations: cache responses (eventually, we might move to metadata + pagination)
 - Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files)
 
