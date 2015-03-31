@@ -29,9 +29,9 @@ Status: We are live at [umd.io](http://umd.io)
 
 ###Future Endpoints:
   - [Buses](http://api-portal.anypoint.mulesoft.com/nextbus/api/nextbus-api)
+  - Finals + Semesters for Courses
   - [Maps + Buildings](http://maps.umd.edu/arcgis/rest/services)
   - Budget - this is kinda hard
-  - Finals + Semesters for Courses
 - optimizations: cache responses (eventually, we might move to metadata + pagination)
 - Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files)
 

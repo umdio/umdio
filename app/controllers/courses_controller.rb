@@ -10,7 +10,10 @@ module Sinatra
           # set the collections by accessing the db variable we attached to the app's settings
           course_coll = app.settings.db.collection('courses')
           section_coll = app.settings.db.collection('sections')
+
+          # this isn't a very specific error message - we should try to give better!
           bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
+
 
           app.before do
             content_type 'application/json'
@@ -94,7 +97,7 @@ module Sinatra
             json courses
           end
 
-          # returns a list of courses, just like /courses/list
+          # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
             courses = find_all_courses_full course_coll
             courses.each{|course| course['sections'] = flatten_sections course['sections']}

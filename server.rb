@@ -32,7 +32,9 @@ class UMDIO < Sinatra::Base
 
   # load in the other files
   require './app/controllers/courses_controller.rb'
+  require './app/controllers/bus_controller.rb'
   require './app/helpers/courses_helpers.rb'
+  require './app/helpers/bus_helpers.rb'
   require './root.rb'
 
   # register the helpers
@@ -41,6 +43,7 @@ class UMDIO < Sinatra::Base
 
   # register the routes
   register Sinatra::UMDIO::Routing::Courses
+  register Sinatra::UMDIO::Routing::Bus
   register Sinatra::UMDIO::Routing::Root
 
 end
