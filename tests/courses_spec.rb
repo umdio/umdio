@@ -2,6 +2,7 @@
 # TODO: when tests are run in the test environment, they should ping the umd.io/api directly
 
 require_relative '../tests/spec_helper'
+require 'json'
 
 describe 'Courses Endpoint' do  # Probably should be moved higher up the test ladder. For now!
   url = '/v0/courses'
@@ -28,7 +29,6 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     shared_examples_for 'get course list' do |url|
       before { get url }
       it 'returns a list of courses' do
-        require 'json'
         res = JSON.parse(last_response.body)
         expect(res.length).to be > 4000
         expect(res[5000]).to be == nil
@@ -39,7 +39,6 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior 'good status', url
       it_has_behavior 'get course list', url
       it 'returns full objects' do
-        require 'json'
         #expect(JSON.parse((get url).body)).to 
       end
     end
@@ -81,6 +80,14 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     describe 'get multiple courses' do
       it_has_behavior 'good status', url + '/ENES100,ENES102' #doesn't check return, could very well make a good corner case
       it_has_behavior 'good status', url + '/ENES100,ENES102,bmgt220'
+    end
+
+    describe 'expand query argument' do
+      it 'can expand section objects' do
+        get url + '/ENES100?expand=sections'
+        obj = JSON.parse(last_response.body)
+        expect(obj['sections'][0].kind_of?(Hash)).to be(true) 
+      end
     end
   end
 

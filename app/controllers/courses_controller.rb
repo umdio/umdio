@@ -58,19 +58,38 @@ module Sinatra
           # MAYBE     if a section_id is specified, returns sections info as well
           # MAYBE     if only a department is specified, acts as a shortcut to search with ?dept=<param>
           app.get '/v0/courses/:course_id' do
+            # parse params
             course_ids = "#{params[:course_id]}".upcase.split(',')
             course_ids.each { |id| halt 400, bad_url_message unless is_course? id }
 
+            # query db
             if course_ids.length > 1
               courses = course_coll.find({course_id: { '$in' => course_ids}},{fields:{_id:0, 'sections._id' => 0}}).to_a
-              courses.each { |course| course['sections'] = flatten_sections course['sections'] }
             else
               courses = course_coll.find({course_id: course_ids[0]},{fields:{_id:0, 'sections._id' => 0}}).to_a
-              courses.each { |course| course['sections'] = flatten_sections course['sections'] }
-              courses = courses[0] #to get rid of [] on single object return
-              # prevent null being returned
-              courses = {} if not courses
             end
+
+            # flatten sections
+            section_ids = []
+            courses.each do |course|
+              course['sections'] = flatten_sections course['sections']
+              section_ids.concat course['sections']
+            end
+
+            # expand sections if ?expand=sections
+            if params[:expand] == 'sections'
+              sections = find_sections section_ids, section_coll
+              sections = [sections] if not sections.kind_of?(Array) # hacky, maybe modify find_sections?
+
+              # map sections to course hash & replace section data
+              course_sections = sections.group_by { |e| e['course'] }
+              courses.each { |course| course['sections'] = course_sections[course['course_id']] }
+            end
+
+            # get rid of [] on single object return
+            courses = courses[0] if course_ids.length == 1
+            # prevent null being returned
+            courses = {} if not courses
 
             json courses
           end
