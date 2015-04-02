@@ -19,7 +19,7 @@ Get information about one course.
 
 `http://api.umd.io/v0/courses/<course_ids>`
 
-Get information about multiple courese where `course_ids` is a comma-seperated list of `course_id`'s.
+Get information about multiple courses where `course_ids` is a comma-seperated list of `course_id`'s.
 
 *Returns:* Array of [course objects](#course_object). If one of the course objects does not exist, the rest are still returned.
 

@@ -342,6 +342,7 @@ div.container > .methods {
       color: $dark-gray;
       padding: 0px 4px;
       font-style: normal;
+      word-break: break-all;
     }
     
     pre {
@@ -409,8 +410,15 @@ div.container > .methods {
 }
 
 footer {
+  text-align: center;
   min-height: 200px;
   background: #eee;
+  padding: $gutter;
+}
+
+footer .footer-text {
+  display:inline-block;
+  font-size: small;
 }
 
 /*`.menu-link` represents the responsive menu toggle that shows/hides on

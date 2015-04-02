@@ -6,7 +6,9 @@ category: bus
 slug: bus
 ---
 
-This endpoint lets you get data about university buses. The data is provided by NextBus, and we wrap it and document it for you. You can list the bus routes available, see their schedules, their stops, their current location, and when they are predicted to arrive at their stops.
+This endpoint lets you get data about bus routes, schedules, stops, locations, and predicted arrival times. The data is provided by [NextBus](http://www.dots.umd.edu/nextbus.html), which monitors buses and gives the data to us via their [API](http://api-portal.anypoint.mulesoft.com/nextbus/api/nextbus-api). We think our API is easier to use, but our data might be behind NextBus by a few seconds. If your app requires to-the-second bus location info, you can go right to the source.
+
+All bus data is copyright University of Maryland 2015.
 
 <!-- EXAMPLE -->
 

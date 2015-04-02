@@ -33,6 +33,11 @@ module Sinatra
                   name: 'Courses',
                   url: 'http://api.umd.io/v0/courses',
                   docs: 'http://umd.io/docs/courses'
+                },
+                {
+                  name: 'Bus',
+                  url: 'http://api.umd.io/v0/bus',
+                  docs: 'http://umd.io/docs/bus'
                 }
               ]
             }

@@ -34,15 +34,20 @@ module Sinatra
             json routes_collection.find({},{fields: {:_id => 0, :route_id => 1, :title => 1}}).to_a
           end
 
+          # get info about one or more routes
           # in nextbus api terms, this is routeConfig - the info for a route
           app.get '/v0/bus/routes/:route_id' do
-             route_id = params[:route_id]
-             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-             
-             # API call
-             # address = apiRoot + "&command=routeConfig"
-             # Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
-             json routes_collection.find({:route_id => route_id},{fields: {:_id => 0}}).to_a
+            route_ids = params[:route_id].downcase.split(",")
+            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id}             
+            # API call
+            # address = apiRoot + "&command=routeConfig"
+            # Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
+            routes = routes_collection.find({route_id: { '$in' => route_ids}},{fields: {:_id => 0}}).to_a
+            # get rid of [] on single object return
+            routes = routes[0] if route_ids.length == 1
+            # prevent null being returned
+            routes = {} if not routes
+            json routes
           end
 
           # schedule for a route

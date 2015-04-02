@@ -20,7 +20,6 @@ module Sinatra
          docs: "http://umd.io/docs/"}.to_json
       end
 
-
     end
   end
 end
