@@ -2,6 +2,7 @@
 
 #we need mongo, nokogiri for parsing, and mechanize to make things smoother
 ENV['RACK_ENV'] ||= 'scrape'
+
 require 'bundler'
 Bundler.require :default, ENV['RACK_ENV'].to_sym
 

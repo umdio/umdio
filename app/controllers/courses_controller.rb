@@ -8,8 +8,8 @@ module Sinatra
         def self.registered(app)
 
           # set the collections by accessing the db variable we attached to the app's settings
-          course_coll = app.settings.db.collection('courses')
-          section_coll = app.settings.db.collection('sections')
+          course_coll = app.settings.courses_db.collection('courses')
+          section_coll = app.settings.courses_db.collection('sections')
 
           # this isn't a very specific error message - we should try to give better!
           bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
@@ -33,10 +33,10 @@ module Sinatra
             "We still don't know what should be returned here. Do you?"
           end
 
-          # Returns unordered list of all courses, with the department, course code, and name
-          app.get '/v0/courses/list' do
-            json find_all_courses course_coll
-          end
+          # # Returns unordered list of all courses, with the department, course code, and name
+          # app.get '/v0/courses/list' do
+          #   json find_all_courses course_coll
+          # end
 
           # Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
@@ -99,9 +99,10 @@ module Sinatra
 
           # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
-            courses = find_all_courses_full course_coll
-            courses.each{|course| course['sections'] = flatten_sections course['sections']}
-            json courses
+            # courses = find_all_courses course_coll
+            # courses.each{|course| course['sections'] = flatten_sections course['sections']}
+            # json courses
+            json find_all_courses course_coll
           end
 
         end

@@ -17,6 +17,7 @@ module Sinatra
         course_coll.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{|e|e} #less memory-intensive than .to_a
       end
 
+      # this is no longer used, and we probably need to write a different helper for search -- move to deprecate
       def find_all_courses_full course_coll
         course_coll.find({},{:fields =>{:_id => 0}}).map{|e|e} #less memory-intensive than .to_a
       end
