@@ -24,7 +24,7 @@ class UMDIO < Sinatra::Base
     port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
     puts "Connecting to mongo on #{host}:#{port}"
     # we might need other databases for other endpoints, but for now this is fine, with multiple collections
-    set :courses_db, MongoClient.new(host, port).db('umdclass') 
+    set :courses_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdclass') 
     set :buses_db, MongoClient.new(host,port).db('umdbus')
   end
 

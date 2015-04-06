@@ -8,12 +8,16 @@ module Sinatra
         def self.registered(app)
 
           # set the collections by accessing the db variable we attached to the app's settings
-          course_coll = app.settings.courses_db.collection('courses')
-          section_coll = app.settings.courses_db.collection('sections')
+          semesters = ['2013','2014','2015'].map { |e| [e + '01', e + '05', e + '08', e + '12']}.flatten
+          course_collections = semesters.inject({}) {|hash,sem| hash.update(sem => app.settings.courses_db.collection("courses#{sem}"))}
+          section_collections = semesters.inject({}) {|hash,sem| hash.update(sem => app.settings.courses_db.collection("sections#{sem}"))}
+          # these should be changed, maybe an environment variable corresponding to current term on the testudo site?
+          current_semester = '201508'
+          course_coll = course_collections[current_semester] 
+          section_coll = section_collections[current_semester]
 
           # this isn't a very specific error message - we should try to give better!
           bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
-
 
           app.before do
             content_type 'application/json'

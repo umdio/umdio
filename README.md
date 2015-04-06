@@ -10,11 +10,11 @@ Status: We are live at [umd.io](http://umd.io)
   - production tests
 
 ###Docs:
-  - Footer: contact info, git repo, license and copyright?, contribute
-  - Courses methods full documentation
+  - license and copyright?
   - Tutorials for using the API in different languages
-  - Styling: font-size, code highlighting, width of description and examples sections, nav float on pages, list styles in description section
+  - Styling: font-size, code highlighting, nav float on pages, list styles in description section
   - listing sections in nav
+  - mobile menu
 
 ###Implement:
   - Turn numbers in database into real numbers, not strings!
