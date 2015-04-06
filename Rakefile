@@ -29,7 +29,7 @@ task :setup => ['scrape']
 desc "Start the web server"
 task :up do
   #if ENV['RACK_ENV'] == :development
-  `shotgun -p 3000`
+  system "shotgun -p 3000"
 end
 task :server => :up
 

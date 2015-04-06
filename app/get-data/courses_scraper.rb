@@ -1,9 +1,10 @@
-# Script for adding umd testudo courses to a mongodb database using mechanize and nokogiri
+# Script for adding umd testudo courses to a mongodb database using open-uri and nokogiri
 
 # When you run it, you may get an undefined method `run' for HTTP:Module (NoMethodError)
 # Disregard it, or read: (http://stackoverflow.com/questions/17334734/how-do-i-get-sinatra-to-work-with-httpclient)
 
-# Uses mongo, nokogiri for parsing, and mechanize to make things smoother
+# This should probably be modularized - one big script is kinda crazy. takes 20 minutes to run in development
+
 ENV['RACK_ENV'] ||= 'scrape'
 
 require 'bundler'

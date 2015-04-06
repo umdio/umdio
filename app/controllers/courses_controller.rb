@@ -13,7 +13,7 @@ module Sinatra
           section_collections = semesters.inject({}) {|hash,sem| hash.update(sem => app.settings.courses_db.collection("sections#{sem}"))}
           # these should be changed, maybe an environment variable corresponding to current term on the testudo site?
           current_semester = '201508'
-          course_coll = course_collections[current_semester] 
+          course_coll = course_collections[current_semester]
           section_coll = section_collections[current_semester]
 
           # this isn't a very specific error message - we should try to give better!
@@ -21,6 +21,13 @@ module Sinatra
 
           app.before do
             content_type 'application/json'
+          end
+
+          app.before '/v0/courses*' do
+            if params['semester'] and semesters.include?(params['semester'])
+              course_coll = course_collections[params['semester']]
+              section_coll = section_collections[params['semester']]
+            end
           end
 
           # Returns sections of courses by their id
