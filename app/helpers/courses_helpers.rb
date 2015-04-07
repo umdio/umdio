@@ -37,6 +37,16 @@ module Sinatra
       def is_full_section_id? string
         /^[A-Z]{4}\d{3}[A-Z]?-\d{4}$/.match string
       end
+
+      # TODO: make this line up with Testudo more accurately
+      def get_current_semester
+        time = Time.new
+        if time.month >= 3 && time.month < 10
+          time.year.to_s + '08'
+        else
+          (time.year + 1).to_s + '01'
+        end
+      end
     end
   end
 end

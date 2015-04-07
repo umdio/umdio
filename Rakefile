@@ -21,7 +21,7 @@ end
 
 desc "Scrape testudo to fill the database"
 task :scrape => ['db:up'] do
-  ruby 'app/helpers/courses_scraper.rb'
+  ruby 'app/scrapers/courses_scraper.rb'
 end
 
 task :setup => ['scrape']

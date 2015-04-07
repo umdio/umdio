@@ -7,14 +7,8 @@ module Sinatra
 
         def self.registered(app)
 
-          # set the collections by accessing the db variable we attached to the app's settings
-          semesters = ['2013','2014','2015'].map { |e| [e + '01', e + '05', e + '08', e + '12']}.flatten
-          course_collections = semesters.inject({}) {|hash,sem| hash.update(sem => app.settings.courses_db.collection("courses#{sem}"))}
-          section_collections = semesters.inject({}) {|hash,sem| hash.update(sem => app.settings.courses_db.collection("sections#{sem}"))}
-          # these should be changed, maybe an environment variable corresponding to current term on the testudo site?
-          current_semester = '201508'
-          course_coll = course_collections[current_semester]
-          section_coll = section_collections[current_semester]
+          course_coll = nil
+          section_coll = nil
 
           # this isn't a very specific error message - we should try to give better!
           bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
@@ -24,10 +18,22 @@ module Sinatra
           end
 
           app.before '/v0/courses*' do
-            if params['semester'] and semesters.include?(params['semester'])
-              course_coll = course_collections[params['semester']]
-              section_coll = section_collections[params['semester']]
+            # TODO: don't hard code the current semester
+            params[:semester] ||= '201508'
+
+            # check for semester formatting
+            halt 400, {error_code: 400, message: "Invalid semeseter parameter!"}.to_json unless params[:semester].length == 6
+
+            # check if we have data for the requested semester
+            collection_names = app.settings.courses_db.collection_names()
+            if not collection_names.index("courses#{params[:semester]}")
+              semesters = collection_names.select { |e| e.start_with? "courses" }.map{ |e| e.slice(7,6) }
+              msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo. Or try one of the available semester below:"
+              halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
             end
+
+            course_coll = app.settings.courses_db.collection("courses#{params[:semseter]}")
+            section_coll = app.settings.courses_db.collection("sections#{params[:semseter]}")
           end
 
           # Returns sections of courses by their id
