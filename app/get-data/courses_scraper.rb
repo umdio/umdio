@@ -23,8 +23,7 @@ port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
 puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port, pool_size: 150, pool_timeout: 20).db('umdclass')
 
-#set the collections (courses and sections), clear the collection if anything was there before
-
+# Specify the years we want to add to the database here!
 years = ['2014','2015']
 semesters = years.map { |e| [e + '01', e + '05', e + '08', e + '12'] }.flatten # year plus starting month is term id
 

@@ -3,18 +3,20 @@
 Status: We are live at [umd.io](http://umd.io)
 
 ##TODO:
-###Testing: Who Can Break The Most Things?
-  - negative tests (should get nothing)
-  - Unit tests for methods - particularly helpers
-  - break tests out into features - the files for each endpoint are unwieldy
-  - production tests
-
 ###Docs:
   - license and copyright?
-  - Tutorials for using the API in different languages
-  - Styling: font-size, code highlighting, nav float on pages, list styles in description section
-  - listing sections in nav
+  - Tutorials for using the API with different languages
+  - Styling: font-size, nav float on pages, list styles in description section
   - mobile menu
+  - Bus
+    - Route schedule
+    - Route arrivals
+    - Route locations
+    - List Stops
+    - Get Stop
+    - Locations
+  - Courses
+    - Semester
 
 ###Implement:
   - Turn numbers in database into real numbers, not strings!
@@ -24,11 +26,22 @@ Status: We are live at [umd.io](http://umd.io)
     - paginate responses
 	  - courses/<dep>
   - namespace the routes or use a controller scheme
-  - expand query parameter that expands returned ID's into their full objects
+  - expand:
+    - sections works
+    - stops?
+    - courses?
+
+###Testing: Who Can Break The Most Things?
+  - Tests for buses!!
+  - negative tests (should get nothing)
+  - Unit tests for methods - particularly helpers
+  - break tests out into features - the files for each endpoint are unwieldy
+  - production tests
+  - tests for docs? alerts for when the site is down? Something!
 
 ###Future Endpoints:
   - [Buses](http://api-portal.anypoint.mulesoft.com/nextbus/api/nextbus-api)
-  - Finals + Semesters for Courses
+  - Finals for Courses
   - [Maps + Buildings](http://maps.umd.edu/arcgis/rest/services)
   - Budget - this is kinda hard
 - optimizations: cache responses (eventually, we might move to metadata + pagination)
@@ -88,8 +101,5 @@ write tests --> add functionality --> make tests pass --> write tests
 
 ###Notes:
 - Security: 
-  - In production, we probably shouldn't have a rake task running mongo - it should be a separate user with only those permissions
-  - We should set up the server firewall to only accept certain connections
-  - We should use strong passwords and keep them secure
   - We should thoroughly test our system's security from the beginning, and have evidence that we are secure - that way, more people can trust us with their data.
   - Eventually, a single API for UMD data is much less vulnerable than a thousand separate databases everywhere - do it right once, enforce it strictly, then you only have one thing to worry about. Defense in depth, lock everything tight. Open is more secure than closed, because you have more eyes on it.

@@ -10,7 +10,7 @@ module Sinatra
           app.get '/' do
             resp = {
               message: "This is the umd.io JSON API.",
-              status: "kinda working",
+              status: "working, most of the time",
               docs: "http://umd.io/docs/",
               current_version: "v0",
               versions: [
@@ -27,7 +27,7 @@ module Sinatra
             resp = {
               id: "v0",
               version: "0.0.1",
-              name: "Some naming convention here",
+              name: "naming convention?",
               endpoints: [
                 {
                   name: 'Courses',

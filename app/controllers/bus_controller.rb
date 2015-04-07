@@ -22,9 +22,14 @@ module Sinatra
           end
 
           # # root of bus endpoint
-          # app.get '/v0/bus' do
-          #   # not sure what this returns!!
-          # end
+           app.get '/v0/bus' do
+              resp = {
+                message: "This is the bus endpoint.",
+                status: "working (we think!)",
+                docs: "http://umd.io/bus",
+              }
+              json resp
+           end
 
           # lists bus routes
           app.get '/v0/bus/routes' do
@@ -76,16 +81,18 @@ module Sinatra
             Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
           end
 
+          # locations of all buses
           app.get '/v0/bus/locations' do
             address = apiRoot + "&command=vehicleLocations"
             Net::HTTP.get(URI(address)).to_s
           end
 
+          # list the bus stops
           app.get '/v0/bus/stops' do
             json stops_collection.find({},{fields: {:_id => 0, :stop_id => 1, :title => 1}}).to_a
           end
 
-          # get info about a stop -- this one is the same level of challenge as /stops. We need to collect the data about all the stops, which is a bit of a pain
+          # get info about a particular bus stop
           app.get '/v0/bus/stops/:stop_id' do
             stop_id = params[:stop_id]
             halt 400, bad_url_error(bad_stop_message) unless is_stop_id? stop_id
