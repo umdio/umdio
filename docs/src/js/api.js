@@ -29,6 +29,21 @@ $(document).ready(function(){
       });
     })( $($items[i]) );
   };
+  
+  // mobile menu toggle
+  var toggle = document.getElementById('toggle');
+  toggle.addEventListener('click', function() {
+    $('body').toggleClass('active');
+  });
+
+  // fix external links
+  var pageContent = document.getElementById('docs');
+  var links = pageContent.getElementsByTagName('a');
+  for (var i=0,n=links.length; i<n; i++) {
+    if (links[i].href.substr(0, 4) == 'http' && links[i].origin != window.location.origin) {
+      links[i].target = "_blank";
+    }
+  }
 });
 
 /* ========================================================================
