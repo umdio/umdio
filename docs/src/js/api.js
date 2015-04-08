@@ -2,10 +2,25 @@
 hljs.initHighlightingOnLoad();
 
 $(document).ready(function(){
-  $('#menu').stick_in_parent({parent: '#docs'});
+  var $menu = $('#menu');
+  
+  var resize = function(){
+    $menu.css('width', $menu.parent().css('width'));
+  };
+  $(window).resize(resize);
+  resize();
+  
+  $menu.affix({
+    offset: {
+      top: 0,
+      bottom: function() {
+        return -($('#docs').outerHeight(true) - $('body').outerHeight(true));
+      }
+    }
+  });
   
   // toggle active menu classes on click
-  $items = $('#menu').find('ul.active:first li');
+  $items = $menu.find('ul.active:first li');
   for (var i=0, n=$items.length; i<n; i++) {
     (function(item){
       item.children('a').click(function(e){
@@ -14,27 +29,7 @@ $(document).ready(function(){
       });
     })( $($items[i]) );
   };
-  
-  /*$('#languages').stick_in_parent();
-  // language toogle active class
-  $languages = $('#languages a');
-  for (var i=0, n=$languages.length; i<n; i++) {
-    $($languages[i]).click(function(e){
-      $languages.removeClass('active');
-      $(e.target).addClass('active');
-    });
-  };*/
 });
-
-/*
- Sticky-kit v1.1.1 | WTFPL | Leaf Corcoran 2014 | http://leafo.net
-*/
-(function(){var k,e;k=this.jQuery||window.jQuery;e=k(window);k.fn.stick_in_parent=function(d){var v,y,n,p,h,C,s,G,q,H;null==d&&(d={});s=d.sticky_class;y=d.inner_scrolling;C=d.recalc_every;h=d.parent;p=d.offset_top;n=d.spacer;v=d.bottoming;null==p&&(p=0);null==h&&(h=void 0);null==y&&(y=!0);null==s&&(s="is_stuck");null==v&&(v=!0);G=function(a,d,q,z,D,t,r,E){var u,F,m,A,c,f,B,w,x,g,b;if(!a.data("sticky_kit")){a.data("sticky_kit",!0);f=a.parent();null!=h&&(f=f.closest(h));if(!f.length)throw"failed to find stick parent";
-u=m=!1;(g=null!=n?n&&a.closest(n):k("<div />"))&&g.css("position",a.css("position"));B=function(){var c,e,l;if(!E&&(c=parseInt(f.css("border-top-width"),10),e=parseInt(f.css("padding-top"),10),d=parseInt(f.css("padding-bottom"),10),q=f.offset().top+c+e,z=f.height(),m&&(u=m=!1,null==n&&(a.insertAfter(g),g.detach()),a.css({position:"",top:"",width:"",bottom:""}).removeClass(s),l=!0),D=a.offset().top-parseInt(a.css("margin-top"),10)-p,t=a.outerHeight(!0),r=a.css("float"),g&&g.css({width:a.outerWidth(!0),
-height:t,display:a.css("display"),"vertical-align":a.css("vertical-align"),"float":r}),l))return b()};B();if(t!==z)return A=void 0,c=p,x=C,b=function(){var b,k,l,h;if(!E&&(null!=x&&(--x,0>=x&&(x=C,B())),l=e.scrollTop(),null!=A&&(k=l-A),A=l,m?(v&&(h=l+t+c>z+q,u&&!h&&(u=!1,a.css({position:"fixed",bottom:"",top:c}).trigger("sticky_kit:unbottom"))),l<D&&(m=!1,c=p,null==n&&("left"!==r&&"right"!==r||a.insertAfter(g),g.detach()),b={position:"",width:"",top:""},a.css(b).removeClass(s).trigger("sticky_kit:unstick")),
-y&&(b=e.height(),t+p>b&&!u&&(c-=k,c=Math.max(b-t,c),c=Math.min(p,c),m&&a.css({top:c+"px"})))):l>D&&(m=!0,b={position:"fixed",top:c},b.width="border-box"===a.css("box-sizing")?a.outerWidth()+"px":a.width()+"px",a.css(b).addClass(s),null==n&&(a.after(g),"left"!==r&&"right"!==r||g.append(a)),a.trigger("sticky_kit:stick")),m&&v&&(null==h&&(h=l+t+c>z+q),!u&&h)))return u=!0,"static"===f.css("position")&&f.css({position:"relative"}),a.css({position:"absolute",bottom:d,top:"auto"}).trigger("sticky_kit:bottom")},
-w=function(){B();return b()},F=function(){E=!0;e.off("touchmove",b);e.off("scroll",b);e.off("resize",w);k(document.body).off("sticky_kit:recalc",w);a.off("sticky_kit:detach",F);a.removeData("sticky_kit");a.css({position:"",bottom:"",top:"",width:""});f.position("position","");if(m)return null==n&&("left"!==r&&"right"!==r||a.insertAfter(g),g.remove()),a.removeClass(s)},e.on("touchmove",b),e.on("scroll",b),e.on("resize",w),k(document.body).on("sticky_kit:recalc",w),a.on("sticky_kit:detach",F),setTimeout(b,
-0)}};q=0;for(H=this.length;q<H;q++)d=this[q],G(k(d));return this}}).call(this);
 
 /* ========================================================================
  * Bootstrap: scrollspy.js v3.3.2 - edited (.nav -> nav)
@@ -48,3 +43,16 @@ g=new c(this,d));if("string"==typeof a)g[a]()})}c.VERSION="3.3.2";c.DEFAULTS={of
 b(this),d=d.data("target")||d.attr("href"),e=/^#./.test(d)&&b(d);return e&&e.length&&e.is(":visible")&&[[e[a]().top+c,d]]||null}).sort(function(a,b){return a[0]-b[0]}).each(function(){g.offsets.push(this[0]);g.targets.push(this[1])})};c.prototype.process=function(){var a=this.$scrollElement.scrollTop()+this.options.offset,b=this.getScrollHeight(),c=this.options.offset+b-this.$scrollElement.height(),d=this.offsets,e=this.targets,k=this.activeTarget,f;this.scrollHeight!=b&&this.refresh();if(a>=c)return k!=
 (f=e[e.length-1])&&this.activate(f);if(k&&a<d[0])return this.activeTarget=null,this.clear();for(f=d.length;f--;)k!=e[f]&&a>=d[f]&&(!d[f+1]||a<=d[f+1])&&this.activate(e[f])};c.prototype.activate=function(a){this.activeTarget=a;this.clear();a=b(this.selector+'[data-target="'+a+'"],'+this.selector+'[href="'+a+'"]').parents("li").addClass("active");a.parent(".dropdown-menu").length&&(a=a.closest("li.dropdown").addClass("active"));a.trigger("activate.bs.scrollspy")};c.prototype.clear=function(){b(this.selector).parentsUntil(this.options.target,
 ".active").removeClass("active")};var m=b.fn.scrollspy;b.fn.scrollspy=l;b.fn.scrollspy.Constructor=c;b.fn.scrollspy.noConflict=function(){b.fn.scrollspy=m;return this};b(window).on("load.bs.scrollspy.data-api",function(){b('[data-spy="scroll"]').each(function(){var a=b(this);l.call(a,a.data())})})}(jQuery);
+
+/* ========================================================================
+ * Bootstrap: affix.js v3.3.4
+ * http://getbootstrap.com/javascript/#affix
+ * ========================================================================
+ * Copyright 2011-2015 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
++function(b){function k(e){return this.each(function(){var a=b(this),d=a.data("bs.affix"),g="object"==typeof e&&e;d||a.data("bs.affix",d=new c(this,g));if("string"==typeof e)d[e]()})}var c=function(e,a){this.options=b.extend({},c.DEFAULTS,a);this.$target=b(this.options.target).on("scroll.bs.affix.data-api",b.proxy(this.checkPosition,this)).on("click.bs.affix.data-api",b.proxy(this.checkPositionWithEventLoop,this));this.$element=b(e);this.pinnedOffset=this.unpin=this.affixed=null;this.checkPosition()};
+c.VERSION="3.3.4";c.RESET="affix affix-top affix-bottom";c.DEFAULTS={offset:0,target:window};c.prototype.getState=function(b,a,d,c){var f=this.$target.scrollTop(),h=this.$element.offset(),k=this.$target.height();if(null!=d&&"top"==this.affixed)return f<d?"top":!1;if("bottom"==this.affixed)return null!=d?f+this.unpin<=h.top?!1:"bottom":f+k<=b-c?!1:"bottom";var l=null==this.affixed,h=l?f:h.top;return null!=d&&f<=d?"top":null!=c&&h+(l?k:a)>=b-c?"bottom":!1};c.prototype.getPinnedOffset=function(){if(this.pinnedOffset)return this.pinnedOffset;
+this.$element.removeClass(c.RESET).addClass("affix");var b=this.$target.scrollTop();return this.pinnedOffset=this.$element.offset().top-b};c.prototype.checkPositionWithEventLoop=function(){setTimeout(b.proxy(this.checkPosition,this),1)};c.prototype.checkPosition=function(){if(this.$element.is(":visible")){var e=this.$element.height(),a=this.options.offset,d=a.top,g=a.bottom,f=b(document.body).height();"object"!=typeof a&&(g=d=a);"function"==typeof d&&(d=a.top(this.$element));"function"==typeof g&&
+(g=a.bottom(this.$element));a=this.getState(f,e,d,g);if(this.affixed!=a){null!=this.unpin&&this.$element.css("top","");var d="affix"+(a?"-"+a:""),h=b.Event(d+".bs.affix");this.$element.trigger(h);if(h.isDefaultPrevented())return;this.affixed=a;this.unpin="bottom"==a?this.getPinnedOffset():null;this.$element.removeClass(c.RESET).addClass(d).trigger(d.replace("affix","affixed")+".bs.affix")}"bottom"==a&&this.$element.offset({top:f-e-g})}};var m=b.fn.affix;b.fn.affix=k;b.fn.affix.Constructor=c;b.fn.affix.noConflict=
+function(){b.fn.affix=m;return this};b(window).on("load",function(){b('[data-spy="affix"]').each(function(){var c=b(this),a=c.data();a.offset=a.offset||{};null!=a.offsetBottom&&(a.offset.bottom=a.offsetBottom);null!=a.offsetTop&&(a.offset.top=a.offsetTop);k.call(c,a)})})}(jQuery);
