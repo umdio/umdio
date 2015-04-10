@@ -11,7 +11,7 @@ module Sinatra
           section_coll = nil
 
           # this isn't a very specific error message - we should try to give better!
-          bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
+          bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/courses/"}.to_json
 
           app.before '/v0/courses*' do
             # TODO: don't hard code the current semester
@@ -61,6 +61,9 @@ module Sinatra
             course_id = "#{params[:course_id]}".upcase
             halt 400, bad_url_message unless is_course? course_id
             course = course_coll.find({course_id: course_id},{fields:{_id:0, 'sections._id' => 0}}).to_a
+            if course.empty?
+              halt 400, {error_code: 400, message: "Course with course_id #{course_id} not found!", docs: "http://umd.io/courses/"}.to_json
+            end
             section_ids = course[0]['sections'].map { |e| e['section_id'] }
             json find_sections section_ids,section_coll
           end
