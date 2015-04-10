@@ -20,8 +20,10 @@ namespace :db do
 end
 
 desc "Scrape testudo to fill the database"
-task :scrape => ['db:up'] do
+task :scrape do
   ruby 'app/scrapers/courses_scraper.rb'
+  ruby 'app/scrapers/bus_routes_scraper.rb'
+  ruby 'app/scrapers/map_controller.rb'
 end
 
 task :setup => ['scrape']

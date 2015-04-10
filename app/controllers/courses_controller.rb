@@ -32,8 +32,8 @@ module Sinatra
               halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
             end
 
-            course_coll = app.settings.courses_db.collection("courses#{params[:semseter]}")
-            section_coll = app.settings.courses_db.collection("sections#{params[:semseter]}")
+            course_coll = app.settings.courses_db.collection("courses#{params[:semester]}")
+            section_coll = app.settings.courses_db.collection("sections#{params[:semester]}")
           end
 
           # Returns sections of courses by their id
@@ -119,7 +119,7 @@ module Sinatra
             # courses = find_all_courses course_coll
             # courses.each{|course| course['sections'] = flatten_sections course['sections']}
             # json courses
-            json find_all_courses course_coll
+            json course_coll.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{|e|e}
           end
 
         end

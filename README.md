@@ -17,10 +17,11 @@ Status: We are live at [umd.io](http://umd.io)
     - Locations
   - Courses
     - Semester
+  - Map
+    - Buildings
 
 ###Implement:
-  - Turn numbers in database into real numbers, not strings!
-  - add query capability (e.g. /courses/ENES100?semester=201501)
+  - add query capability (e.g. /courses/ENES100?instructor=Calabro)
   - allow limits and filters -- projection stuff
 	- courses/search
     - paginate responses
@@ -31,11 +32,12 @@ Status: We are live at [umd.io](http://umd.io)
     - stops?
     - courses?
 
-###Testing: Who Can Break The Most Things?
-  - Tests for buses!!
-  - negative tests (should get nothing)
+###Testing:
+  - Remove hardcoding from tests
+  - maps
+  - buses
   - Unit tests for methods - particularly helpers
-  - break tests out into features - the files for each endpoint are unwieldy
+  - break tests out into features - a file per endpoint gets unwieldy
   - production tests
   - tests for docs? alerts for when the site is down? Something!
 
@@ -44,6 +46,7 @@ Status: We are live at [umd.io](http://umd.io)
   - Finals for Courses
   - [Maps + Buildings](http://maps.umd.edu/arcgis/rest/services)
   - Budget - this is kinda hard
+  - CAS
 - optimizations: cache responses (eventually, we might move to metadata + pagination)
 - Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files)
 
@@ -94,12 +97,14 @@ write tests --> add functionality --> make tests pass --> write tests
 
 ##Contributing:Read more
 - [Design doc](https://docs.google.com/document/d/11uslF3ftvQ3It-NRXs7iRgI34S0MxvqV2S1jioXPcL0/edit?usp=sharing)
+- [Ideas doc](https://docs.google.com/document/d/1WQ4w4_HSdkzNP1j0KqrHSYtiU8DEGoXnxHyC5FEp5sY/edit)
 - [Sinatra](http://www.sinatrarb.com/)
 - [Rack](http://rack.github.io/)
 - [MongoDB](http://www.mongodb.org/)
 - [RSpec](http://rspec.info/)
+- [Nginx](http://nginx.org/en/docs/)
 
 ###Notes:
 - Security: 
-  - We should thoroughly test our system's security from the beginning, and have evidence that we are secure - that way, more people can trust us with their data.
+  - We should thoroughly test our system's security from the beginning, and have evidence that we are secure - that way, more people can trust us with their data!
   - Eventually, a single API for UMD data is much less vulnerable than a thousand separate databases everywhere - do it right once, enforce it strictly, then you only have one thing to worry about. Defense in depth, lock everything tight. Open is more secure than closed, because you have more eyes on it.
