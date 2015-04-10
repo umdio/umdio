@@ -21,6 +21,8 @@ module Sinatra
         /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
       end
 
+      # TODO: this may not be true. section_numbers might be able to be any 4 alphanumberic characters
+      # https://ntst.umd.edu/soc/search?courseId=ENES100&sectionId=&termId=201405&_openSectionsOnly=on&courseLevelFilter=ALL&instructor=&teachingCenter=ALL&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&creditCompare=&credits=&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on
       def is_section? string
         /^\d{4}$/.match string #if the string is of this particular format
       end
@@ -64,6 +66,8 @@ module Sinatra
       # @return: Array of courses
       def find_courses collection, course_ids
         course_ids = [course_ids] if course_ids.is_a?(String)
+
+        validate_course_ids course_ids
 
         # query db
         if course_ids.length > 1

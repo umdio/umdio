@@ -57,11 +57,7 @@ module Sinatra
           app.get '/v0/courses/:course_id/sections/:section_id' do
             course_id = "#{params[:course_id]}".upcase
 
-            # TODO: implement validate_course_ids
-            if not is_course? course_id
-              error_msg = { error_code: 400, message: "Invalid course_id #{id}", docs: "http://umd.io/courses/" }.to_json
-              halt 400, error_msg 
-            end
+            validate_course_ids course_id
 
             section_numbers = "#{params[:section_id]}".upcase.split(',')
             # TODO: validate_section_ids
@@ -84,11 +80,6 @@ module Sinatra
           # Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
             course_id = "#{params[:course_id]}".upcase
-
-            # TODO: implement validate_course_ids
-            if not is_course? course_id
-              halt 400, { error_code: 400, message: "Invalid course_id #{course_id}", docs: "http://umd.io/courses/" }.to_json
-            end
 
             courses = find_courses course_coll, course_id
             section_ids = courses[0]['sections'].map { |e| e['section_id'] }
