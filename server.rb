@@ -36,6 +36,12 @@ class UMDIO < Sinatra::Base
   configure :development do
   end
 
+  # before application/request starts
+  before do
+    content_type 'application/json'
+    cache_control :public, max_age: 86400
+  end
+
   # load in the other files
   require './app/controllers/courses_controller.rb'
   require './app/controllers/bus_controller.rb'

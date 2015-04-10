@@ -17,10 +17,6 @@ module Sinatra
           apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 
-          app.before do
-            content_type 'application/json'
-          end
-
           # # root of bus endpoint
            app.get '/v0/bus' do
               resp = {
@@ -75,6 +71,7 @@ module Sinatra
 
           # locations of buses on route
           app.get '/v0/bus/routes/:route_id/locations' do
+            cache_control :public, :must_revalidate, :no_cache, max_age: 0
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
             address = apiRoot + "&command=vehicleLocations"

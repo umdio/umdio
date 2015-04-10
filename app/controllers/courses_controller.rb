@@ -13,10 +13,6 @@ module Sinatra
           # this isn't a very specific error message - we should try to give better!
           bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/docs/"}.to_json
 
-          app.before do
-            content_type 'application/json'
-          end
-
           app.before '/v0/courses*' do
             # TODO: don't hard code the current semester
             params[:semester] ||= '201508'
@@ -49,11 +45,6 @@ module Sinatra
             # TODO does this really exist? What do we return on this?
             "We still don't know what should be returned here. Do you?"
           end
-
-          # # Returns unordered list of all courses, with the department, course code, and name
-          # app.get '/v0/courses/list' do
-          #   json find_all_courses course_coll
-          # end
 
           # Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
@@ -116,10 +107,7 @@ module Sinatra
 
           # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
-            # courses = find_all_courses course_coll
-            # courses.each{|course| course['sections'] = flatten_sections course['sections']}
-            # json courses
-            json course_coll.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{|e|e}
+            json course_coll.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
           end
 
         end
