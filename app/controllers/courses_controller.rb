@@ -10,6 +10,7 @@ module Sinatra
           course_coll = nil
           section_coll = nil
 
+          # TODO: remove this, handle error checking in the helpers
           # this isn't a very specific error message - we should try to give better!
           bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/courses/"}.to_json
 
@@ -36,35 +37,62 @@ module Sinatra
           app.get '/v0/courses/sections/:section_id' do
             # separate into an array on commas, turn it into uppercase
             section_ids = "#{params[:section_id]}".upcase.split(",")
-            section_ids.each {|section_id| halt 400, bad_url_message unless is_full_section_id? section_id}
+
+            section_ids.each do |section_id|
+              if not is_full_section_id? section_id
+                halt 400, { error_code: 400, message: "Invalid section_id #{section_id}"}.to_json
+              end
+            end
+
             json find_sections section_ids, section_coll #using helper method
           end
 
           # should this give error or it could do something like courses/list except with sections array too?
           app.get '/v0/courses/sections' do
             # TODO does this really exist? What do we return on this?
-            "We still don't know what should be returned here. Do you?"
+            { error_code: 404, message: "We still don't know what should be returned here. Do you?" }.to_json
           end
 
           # Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
             course_id = "#{params[:course_id]}".upcase
-            halt 400, bad_url_message unless is_course? course_id
+
+            # TODO: implement validate_course_ids
+            if not is_course? course_id
+              error_msg = { error_code: 400, message: "Invalid course_id #{id}", docs: "http://umd.io/courses/" }.to_json
+              halt 400, error_msg 
+            end
+
             section_numbers = "#{params[:section_id]}".upcase.split(',')
-            section_numbers.each { |number| halt 400, bad_url_message unless is_section? number }
+            # TODO: validate_section_ids
+            section_numbers.each do |number|
+              if not is_section? number
+                halt 400, { error_code: 400, message: "Invalid section_number #{number}" }.to_json
+              end
+            end
+
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
-            json find_sections section_ids, section_coll
+            sections = find_sections section_ids, section_coll
+
+            if sections.nil? or sections.empty?
+              halt 404, { error_code: 404, message: "No sections found." }.to_json
+            end
+
+            json sections
           end
 
           # Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
             course_id = "#{params[:course_id]}".upcase
-            halt 400, bad_url_message unless is_course? course_id
-            course = course_coll.find({course_id: course_id},{fields:{_id:0, 'sections._id' => 0}}).to_a
-            if course.empty?
-              halt 400, {error_code: 400, message: "Course with course_id #{course_id} not found!", docs: "http://umd.io/courses/"}.to_json
+
+            # TODO: implement validate_course_ids
+            if not is_course? course_id
+              halt 400, { error_code: 400, message: "Invalid course_id #{course_id}", docs: "http://umd.io/courses/" }.to_json
             end
-            section_ids = course[0]['sections'].map { |e| e['section_id'] }
+
+            courses = find_courses course_coll, course_id
+            section_ids = courses[0]['sections'].map { |e| e['section_id'] }
+
             json find_sections section_ids,section_coll
           end
 
@@ -74,14 +102,8 @@ module Sinatra
           app.get '/v0/courses/:course_id' do
             # parse params
             course_ids = "#{params[:course_id]}".upcase.split(',')
-            course_ids.each { |id| halt 400, bad_url_message unless is_course? id }
 
-            # query db
-            if course_ids.length > 1
-              courses = course_coll.find({course_id: { '$in' => course_ids}},{fields:{_id:0, 'sections._id' => 0}}).to_a
-            else
-              courses = course_coll.find({course_id: course_ids[0]},{fields:{_id:0, 'sections._id' => 0}}).to_a
-            end
+            courses = find_courses course_coll, course_ids
 
             # flatten sections
             section_ids = []
