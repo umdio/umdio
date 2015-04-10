@@ -10,16 +10,14 @@ module Sinatra
           course_coll = nil
           section_coll = nil
 
-          # TODO: remove this, handle error checking in the helpers
-          # this isn't a very specific error message - we should try to give better!
-          bad_url_message = {error_code: 400, message: "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page.", docs: "http://umd.io/courses/"}.to_json
-
           app.before '/v0/courses*' do
             # TODO: don't hard code the current semester
             params[:semester] ||= '201508'
 
             # check for semester formatting
-            halt 400, {error_code: 400, message: "Invalid semeseter parameter!"}.to_json unless params[:semester].length == 6
+            if not (params[:semester].length == 6 and params[:semester].is_number?)
+              halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
+            end
 
             # check if we have data for the requested semester
             collection_names = app.settings.courses_db.collection_names()
@@ -123,7 +121,48 @@ module Sinatra
 
           # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
-            json course_coll.find({},{:fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
+            # sorting
+            sorting = []
+            params['sort'] ||= []
+            params['sort'].split(',').each do |sort|
+              order_str = '+'
+              if sort[0] == '+' or sort[0] == '-'
+                order_str = sort[0]
+                sort = sort[1..sort.length]
+              end
+              order = (order_str == '+' ? 1 : -1)
+              sorting << sort
+              sorting << order
+            end unless params['sort'].empty?
+
+            # searching
+            params.delete('sort')
+            params.delete('semester')
+            query = {}
+            params.keys.each do |k|
+              e = ''
+              if k.include? ('<')
+                parts = k.split('<')
+                if parts.length == 1
+                  parts[1] = params[k]
+                  e = 'e'
+                end
+                query[parts[0]] = { "$lt#{e}" => parts[1] }
+              elsif k.include? ('>')
+                parts = k.split('>')
+                if parts.length == 1
+                  parts[1] = params[k]
+                  e = 'e'
+                end
+                query[parts[0]] = { "$gt#{e}" => parts[1] }
+              else
+                query[k] = params[k]
+              end
+            end
+
+            #require 'pry'; binding.pry
+
+            json course_coll.find(query, {:sort => sorting, :fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
           end
 
         end

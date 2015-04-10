@@ -42,13 +42,9 @@ class UMDIO < Sinatra::Base
     cache_control :public, max_age: 86400
   end
 
-  # load in the other files
-  require './app/controllers/courses_controller.rb'
-  require './app/controllers/bus_controller.rb'
-  require './app/controllers/map_controller.rb'
-  require './app/helpers/courses_helpers.rb'
-  require './app/helpers/bus_helpers.rb'
-  require './app/helpers/map_helpers.rb'
+  # load in app helpers & controllers
+  Dir["./app/helpers/*.rb"].each { |file| require file }
+  Dir["./app/controllers/*.rb"].each { |file| require file }
   require './root.rb'
 
   # register the helpers
