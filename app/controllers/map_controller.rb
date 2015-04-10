@@ -14,21 +14,21 @@ module Sinatra
           end
 
           app.get '/v0/map' do
-              resp = {
-                message: "This is the map endpoint.",
-                status: "in development",
-                docs: "http://umd.io/map",
-              }
-              json resp
-           end
+            resp = {
+              message: "This is the map endpoint.",
+              status: "in development",
+              docs: "http://umd.io/map",
+            }
+            json resp
+          end
 
-           # get list of all buildings with names and numbers
-           app.get '/v0/map/buildings' do
-              json buildings_collection.find({},{fields: {:_id => 0, :name => 1, :number => 1}}).to_a
-           end
+          # get list of all buildings with names and numbers
+          app.get '/v0/map/buildings' do
+            json buildings_collection.find({},{fields: {:_id => 0, :name => 1, :number => 1}}).to_a
+          end
 
-           # get buildings by building id
-           app.get '/v0/map/buildings/:building_id' do
+          # get buildings by building id
+          app.get '/v0/map/buildings/:building_id' do
             building_ids = params[:building_id].split(",")
             building_ids.each {|building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id}             
             buildings = buildings_collection.find({number: { '$in' => building_ids}},{fields: {:_id => 0}}).to_a
@@ -37,7 +37,7 @@ module Sinatra
             # prevent null being returned
             buildings = {} if not buildings
             json buildings
-           end
+          end
 
         end
    
