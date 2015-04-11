@@ -24,7 +24,7 @@ module Sinatra
 
           # get list of all buildings with names and numbers
           app.get '/v0/map/buildings' do
-            json buildings_collection.find({},{fields: {:_id => 0, :name => 1, :number => 1}}).to_a
+            json buildings_collection.find({},{fields: {:_id => 0}}).map { |e| e }
           end
 
           # get buildings by building id
