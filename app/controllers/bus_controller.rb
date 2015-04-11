@@ -17,12 +17,12 @@ module Sinatra
           apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 
-          # # root of bus endpoint
+          # root of bus endpoint
            app.get '/v0/bus' do
               resp = {
                 message: "This is the bus endpoint.",
                 status: "working (we think!)",
-                docs: "http://umd.io/bus",
+                docs: "http://umd.io/bus/",
               }
               json resp
            end
@@ -53,14 +53,18 @@ module Sinatra
 
           # schedule for a route
           app.get '/v0/bus/routes/:route_id/schedule' do
+            cache_control :public, :must_revalidate, max_age: 60
+
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
             address = apiRoot + "&command=schedule"
             Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
           end
 
-          #  next arriving buses for a particular stop on the route (in nextbus, the predictions)
+          # next arriving buses for a particular stop on the route (in nextbus, the predictions)
           app.get '/v0/bus/routes/:route_id/arrivals/:stop_id' do
+            cache_control :public, :must_revalidate, max_age: 60
+
             route_id = params[:route_id]
             stop_id = params[:stop_id]
             halt 400, bad_url_error(bad_route_message)  unless is_route_id? route_id
@@ -71,7 +75,8 @@ module Sinatra
 
           # locations of buses on route
           app.get '/v0/bus/routes/:route_id/locations' do
-            cache_control :public, :must_revalidate, :no_cache, max_age: 0
+            cache_control :public, :must_revalidate, :no_cache, max_age: 60
+
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
             address = apiRoot + "&command=vehicleLocations"
@@ -80,6 +85,8 @@ module Sinatra
 
           # locations of all buses
           app.get '/v0/bus/locations' do
+            cache_control :public, :must_revalidate, max_age: 60
+
             address = apiRoot + "&command=vehicleLocations"
             Net::HTTP.get(URI(address)).to_s
           end
@@ -96,11 +103,10 @@ module Sinatra
             json stops_collection.find({:stop_id => stop_id},{fields: {:_id => 0}}).to_a
           end
 
-          # # get predicted arrivals for a stop -- this one isn't working because the NextBus API docs lie. Frustrating.
+          # get predicted arrivals for a stop -- this one isn't working because the NextBus API docs lie. Frustrating.
           # app.get 'v0/bus/stops/:stop_id/arrivals'
             
           # end
-
           
         end
       end
