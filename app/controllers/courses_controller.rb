@@ -160,8 +160,6 @@ module Sinatra
               end
             end
 
-            #require 'pry'; binding.pry
-
             json course_coll.find(query, {:sort => sorting, :fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
           end
 

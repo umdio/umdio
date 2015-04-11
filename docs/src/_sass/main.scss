@@ -333,6 +333,11 @@ div.container > .methods {
       font-weight: 400;
       font-size: 1.5em;
     }
+
+    h3, h4 {
+      color: $gray;
+      font-weight: normal;
+    }
     
     p {
       font-family: $body-font;
@@ -389,6 +394,7 @@ div.container > .methods {
       text-shadow: 1px 1px 1px darken($code-bg, 10%);
       line-height: 1.25em;
       font-style: normal;
+      word-break: break-all;
       
       .prompt:after {
         content: '$ ';

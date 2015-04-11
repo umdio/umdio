@@ -1,4 +1,5 @@
 # TODO: implement controller tests and API endpoint tests
+# TODO: make extensive tests
 
 require_relative '../tests/spec_helper'
 require 'json'
