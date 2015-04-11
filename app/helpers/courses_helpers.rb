@@ -4,7 +4,7 @@ module Sinatra
     module Helpers
 
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
-      def find_sections section_ids, section_coll
+      def find_sections section_coll, section_ids
         if section_ids.length > 1
           section_coll.find({section_id: { '$in' => section_ids } },{fields: {_id: 0}}).to_a
         else
@@ -14,21 +14,31 @@ module Sinatra
       end
 
       def flatten_sections sections_array
-        sections_array.map { |e| e['section_id'] }
+        sections_array.map { |e| e['section_id'] } unless sections_array.nil?
       end
 
-      def is_course? string
-        /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
-      end
+      # flattens course sections and expands them if params[:expand] is set
+      def flatten_course_sections_expand section_coll, courses
+        # flatten sections
+        section_ids = []
+        courses.each do |course|
+          course['sections'] = flatten_sections course['sections']
+          section_ids.concat course['sections']
+        end
 
-      # TODO: this may not be true. section_numbers might be able to be any 4 alphanumberic characters
-      # https://ntst.umd.edu/soc/search?courseId=ENES100&sectionId=&termId=201405&_openSectionsOnly=on&courseLevelFilter=ALL&instructor=&teachingCenter=ALL&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&creditCompare=&credits=&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on
-      def is_section? string
-        /^\d{4}$/.match string #if the string is of this particular format
-      end
+        # expand sections if ?expand=sections
+        if params[:expand] == 'sections'
+          sections = find_sections section_coll, section_ids
+          sections = [sections] if not sections.kind_of?(Array) # hacky, maybe modify find_sections?
 
-      def is_full_section_id? string
-        /^[A-Z]{4}\d{3}[A-Z]?-\d{4}$/.match string
+          # map sections to course hash & replace section data
+          if not sections.empty?
+            course_sections = sections.group_by { |e| e['course'] }
+            courses.each { |course| course['sections'] = course_sections[course['course_id']] }
+          end
+        end
+
+        return courses
       end
 
       def validate_section_ids section_ids, do_halt=true
@@ -82,7 +92,8 @@ module Sinatra
           )
         end
 
-        courses = courses.to_a
+        # to_a, map is more memory efficient
+        courses = courses.map { |e| e }
 
         # check if found
         if courses.empty?
@@ -98,7 +109,7 @@ module Sinatra
         courses
       end
 
-      # TODO: make this line up with Testudo more accurately
+      # TODO: make this line up with Testudo accurately and implement it in course controller
       def get_current_semester
         time = Time.new
         if time.month >= 3 && time.month < 10
@@ -106,6 +117,19 @@ module Sinatra
         else
           (time.year + 1).to_s + '01'
         end
+      end
+
+      def is_course? string
+        /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
+      end
+
+      # TODO: refactor this... confusing (I would expect section to be the full_id and section number to be this)
+      def is_section? string
+        /^[A-Za-z0-9]{4}$/.match string #if the string is of this particular format
+      end
+
+      def is_full_section_id? string
+        /^[A-Z]{4}\d{3}[A-Z]?-[A-Za-z0-9]{4}$/.match string
       end
     end
   end

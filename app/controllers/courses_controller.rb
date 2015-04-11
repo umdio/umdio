@@ -42,7 +42,7 @@ module Sinatra
               end
             end
 
-            json find_sections section_ids, section_coll #using helper method
+            json find_sections section_coll, section_ids #using helper method
           end
 
           # should this give error or it could do something like courses/list except with sections array too?
@@ -71,7 +71,7 @@ module Sinatra
             end
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
-            sections = find_sections section_ids, section_coll
+            sections = find_sections section_coll, section_ids
 
             if sections.nil? or sections.empty?
               halt 404, { error_code: 404, message: "No sections found." }.to_json
@@ -87,7 +87,7 @@ module Sinatra
             courses = find_courses course_coll, course_id
             section_ids = courses[0]['sections'].map { |e| e['section_id'] }
 
-            json find_sections section_ids,section_coll
+            json find_sections section_coll, section_ids
           end
 
           # returns courses specified by :course_id
@@ -99,22 +99,7 @@ module Sinatra
 
             courses = find_courses course_coll, course_ids
 
-            # flatten sections
-            section_ids = []
-            courses.each do |course|
-              course['sections'] = flatten_sections course['sections']
-              section_ids.concat course['sections']
-            end
-
-            # expand sections if ?expand=sections
-            if params[:expand] == 'sections'
-              sections = find_sections section_ids, section_coll
-              sections = [sections] if not sections.kind_of?(Array) # hacky, maybe modify find_sections?
-
-              # map sections to course hash & replace section data
-              course_sections = sections.group_by { |e| e['course'] }
-              courses.each { |course| course['sections'] = course_sections[course['course_id']] }
-            end
+            courses = flatten_course_sections_expand section_coll, courses
 
             # get rid of [] on single object return
             courses = courses[0] if course_ids.length == 1
@@ -124,8 +109,32 @@ module Sinatra
             json courses
           end
 
+          # TODO: refactor this into a bunch of helper methods
           # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
+            # sanitize
+            params['page'] = (params['page'] || 1).to_i
+            params['page'] = 1 if params['page'] < 1
+            params['per_page'] = (params['per_page'] || 30).to_i
+            params['per_page'] = 100 if params['per_page'] > 100
+            params['per_page'] = 1   if params['per_page'] < 1
+
+            params['dept_id'] = params['dept_id'].upcase if params['dept_id']
+
+            limit = params['per_page']
+            page = params['page']
+            # create the next & prev page links
+            path = request.fullpath.split('?')[0]
+            
+            params['page'] += 1
+            next_page = base_url + path + '?' + params.map{|k,v| "#{k}=#{v}"}.join('&')
+
+            params['page'] -= 2
+            if (params['page']*limit > course_coll.count)
+              params['page'] = (course_coll.count.to_f / limit).ceil.to_i
+            end
+            prev_page = base_url + path + '?' + params.map{|k,v| "#{k}=#{v}"}.join('&')
+
             # sorting
             sorting = []
             params['sort'] ||= []
@@ -140,16 +149,10 @@ module Sinatra
               sorting << order
             end unless params['sort'].empty?
 
-            # cleanup
-            params.delete('sort')
-            params.delete('semester')
-            params.delete('expand')
-
-            params['dept_id'] = params['dept_id'].upcase if params['dept_id']
-
+            special = ['sort', 'semester', 'expand', 'per_page', 'page']
             # searching
             query = {}
-            params.keys.each do |k|
+            params.keys.each do |k| unless special.include?(k)
               e = ''
               if k.include? ('<')
                 parts = k.split('<')
@@ -169,8 +172,22 @@ module Sinatra
                 query[k] = params[k]
               end
             end
+            end
 
-            json course_coll.find(query, {:sort => sorting, :fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
+            courses = course_coll.find(query, {:sort => sorting, :limit => limit, :skip => (page - 1)*limit, :fields => {:_id => 0}}).map{ |e| e }
+            #courses.each { |course| course['sections'] = flatten_sections course['sections'] } unless courses.nil?
+            courses = flatten_course_sections_expand section_coll, courses
+
+            # set the link headers
+            link = ""
+            link += "<#{next_page}>; rel=\"next\"" unless courses.empty?
+            if not courses.empty? and page > 1
+              link += ", "
+            end
+            link += "<#{prev_page}>; rel=\"prev\"" unless page == 1
+            headers['Link'] = link
+
+            json courses
           end
 
         end

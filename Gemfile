@@ -14,7 +14,9 @@ group :development do
   gem 'rspec'
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
   gem 'pry'
+  gem 'rerun'
   gem 'shotgun'
+  gem 'better_errors'
 end
 
 group :test do

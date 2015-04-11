@@ -35,6 +35,10 @@ task :up do
 end
 task :server => :up
 
+task :rerun do
+  system "rerun 'rackup config.ru -p 3000'"
+end
+
 desc "Run tests in /tests that look like *_spec.rb"
 RSpec::Core::RakeTask.new :test do |task|
   task.pattern = Dir['tests/**/*_spec.rb']

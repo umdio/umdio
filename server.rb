@@ -34,12 +34,21 @@ class UMDIO < Sinatra::Base
   end
 
   configure :development do
+    # TODO: fix weird namespace conflict and install better_errors
+    use BetterErrors::Middleware
+    BetterErrors.application_root = __dir__
   end
 
   # before application/request starts
   before do
     content_type 'application/json'
     cache_control :public, max_age: 86400
+  end
+
+  helpers do
+    def base_url
+      @base_url ||= "#{request.env['rack.url_scheme']}://#{request.env['HTTP_HOST']}"
+    end
   end
 
   # load in app helpers & controllers
