@@ -25,30 +25,29 @@ Get detailed info about one or more bus routes.
 `GET http://api.umd.io/v0/bus/routes/115`
 
 Trimmed Response:
-{% highlight json%}
+{% highlight json %}
 {
-"route_id": "701",
-"title": "701 UMB BioPark",
-"stops": [],
-"directions": [
-{
-"direction_id": "peargara",
-"title": "Pearl St Garage",
-"stops": []
-},
-{
-"direction_id": "ramsapts",
-"title": "Ramsay St Apts",
-"stops": []
+  "route_id": "701",
+  "title": "701 UMB BioPark",
+  "stops": [],
+  "directions": [
+    {
+      "direction_id": "peargara",
+      "title": "Pearl St Garage",
+      "stops": []
+    },
+    {
+      "direction_id": "ramsapts",
+      "title": "Ramsay St Apts",
+      "stops": []
+    }
+  ],
+  "paths": [],
+  "lat_max": "39.2995236",
+  "lat_min": "39.28301",
+  "lon_max": "-76.620848",
+  "lon_min": "-76.6320545"
 }
-],
-"paths": [],
-"lat_max": "39.2995236",
-"lat_min": "39.28301",
-"lon_max": "-76.620848",
-"lon_min": "-76.6320545"
-}
-
-{% endhighlight%}
+{% endhighlight %}
 
 <!-- END -->
