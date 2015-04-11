@@ -138,6 +138,8 @@ module Sinatra
             # searching
             params.delete('sort')
             params.delete('semester')
+            params.delete('expand')
+
             query = {}
             params.keys.each do |k|
               e = ''

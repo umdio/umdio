@@ -1,5 +1,4 @@
 # Module for the root route and a catch-all error route
-# TODO: use URL re-writing to remove trailing slashes (301)
 module Sinatra
   module UMDIO
     module Routing
@@ -32,13 +31,18 @@ module Sinatra
                 {
                   name: 'Courses',
                   url: 'http://api.umd.io/v0/courses',
-                  docs: 'http://umd.io/docs/courses'
+                  docs: 'http://umd.io/courses/'
                 },
                 {
                   name: 'Bus',
                   url: 'http://api.umd.io/v0/bus',
-                  docs: 'http://umd.io/docs/bus'
-                }
+                  docs: 'http://umd.io/bus/'
+                },
+                {
+                  name: 'Map',
+                  url: 'http://api.umd.io/v0/map',
+                  docs: 'http://umd.io/map/'
+                },
               ]
             }
             json resp
