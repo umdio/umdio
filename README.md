@@ -23,14 +23,14 @@ Status: We are live at [umd.io](http://umd.io)
 ###Implement:
   - add query capability (e.g. /courses/ENES100?instructor=Calabro)
   - allow limits and filters -- projection stuff
-	- courses/search
-    - paginate responses
-	  - courses/<dep>
-  - namespace the routes or use a controller scheme
+    - paginate responses with headers (trim to 30 results, max 100)
+	  - courses
+	  - sections/courses
+  - i18n to move messages to a en.yml file to keep the controllers clean
+  - namespace the routes
   - expand:
     - sections works
-    - stops?
-    - courses?
+    - courses
 
 ###Testing:
   - Remove hardcoding from tests
