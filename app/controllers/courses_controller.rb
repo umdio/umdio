@@ -51,6 +51,11 @@ module Sinatra
             { error_code: 404, message: "We still don't know what should be returned here. Do you?" }.to_json
           end
 
+          app.get '/v0/courses/departments' do
+            departments = course_coll.distinct("dept_id")
+            json departments
+          end
+
           # Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
             course_id = "#{params[:course_id]}".upcase
@@ -135,11 +140,14 @@ module Sinatra
               sorting << order
             end unless params['sort'].empty?
 
-            # searching
+            # cleanup
             params.delete('sort')
             params.delete('semester')
             params.delete('expand')
 
+            params['dept_id'] = params['dept_id'].upcase if params['dept_id']
+
+            # searching
             query = {}
             params.keys.each do |k|
               e = ''
