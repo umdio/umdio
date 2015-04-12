@@ -142,9 +142,9 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     end
 
     describe 'Case insensitive' do
-      it_has_behavior 'good status', url + '/sections/ENES100-0101'
-      it_has_behavior 'good status', url + '/sections/enes100-0101'
-      it_has_behavior 'good status', url + '/sections/Enes100-0101'
+      it_has_behavior 'good status', url + '/sections/ENES100-0201'
+      it_has_behavior 'good status', url + '/sections/enes100-0201'
+      it_has_behavior 'good status', url + '/sections/Enes100-0201'
     end
 
     describe 'handles multiple arguments' do

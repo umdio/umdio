@@ -6,10 +6,18 @@ module Sinatra
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections section_coll, section_ids
         if section_ids.length > 1
-          section_coll.find({section_id: { '$in' => section_ids } },{fields: {_id: 0}}).to_a
+          res = section_coll.find({section_id: { '$in' => section_ids } },{fields: {_id: 0}}).to_a
         else
-          section_coll.find({section_id: section_ids[0]}, {fields: {_id: 0}}).to_a[0] 
+          res = section_coll.find({section_id: section_ids[0]}, {fields: {_id: 0}}).to_a[0] 
           # is returning the single object without [] weird? should we return the array without []?
+        end
+        if !res 
+          halt 404, { error_code: 404, 
+          message: "Section with section_id #{section_ids[0]} not found.", 
+          available_sections: "http://api.umd.io/v0/courses/sections",
+          docs: "http://umd.io/courses" }.to_json
+        else
+          res
         end
       end
 

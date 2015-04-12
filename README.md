@@ -4,32 +4,23 @@ Status: We are live at [umd.io](http://umd.io)
 
 ##TODO:
 ###Docs:
-  - license and copyright?
+  - License + Terms of Use
   - Tutorials for using the API with different languages
-  - Styling: font-size, nav float on pages, list styles in description section
-  - mobile menu
-  - Bus
-    - Route schedule
-    - Route arrivals
-    - Route locations
-    - List Stops
-    - Get Stop
-    - Locations
-  - Courses
-    - Semester
-  - Map
-    - Buildings
+  - Styling: 
+    - nav disappears?
+    - nav link highlighting at bottom of page
+  - how parameters work, generally
+  - 'next page' link
 
 ###Implement:
-  - add query capability (e.g. /courses/ENES100?instructor=Calabro)
-  - allow limits and filters -- projection stuff
-    - paginate responses with headers (trim to 30 results, max 100)
-	  - courses
-	  - sections/courses
-  - i18n to move messages to a en.yml file to keep the controllers clean
+  - queries - subfields on objects
+  - limits and filters 
+  - 'near' search on locations (section meetings, buildings, buses?)
+  - paginate responses with headers (trim to 30 results, max 100)
+  - i18n to move all string messages to a en.yml file + refer to them as variables in controllers 
   - namespace the routes
   - expand:
-    - sections works
+    - sections - works
     - courses
 
 ###Testing:
@@ -39,20 +30,20 @@ Status: We are live at [umd.io](http://umd.io)
   - Unit tests for methods - particularly helpers
   - break tests out into features - a file per endpoint gets unwieldy
   - production tests
-  - tests for docs? alerts for when the site is down? Something!
+  - howto: test that docs are correct?
 
-###Future Endpoints:
-  - [Buses](http://api-portal.anypoint.mulesoft.com/nextbus/api/nextbus-api)
-  - Finals for Courses
-  - [Maps + Buildings](http://maps.umd.edu/arcgis/rest/services)
-  - Budget - this is kinda hard
+###Future:
+  - Finals 
+  - [Maps - more!](http://maps.umd.edu/arcgis/rest/services)
+  - Budget
   - CAS
-- optimizations: cache responses (eventually, we might move to metadata + pagination)
-- Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files)
+  - Refactor [this way?](http://stackoverflow.com/questions/5015471/using-sinatra-for-larger-projects-via-multiple-files)
 
 Meta: find developers and projects, eat more databases, build core team, think about long term (license, technology, team structure)
 
 ##Contributing: Getting Started
+*Let's work on making this whole process easier, starting with docker*
+
 Depending on where you are starting from, should take between 10 minutes and forever
 
 -  (mac) install [xcode command line tools](https://developer.apple.com/xcode/) (or `xcode-select --install` from the command line)
@@ -60,7 +51,7 @@ Depending on where you are starting from, should take between 10 minutes and for
 - install [git](http://git-scm.com/) (or `brew install git`)
 - install [rvm](https://rvm.io/rvm/install)
 - install [node and npm](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager)
-- install ruby 2.2.0 and switch rubies `rvm use 2.2.0`
+- install ruby 2.2.0 and switch rubies `rvm install 2.2.0` and `rvm use 2.2.0`
 - install [mongodb](http://docs.mongodb.org/manual/installation/)
 - git clone this repo `git clone https://github.com/umdio/umdio my_umdio_app_folder`
 - install bundler to manage dependencies `gem install bundler`
@@ -106,5 +97,5 @@ write tests --> add functionality --> make tests pass --> write tests
 
 ###Notes:
 - Security: 
-  - We should thoroughly test our system's security from the beginning, and have evidence that we are secure - that way, more people can trust us with their data!
-  - Eventually, a single API for UMD data is much less vulnerable than a thousand separate databases everywhere - do it right once, enforce it strictly, then you only have one thing to worry about. Defense in depth, lock everything tight. Open is more secure than closed, because you have more eyes on it.
+  - Right now, all the data is public. Before we have any secure data, we should do an audit.
+  - Eventually, a single API for UMD data is more secure than a hundred separate databases - do it right once, and then it's only one thing to keep track of.

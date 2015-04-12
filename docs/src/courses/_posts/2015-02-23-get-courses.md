@@ -13,7 +13,7 @@ Get information about one or more courses.
 
 Get information about one course.
 
-*Returns:* The [course object](#course_object) specified, or `null`
+*Returns:* The [course object](#course_object) specified, or a 404 error, letting you know that the course doesn't exist on the database.
 
 ----
 

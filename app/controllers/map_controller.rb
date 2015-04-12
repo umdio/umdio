@@ -35,7 +35,12 @@ module Sinatra
             # get rid of [] on single object return
             buildings = buildings[0] if building_ids.length == 1
             # prevent null being returned
-            buildings = {} if not buildings
+            if not buildings
+              halt 404, {error_code: 404, 
+                message: "Building number #{buildings[0]} isn't in our database, and probably doesn't exist.",
+                available_buildings: "http://api.umd.io/map/buildings",
+                docs: "http://umd.io/map"}.to_json
+            end
             json buildings
           end
 
