@@ -14,9 +14,14 @@ describe 'Pagination' do
 
       it 'should always at least return 1 course' do
       end
+
+      it 'should return the number of courses requested (between 1 and 100)' do
+      end
     end
 
     describe 'response headers' do
+      before { get url }
+
       # https://developer.github.com/v3/#link-header
       it 'should have a properly formatted Link' do
       end

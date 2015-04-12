@@ -4,13 +4,12 @@ module Sinatra
   module UMDIO
     module Routing
       module Courses
-
+        
         def self.registered(app)
 
-          course_coll = nil
-          section_coll = nil
-
           app.before '/v0/courses*' do
+            @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
+
             # TODO: don't hard code the current semester
             params[:semester] ||= '201508'
 
@@ -27,8 +26,8 @@ module Sinatra
               halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
             end
 
-            course_coll = app.settings.courses_db.collection("courses#{params[:semester]}")
-            section_coll = app.settings.courses_db.collection("sections#{params[:semester]}")
+            @course_coll = app.settings.courses_db.collection("courses#{params[:semester]}")
+            @section_coll = app.settings.courses_db.collection("sections#{params[:semester]}")
           end
 
           # Returns sections of courses by their id
@@ -42,18 +41,32 @@ module Sinatra
               end
             end
 
-            json find_sections section_coll, section_ids #using helper method
+            json find_sections @section_coll, section_ids #using helper method
           end
 
-          # should this give error or it could do something like courses/list except with sections array too?
+          # TODO: allow for searching in meetings properties
           app.get '/v0/courses/sections' do
-            # TODO does this really exist? What do we return on this?
-            { error_code: 404, message: "We still don't know what should be returned here. Do you?" }.to_json
+            begin_paginate!
+
+            # get parse the search and sort
+            sorting = params_sorting_array
+            query   = params_search_query
+
+            sections = @section_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0}}).map{ |e| e }
+
+            end_paginate! sections
+
+            json sections
           end
 
           app.get '/v0/courses/departments' do
-            departments = course_coll.distinct("dept_id")
+            departments = @course_coll.distinct("dept_id")
             json departments
+          end
+
+          app.get '/v0/courses/list' do
+            courses = @course_coll.find({}, {:sort => ['course_id', 1], :fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
+            json courses
           end
 
           # Returns section info about particular sections of a course, comma separated
@@ -65,13 +78,13 @@ module Sinatra
             section_numbers = "#{params[:section_id]}".upcase.split(',')
             # TODO: validate_section_ids
             section_numbers.each do |number|
-              if not is_section? number
+              if not is_section_number? number
                 halt 400, { error_code: 400, message: "Invalid section_number #{number}" }.to_json
               end
             end
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
-            sections = find_sections section_coll, section_ids
+            sections = find_sections @section_coll, section_ids
 
             if sections.nil? or sections.empty?
               halt 404, { error_code: 404, message: "No sections found." }.to_json
@@ -84,10 +97,10 @@ module Sinatra
           app.get '/v0/courses/:course_id/sections' do
             course_id = "#{params[:course_id]}".upcase
 
-            courses = find_courses course_coll, course_id
+            courses = find_courses @course_coll, course_id
             section_ids = courses[0]['sections'].map { |e| e['section_id'] }
 
-            json find_sections section_coll, section_ids
+            json find_sections @section_coll, section_ids
           end
 
           # returns courses specified by :course_id
@@ -97,9 +110,9 @@ module Sinatra
             # parse params
             course_ids = "#{params[:course_id]}".upcase.split(',')
 
-            courses = find_courses course_coll, course_ids
+            courses = find_courses @course_coll, course_ids
 
-            courses = flatten_course_sections_expand section_coll, courses
+            courses = flatten_course_sections_expand @section_coll, courses
 
             # get rid of [] on single object return
             courses = courses[0] if course_ids.length == 1
@@ -109,83 +122,23 @@ module Sinatra
             json courses
           end
 
-          # TODO: refactor this into a bunch of helper methods
+          # TODO: allow searching for multiple values in an array?
           # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
-            # sanitize
-            params['page'] = (params['page'] || 1).to_i
-            params['page'] = 1 if params['page'] < 1
-            params['per_page'] = (params['per_page'] || 30).to_i
-            params['per_page'] = 100 if params['per_page'] > 100
-            params['per_page'] = 1   if params['per_page'] < 1
+            begin_paginate!
 
+            # sanitize params
+            # TODO: sanitize more parameters to make searching a little more user friendly
             params['dept_id'] = params['dept_id'].upcase if params['dept_id']
 
-            limit = params['per_page']
-            page = params['page']
-            # create the next & prev page links
-            path = request.fullpath.split('?')[0]
-            
-            params['page'] += 1
-            next_page = base_url + path + '?' + params.map{|k,v| "#{k}=#{v}"}.join('&')
+            # get parse the search and sort
+            sorting = params_sorting_array
+            query   = params_search_query
 
-            params['page'] -= 2
-            if (params['page']*limit > course_coll.count)
-              params['page'] = (course_coll.count.to_f / limit).ceil.to_i
-            end
-            prev_page = base_url + path + '?' + params.map{|k,v| "#{k}=#{v}"}.join('&')
+            courses = @course_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0}}).map{ |e| e }
+            courses = flatten_course_sections_expand @section_coll, courses unless courses.empty?
 
-            # sorting
-            sorting = []
-            params['sort'] ||= []
-            params['sort'].split(',').each do |sort|
-              order_str = '+'
-              if sort[0] == '+' or sort[0] == '-'
-                order_str = sort[0]
-                sort = sort[1..sort.length]
-              end
-              order = (order_str == '+' ? 1 : -1)
-              sorting << sort
-              sorting << order
-            end unless params['sort'].empty?
-
-            special = ['sort', 'semester', 'expand', 'per_page', 'page']
-            # searching
-            query = {}
-            params.keys.each do |k| unless special.include?(k)
-              e = ''
-              if k.include? ('<')
-                parts = k.split('<')
-                if parts.length == 1
-                  parts[1] = params[k]
-                  e = 'e'
-                end
-                query[parts[0]] = { "$lt#{e}" => parts[1] }
-              elsif k.include? ('>')
-                parts = k.split('>')
-                if parts.length == 1
-                  parts[1] = params[k]
-                  e = 'e'
-                end
-                query[parts[0]] = { "$gt#{e}" => parts[1] }
-              else
-                query[k] = params[k]
-              end
-            end
-            end
-
-            courses = course_coll.find(query, {:sort => sorting, :limit => limit, :skip => (page - 1)*limit, :fields => {:_id => 0}}).map{ |e| e }
-            #courses.each { |course| course['sections'] = flatten_sections course['sections'] } unless courses.nil?
-            courses = flatten_course_sections_expand section_coll, courses
-
-            # set the link headers
-            link = ""
-            link += "<#{next_page}>; rel=\"next\"" unless courses.empty?
-            if not courses.empty? and page > 1
-              link += ", "
-            end
-            link += "<#{prev_page}>; rel=\"prev\"" unless page == 1
-            headers['Link'] = link
+            end_paginate! courses
 
             json courses
           end

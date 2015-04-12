@@ -17,6 +17,92 @@ module Sinatra
         sections_array.map { |e| e['section_id'] } unless sections_array.nil?
       end
 
+      def begin_paginate! default_per_page=30, max_per_page=100
+        # clamp page and per_page params
+        params['page'] = (params['page'] || 1).to_i
+        params['page'] = 1 if params['page'] < 1
+
+        params['per_page'] = (params['per_page'] || default_per_page).to_i
+        params['per_page'] = max_per_page if params['per_page'] > max_per_page
+        params['per_page'] = 1 if params['per_page'] < 1
+
+        @limit = params['per_page']
+        @page  = params['page']
+
+        # create the next & prev page links
+        path = request.fullpath.split('?')[0]
+        base = base_url + path + '?'
+        
+        # next page
+        params['page'] += 1
+        @next_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
+
+        # prev page
+        params['page'] -= 2
+        if (params['page']*@limit > @course_coll.count)
+          params['page'] = (@course_coll.count.to_f / limit).ceil.to_i
+        end
+        @prev_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
+      end
+
+      def end_paginate! courses
+        # set the link headers
+        link = ""
+        link += "<#{@next_page}>; rel=\"next\"" unless courses.empty?
+        if not courses.empty? and @page > 1
+          link += ", "
+        end
+        link += "<#{@prev_page}>; rel=\"prev\"" unless @page == 1
+        headers['Link'] = link
+        headers['X-Total-Count'] = @course_coll.count.to_s
+      end
+
+      def params_sorting_array
+        sorting = []
+        params['sort'] ||= []
+        params['sort'].split(',').each do |sort|
+          order_str = '+'
+          if sort[0] == '+' or sort[0] == '-'
+            order_str = sort[0]
+            sort = sort[1..sort.length]
+          end
+          order = (order_str == '+' ? 1 : -1)
+          sorting << sort
+          sorting << order
+        end unless params['sort'].empty?
+
+        return sorting
+      end
+
+      def params_search_query ignore=nil
+        ignore ||= @special_params
+
+        query = {}
+        params.keys.each do |k| unless ignore.include?(k)
+          e = ''
+          if k.include? ('<')
+            parts = k.split('<')
+            if parts.length == 1
+              parts[1] = params[k]
+              e = 'e'
+            end
+            query[parts[0]] = { "$lt#{e}" => parts[1] }
+          elsif k.include? ('>')
+            parts = k.split('>')
+            if parts.length == 1
+              parts[1] = params[k]
+              e = 'e'
+            end
+            query[parts[0]] = { "$gt#{e}" => parts[1] }
+          else
+            query[k] = params[k]
+          end
+        end
+        end
+
+        return query
+      end
+
       # flattens course sections and expands them if params[:expand] is set
       def flatten_course_sections_expand section_coll, courses
         # flatten sections
@@ -124,7 +210,7 @@ module Sinatra
       end
 
       # TODO: refactor this... confusing (I would expect section to be the full_id and section number to be this)
-      def is_section? string
+      def is_section_number? string
         /^[A-Za-z0-9]{4}$/.match string #if the string is of this particular format
       end
 
