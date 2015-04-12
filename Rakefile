@@ -19,14 +19,17 @@ namespace :db do
   end
 end
 
-desc "Scrape testudo to fill the database"
+desc "Scrape to fill databases" # takes about 15 minutes
 task :scrape do
-  ruby 'app/scrapers/courses_scraper.rb'
-  ruby 'app/scrapers/bus_routes_scraper.rb'
-  ruby 'app/scrapers/map_controller.rb'
+  sh 'ruby app/scrapers/courses_scraper.rb 2013 2014 2015'
+  sh 'ruby app/scrapers/sections_scraper.rb'
+  sh 'ruby app/scrapers/section_course_linker.rb'
+  sh 'ruby app/scrapers/update_open_seats.rb 201508'
+  sh 'ruby app/scrapers/bus_routes_scraper.rb'
+  sh 'ruby app/scrapers/buildings.rb'
 end
 
-task :setup => ['scrape']
+task :setup => ['db:up','scrape']
 
 desc "Start the web server"
 task :up do

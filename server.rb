@@ -20,8 +20,8 @@ class UMDIO < Sinatra::Base
 
   # fix strange scraper bug by explicitly setting the server
   # reference: http://stackoverflow.com/questions/17334734/how-do-i-get-sinatra-to-work-with-httpclient
-  set :server, 'webrick'
-
+  
+  
   configure do
     # set up mongo database - code from ruby mongo driver tutorial
     host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
