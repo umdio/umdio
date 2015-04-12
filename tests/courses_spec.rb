@@ -61,8 +61,8 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior "good status", url + '/ENES100' 
       it_has_behavior "good status", url + '/enes100'
       it_has_behavior "good status", url + '/Enes100'
-      it_has_behavior "good status", url + '/cmsc132h'
-    end
+      it_has_behavior "good status", url + '/bees608a'
+    end 
 
     describe 'get multiple courses' do
       it_has_behavior 'good status', url + '/ENES100,ENES102' #doesn't check return, could very well make a good corner case
@@ -111,9 +111,9 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     end
 
     describe 'Case insensitive to course_id' do
-      it_has_behavior 'good status', url + '/ENES100/sections/0101'
-      it_has_behavior 'good status', url + '/Enes100/sections/0101'
-      it_has_behavior 'good status', url + '/enes100/sections/0101'
+      it_has_behavior 'good status', url + '/ENES100/sections/0201'
+      it_has_behavior 'good status', url + '/Enes100/sections/0201'
+      it_has_behavior 'good status', url + '/enes100/sections/0201'
     end
 
     describe 'handles multiple arguments' do
