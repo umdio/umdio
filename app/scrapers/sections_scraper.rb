@@ -5,24 +5,29 @@ require 'open-uri'
 require 'nokogiri'
 require 'mongo'
 include Mongo
+require './app/helpers/courses_helpers.rb'
+include Sinatra::UMDIO::Helpers
 
-#set up mongo database - code from ruby mongo driver tutorial
+# set up mongo database - code from ruby mongo driver tutorial
 host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
 port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
 
-#announce connection and connect
+# announce connection and connect
 puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
 
 # Architecture:
 # build list of queries
-course_collections = db.collection_names.select{|e| e.include?('courses')}.map{|name| db.collection(name)}
+course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
 section_queries = []
 course_collections.each do |c|
-  semester = c.name.scan(/courses(.+)/)[0][0]
-  c.find({},{fields: {_id:0,course_id:1}}).to_a
-    .each_slice(200){|a| section_queries << 
-      "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"}
+  semester = c.name.scan(/courses(.+)/)[0]
+  if not semester.nil?
+    semester = semester[0]
+    c.find({},{fields: {_id:0,course_id:1}}).to_a
+      .each_slice(200){|a| section_queries << 
+        "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"}
+  end
 end
 
 count = 0
@@ -44,10 +49,15 @@ section_queries.each do |query|
       # add section to array to add
       meetings = []
       section.search('div.class-days-container div.row').each do |meeting|
+        start_time = meeting.search('span.class-start-time').text
+        end_time = meeting.search('span.class-end-time').text
+
         meetings << {
           :days => meeting.search('span.section-days').text,
-          :start_time => meeting.search('span.class-start-time').text,
-          :end_time => meeting.search('span.class-end-time').text,
+          :start_time => start_time,
+          :end_time => end_time,
+          :start_seconds => time_to_int(start_time),
+          :end_seconds => time_to_int(end_time),
           :building => meeting.search('span.building-code').text,
           :room => meeting.search('span.class-room').text,
           :classtype => meeting.search('span.class-type').text || "Lecture"
@@ -66,7 +76,8 @@ section_queries.each do |query|
       total += 1
     end
   end
-  #insert array of sections into mongo
+
+  # insert array of sections into mongo
   count += 1
   puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
   

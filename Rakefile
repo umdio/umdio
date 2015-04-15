@@ -24,6 +24,7 @@ task :scrape do
   sh 'ruby app/scrapers/courses_scraper.rb 2013 2014 2015'
   sh 'ruby app/scrapers/sections_scraper.rb'
   sh 'ruby app/scrapers/section_course_linker.rb'
+  # TODO: don't hardcode semester_id
   sh 'ruby app/scrapers/update_open_seats.rb 201508'
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
   sh 'ruby app/scrapers/buildings.rb'
@@ -38,9 +39,11 @@ task :up do
 end
 task :server => :up
 
-task :rerun do
-  system "rerun 'rackup config.ru -p 3000'"
+desc "Sinatra console"
+task :console do
+  system "bundle exec irb -r ./config.ru"
 end
+task :c => :console
 
 desc "Run tests in /tests that look like *_spec.rb"
 RSpec::Core::RakeTask.new :test do |task|

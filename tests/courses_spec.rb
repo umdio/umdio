@@ -28,10 +28,12 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       before { get url }
       it_has_behavior 'good status', url
       it 'returns a list of courses' do
-        # TODO: make this check a course for the course spec
-        #res = JSON.parse(last_response.body)
-        #expect(res.length).to be > 4000
-        #expect(res[5000]).to be == nil 
+        res = JSON.parse(last_response.body)
+        course_keys = ['course_id', 'name', 'dept_id', 'credits', 'sections']
+        keys_len    = course_keys.length
+        res.each do |r|
+          expect((r.keys & course_keys).length).to be keys_len
+        end
       end
     end
 

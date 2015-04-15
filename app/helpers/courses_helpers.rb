@@ -5,20 +5,29 @@ module Sinatra
 
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections section_coll, section_ids
-        if section_ids.length > 1
-          res = section_coll.find({section_id: { '$in' => section_ids } },{fields: {_id: 0}}).to_a
-        else
-          res = section_coll.find({section_id: section_ids[0]}, {fields: {_id: 0}}).to_a[0] 
-          # is returning the single object without [] weird? should we return the array without []?
+        query = section_ids[0]
+        query = { '$in' => section_ids } if section_ids.length > 1
+
+        res = section_coll.find(
+          { section_id: query },
+          { fields: {_id: 0, 'meetings.start_seconds' => 0, 'meetings.end_seconds' => 0} }
+        ).map { |e| e }
+
+        # is returning the single object without [] weird? should we return the array without []?
+        if section_ids.length == 1
+          return res[0]
         end
+
         if !res 
-          halt 404, { error_code: 404, 
-          message: "Section with section_id #{section_ids[0]} not found.", 
-          available_sections: "http://api.umd.io/v0/courses/sections",
-          docs: "http://umd.io/courses" }.to_json
-        else
-          res
+          halt 404, {
+            error_code: 404, 
+            message: "Section with section_id #{section_ids[0]} not found.", 
+            available_sections: "http://api.umd.io/v0/courses/sections",
+            docs: "http://umd.io/courses"
+          }.to_json
         end
+
+        return res
       end
 
       def flatten_sections sections_array
@@ -79,9 +88,16 @@ module Sinatra
           sorting << order
         end unless params['sort'].empty?
 
+        # map common parameters to their mongo-matching representation
+        mappings = {'start_time' => 'meetings.start_seconds', 'end_time' => 'meetings.end_seconds'}
+        sorting.map! { |e| mappings.has_key?(e) ? mappings[e] : e }
+
         return sorting
       end
 
+      # TODO: support != operations
+      # TODO: support fuzzy equals for sections like "MWF," give me all sections with class on Mondays. Should days be an array?
+      # TODO: index the meeting time as an Integer to allow queries like ?start_time>10:00am
       def params_search_query ignore=nil
         ignore ||= @special_params
 
@@ -203,6 +219,22 @@ module Sinatra
         courses
       end
 
+      # @param string_time string in format like 10:00am, 10:00, 10am or 10
+      def time_to_int time
+        time = time.to_s if time.is_a? (Fixnum)
+        if time.length == 2
+          time += ( time.to_i >= 12 ? 'pm' : 'am' )
+        end
+
+        require 'date'
+        if dt = DateTime.parse(time) rescue false
+          return dt.hour * 3600 + dt.min * 60
+        end
+
+        # all else fails, return the original time
+        time.to_i
+      end
+
       # TODO: make this line up with Testudo accurately and implement it in course controller
       def get_current_semester
         time = Time.new
@@ -217,7 +249,6 @@ module Sinatra
         /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
       end
 
-      # TODO: refactor this... confusing (I would expect section to be the full_id and section number to be this)
       def is_section_number? string
         /^[A-Za-z0-9]{4}$/.match string #if the string is of this particular format
       end

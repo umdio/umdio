@@ -22,6 +22,16 @@ Status: We are live at [umd.io](http://umd.io)
   - expand:
     - sections - works
     - courses
+  - events:
+    https://see.umd.edu/event/feed/
+	https://see.umd.edu/feed/
+	[academic calendar](http://registrar.umd.edu/calendar.html) - maybe?
+	http://www.freestuff.umd.edu/events.cfm
+	http://theclarice.umd.edu/calendar
+	http://www.umterps.com/calendar/events/
+	http://www.careercenter.umd.edu/events.cfm
+	http://www.umdrightnow.umd.edu/spark
+	Twitter?
 
 ###Testing:
   - Remove hardcoding from tests
