@@ -24,5 +24,4 @@ sections_names.each do |coll|
     bulk.find({'_id' => section['_id']}).update_one( { '$set' => { 'meetings' => meetings } } )
   end
   bulk.execute() rescue nil
-  sections.re_index()
 end
