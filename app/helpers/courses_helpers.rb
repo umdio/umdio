@@ -88,10 +88,6 @@ module Sinatra
           sorting << order
         end unless params['sort'].empty?
 
-        # map common parameters to their mongo-matching representation
-        mappings = {'start_time' => 'meetings.start_seconds', 'end_time' => 'meetings.end_seconds'}
-        sorting.map! { |e| mappings.has_key?(e) ? mappings[e] : e }
-
         return sorting
       end
 
@@ -170,7 +166,7 @@ module Sinatra
       def validate_course_ids course_ids, do_halt=true
         course_ids = [course_ids] if course_ids.is_a?(String)
         course_ids.each do |id|
-          if not is_course? id
+          if not is_course_id? id
             return false if not do_halt
             error_msg = { error_code: 400, message: "Invalid course_id #{id}", docs: "http://umd.io/courses/" }.to_json
             halt 400, error_msg
@@ -245,7 +241,7 @@ module Sinatra
         end
       end
 
-      def is_course? string
+      def is_course_id? string
         /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
       end
 

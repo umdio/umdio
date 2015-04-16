@@ -2,9 +2,9 @@
 # TODO: make extensive tests, test object structures and behaviors
 
 require_relative '../tests/spec_helper'
-require 'json'
 
 describe 'Courses Endpoint' do  # Probably should be moved higher up the test ladder. For now!
+  # TODO: make this an instance variable @url
   url = '/v0/courses'
     
   shared_examples_for 'good status' do |url|
@@ -40,10 +40,13 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
   end
 
   describe 'GET /courses/<course_id>' do
+    # TODO: beware of variable shadowing
     shared_examples_for "gets enes100" do |url|
-      before {get url}
+      before { get url }
       it 'returns enes100 course object' do
-        # To Fix
+        course = JSON.parse(last_response.body)
+        expect(course['course_id']).to eq 'ENES100'
+        expect(course['name']).to eq 'Introduction to Engineering Design'
       end
     end
 
@@ -52,10 +55,9 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     end
 
     describe 'returns error on misformed urls' do
-      it_has_behavior 'bad status', url + '/ene12'
-      it_has_behavior 'bad status', url + '/enes13'
-      it_has_behavior 'bad status', url + '/enes100-0101'
-      it_has_behavior 'bad status', url + '/enes100,enes132,BMGT22'
+      ['ene12', 'enes13', 'enes13123', 'enes100-0101', 'enes100,enes132,bmgt22'].each do |id|
+        it_has_behavior 'bad status', "#{url}/#{id}"
+      end
     end
 
     #tests for case insensitivity can just check status (so long as bad tests give bad status!)
@@ -84,7 +86,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     shared_examples_for 'gets enes100 sections' do |url|
       before { get url }
       it 'returns array of section objects' do
-        # To Fix
+        # TODO: implement
       end
     end
     
@@ -108,7 +110,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     describe 'returns section properly' do
       before {get url + '/enes100/sections/0101'}
       it 'returns the correct section' do
-        # TO Fix
+        # TODO: implement
       end
     end
 
@@ -121,7 +123,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     describe 'handles multiple arguments' do
       before {get url + '/enes100/sections/0101,0201,0202,0301,0302,0401,0501,0502,0601,0602,0801'}
       it 'returns multiple sections to request' do
-        # To Fix
+        # TODO: implement
       end
     end
 
@@ -139,7 +141,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     describe 'returns section properly' do
       before { get url + '/sections/ENES100-0101'}
       it 'returns the right section' do
-          # To fix       
+        # TODO: implement
       end
     end
 
@@ -152,7 +154,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     describe 'handles multiple arguments' do
       before {get url + '/sections/ENES100-0101,ENES100-0201,ENES100-0202,ENES100-0301,ENES100-0302,ENES100-0401,ENES100-0501,ENES100-0502,ENES100-0601,ENES100-0602,ENES100-0801'}
       it 'returns multiple sections on request' do
-        #TO Fix
+        # TODO: implement
       end          
     end
 

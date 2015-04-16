@@ -1,6 +1,7 @@
 require_relative '../tests/spec_helper.rb'
 require_relative '../app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
+# TODO: test more helpers like is_full_section_id and is_course_id
 
 describe 'Helpers' do
   describe 'Courses' do

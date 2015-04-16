@@ -2,7 +2,6 @@ require 'simplecov'
 SimpleCov.start
 require 'json'
 
-#spec_helper.rb
 ENV['RACK_ENV'] = 'test'
 
 require_relative File.join('..', 'server')
@@ -16,5 +15,10 @@ RSpec.configure do |config|
   def app
     UMDIO
   end
-  
+
+  def get_json url
+    response = get(url)
+    JSON.parse(response.body)
+  end
+
 end
