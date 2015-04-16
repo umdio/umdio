@@ -91,29 +91,34 @@ module Sinatra
         return sorting
       end
 
-      # TODO: support != operations
       # TODO: support fuzzy equals for sections like "MWF," give me all sections with class on Mondays. Should days be an array?
-      # TODO: index the meeting time as an Integer to allow queries like ?start_time>10:00am
       def params_search_query ignore=nil
         ignore ||= @special_params
 
         query = {}
         params.keys.each do |k| unless ignore.include?(k)
           e = ''
-          if k.include? ('<')
-            parts = k.split('<')
+          if k.include? ('<') or k.include? ('>')
+            delim = ((k.include? ('<')) ? '<' : '>')
+            cmp   = ((delim ==    '<')  ? 'l' : 'g')
+            parts = k.split(delim)
             if parts.length == 1
               parts[1] = params[k]
               e = 'e'
             end
-            query[parts[0]] = { "$lt#{e}" => parts[1] }
-          elsif k.include? ('>')
-            parts = k.split('>')
-            if parts.length == 1
-              parts[1] = params[k]
-              e = 'e'
+            query[parts[0]] = { "$#{cmp}t#{e}" => parts[1] }
+          elsif k.include? ('!')
+            parts = k.split('!')
+            if params[k].include? (',') or params[k].include? ('|')
+              delim = (params[k].include?(',') ? ',' : '|')
+              query[parts[0]] = { "$nin" => params[k].split(delim) }
+            else
+              query[parts[0]] = { "$ne" => params[k] }
             end
-            query[parts[0]] = { "$gt#{e}" => parts[1] }
+          elsif params[k].include? (',')
+            query[k] = { "$in" => params[k].split(',') }
+          elsif params[k].include? ('|')
+            query[k] = { "$all" => params[k].split('|') }
           else
             query[k] = params[k]
           end
@@ -168,7 +173,7 @@ module Sinatra
         course_ids.each do |id|
           if not is_course_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid course_id #{id}", docs: "http://umd.io/courses/" }.to_json
+            error_msg = { error_code: 400, message: "Invalid course_id #{id}.", docs: "http://umd.io/courses/" }.to_json
             halt 400, error_msg
           end
         end

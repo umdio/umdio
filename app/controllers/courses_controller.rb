@@ -158,7 +158,6 @@ module Sinatra
             json courses
           end
 
-          # TODO: allow searching for multiple values in an array?
           # returns a list of courses, with the full course objects. This is probably not what we want in the end
           app.get '/v0/courses' do
             begin_paginate!
