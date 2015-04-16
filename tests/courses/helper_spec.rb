@@ -1,7 +1,6 @@
-require_relative '../tests/spec_helper.rb'
-require_relative '../app/helpers/courses_helpers.rb'
+require_relative '../../tests/spec_helper.rb'
+require_relative '../../app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
-# TODO: test more helpers like is_full_section_id and is_course_id
 
 describe 'Helpers' do
   describe 'Courses' do
@@ -29,6 +28,29 @@ describe 'Helpers' do
         expect(res).to be(36000)
         expect(res.class).to be(Fixnum)
         expect(time_to_int(36000)).to be(36000)
+      end
+    end
+
+    describe 'object ids' do
+      # ! eq ! is used because of weird oddities in Ruby
+      it 'is_section_id?' do
+        {
+          'CMSC131' => false,
+          'CMSC131-01' => false,
+          'CMSC-0101' => false,
+          'CMSC131A-0113' => true,
+          'CMSC131-0101' => true,
+          'CMSC131-ABCD' => true
+        }.each { |k,v| expect(!is_full_section_id?(k)).to eq(!v) }
+      end
+
+      it 'is_course_id?' do
+        {
+          'CMSC131' => true,
+          'CMSC131A' => true,
+          'BMGT' => false,
+          'CMSC131-0101' => false
+        }.each { |k,v| expect(!is_course_id?(k)).to eq(!v) }
       end
     end
 

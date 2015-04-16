@@ -48,45 +48,34 @@ module Sinatra
           app.get '/v0/courses/sections' do
             begin_paginate!
 
-            # sanitize parameters
-            # adjust params if meeting property is specified without meetings qualifier
-            meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
-            (params.keys & meeting_properties).each do |prop|
-              params["meetings.#{prop}"] = params[prop]
-              params.delete(prop)
-            end
-
             # get parse the search and sort
             sorting = params_sorting_array
             query   = params_search_query
 
-            # TODO: put this in a helper or something
-            # map queries from start_time to start_seconds
-            if query['meetings.start_time']
-              val = query['meetings.start_time']
-              if val.is_a? Hash
-                val.update(val){ |k,v| time_to_int(v) }
-                query['meetings.start_seconds'] = val
-              else
-                query['meetings.start_seconds'] = time_to_int(val)
-              end
-              query.delete('meetings.start_time')
-            end
-            # map queries from end_time to end_seconds
-            if query['meetings.end_time']
-              val = query['meetings.end_time']
-              if val.is_a? Hash
-                val.update(val){ |k,v| time_to_int(v) }
-                query['meetings.end_seconds'] = val
-              else
-                query['meetings.end_seconds'] = time_to_int(val)
-              end
-              query.delete('meetings.end_time')
+            # adjust query if meeting property is specified without meetings qualifier
+            meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
+            (query.keys & meeting_properties).each do |prop|
+              query["meetings.#{prop}"] = query[prop]
+              query.delete(prop)
             end
 
-            # map common sorting parameters to their mongo-matching representation
-            mappings = {'start_time' => 'meetings.start_seconds', 'end_time' => 'meetings.end_seconds'}
-            sorting.map! { |e| mappings.has_key?(e) ? mappings[e] : e }
+            # TODO: possible combine this with above / move into a helper method
+            mappings = {'start_time' => 'start_seconds', 'end_time' => 'end_seconds'}
+            mappings.each do |key, value|
+              if query["meetings.#{key}"]
+                val = query["meetings.#{key}"]
+                if val.is_a? Hash
+                  val.each { |k,v| val[k] = time_to_int(v) }
+                  query["meetings.#{value}"] = val
+                else
+                  query["meetings.#{value}"] = time_to_int(val)
+                end
+                query.delete("meetings.#{key}")
+              end
+            end
+
+            # map sorting parameters to their mongo-matching representation
+            sorting.map! { |e| mappings.has_key?(e) ? "meetings.#{mappings[e]}" : e }
 
             sections = @section_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0, 'meetings.start_seconds' => 0, 'meetings.end_seconds' => 0}}).map{ |e| e }
 

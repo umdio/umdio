@@ -334,7 +334,12 @@ div.container > .methods {
       font-size: 1.5em;
     }
 
-    h3, h4 {
+    h3 {
+      color: $dark-gray;
+      font-weight: normal;
+    }
+
+    h4 {
       color: $gray;
       font-weight: normal;
     }
@@ -416,6 +421,21 @@ div.container > .methods {
     .description {
       border-bottom: none;
     }
+  }
+
+  table {
+    font-size: 0.9em;
+    th, td {
+      padding: 0.5em;
+      border: 1px solid $light-gray;
+    }
+
+    th {
+      color: $dark-gray;
+    }
+  }
+  .description table td code {
+    background: transparent;
   }
 }
 
