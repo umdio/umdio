@@ -18,3 +18,6 @@ sass:
   sass_dir: _sass
   style: :compressed
 highlighter: rouge
+
+# Server settings
+host: 0.0.0.0

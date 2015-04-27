@@ -3,6 +3,7 @@ bower_components
 css
 tmp
 docs/public/
+docs/node_modules
 
 # exclude database
 /data/*
@@ -17,3 +18,4 @@ mime.types
 *.sass-cache
 *.swp
 .DS_Store
+.vagrant

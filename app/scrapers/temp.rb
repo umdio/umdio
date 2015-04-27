@@ -20,4 +20,3 @@ course_ids.each do |course|
     puts "#{sec_id} has #{open} open and #{wait} on waitlist"
   end
 end
-

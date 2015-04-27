@@ -1,5 +1,5 @@
 # script for getting route info from nextbus api, dumping into Mongo database. 
-# will be run regularly using a cronjob or ruby equivalent, started by the server
+# run  every ~month
 
 require 'mongo'
 require 'net/http'

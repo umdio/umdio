@@ -8,4 +8,3 @@ bower:
 	bower install
 
 dependencies: bower
-

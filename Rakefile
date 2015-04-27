@@ -11,11 +11,20 @@ namespace :db do
   task :down do
     mongo_pid = `pgrep mongod`
     if (!mongo_pid.empty?) then
-      puts "DANGER: killing mongod instances: #{mongo_pid}"
-      mongo_pid.split("\n").each{|pid| Process.kill(15,pid.to_i)}
+      puts "DANGER: killing mongod instances: #{mongo_pid}."
+      mongo_pid.split("\n").each{|pid| `sudo kill 15 #{pid.to_i}`}
     else
       puts 'No mongod processes found -- free to go ahead'
     end
+  end
+
+  desc "clean database"
+  task :clean do
+    puts "DANGER: will remove everything in the database, including logs."
+    `rm -r ./data/db`
+    `rm -r ./data/mongo`
+    `mkdir ./data/db`
+    `mkdir ./data/mongo`
   end
 end
 
@@ -27,15 +36,16 @@ task :scrape do
   # TODO: don't hardcode semester_id
   sh 'ruby app/scrapers/update_open_seats.rb 201508'
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
   sh 'ruby app/scrapers/buildings.rb'
 end
 
-task :setup => ['db:up','scrape']
+task :setup => ['db:clean','db:up','scrape']
 
 desc "Start the web server"
 task :up do
   #if ENV['RACK_ENV'] == :development
-  system "shotgun -p 3000"
+  system "shotgun -p 3000 -o 0.0.0.0"
 end
 task :server => :up
 
