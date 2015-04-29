@@ -1,5 +1,4 @@
 #Todo
-Fix nginx.conf and nginx_site_config
 figure out bus schedule test failure
 
 ##Docs:
@@ -8,6 +7,7 @@ figure out bus schedule test failure
   - Styling:
     - nav disappears?
     - nav link highlighting at bottom of page
+    - nav too many items, bumps past bottom
   - how parameters work, generally
   - 'next page' link
 

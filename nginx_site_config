@@ -9,8 +9,9 @@ server {
 server {
   listen 80;
   listen 443;
-  server_name umd.io;
-  root /home/normal/umdio/docs/public;
+  server_name umd.io
+              localhost;
+  root /home/vagrant/umdio/docs/public;
 
   location / {
     try_files $uri $uri.html $uri/index.html index.html;
@@ -28,11 +29,12 @@ server {
 server {
   listen 80 default_server;
   listen 443 default_server;
-  server_name api.umd.io;
+  server_name api.umd.io
+              api.localhost;
   proxy_cache api;
   proxy_cache_bypass $cookie_nocache $arg_nocache$arg_comment;
   proxy_no_cache $http_pragma;
-  root /home/normal/umdio/public;
+  root /home/vagrant/umdio/public;
   passenger_enabled on;
   rewrite ^/(.*)/$ /$1 permanent;
 }
