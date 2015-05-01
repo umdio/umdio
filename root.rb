@@ -10,7 +10,7 @@ module Sinatra
             resp = {
               message: "This is the umd.io JSON API.",
               status: "working, most of the time",
-              docs: "http://umd.io/docs/",
+              docs: "http://umd.io/",
               current_version: "v0",
               versions: [
                 {
@@ -52,8 +52,9 @@ module Sinatra
             resp = {
               error_code: 404,
               message: "We couldn't find what you're looking for. Please see the docs for more information.",
-              docs: "http://umd.io/docs/"
+              docs: "http://umd.io/"
             }
+            status 404
             json resp
           end
 
