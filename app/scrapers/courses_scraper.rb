@@ -75,4 +75,7 @@ dep_urls.each do |url|
   #should be upserts, if we can swing it. That way we can run this lots of times!
   coll.insert(course_array) unless course_array.empty?
 
+  #bulk.find({course_id: course['course_id']}).upsert().update({ "$set" => { sections: sections} })
+
+
 end

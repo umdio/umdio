@@ -1,5 +1,5 @@
 #Todo
-figure out bus schedule test failure
+upsert + expire data + cron = permanent database goodness
 
 ##Docs:
   - License + Terms of Use
@@ -10,6 +10,7 @@ figure out bus schedule test failure
     - nav too many items, bumps past bottom
   - how parameters work, generally
   - 'next page' link
+  - how versioning will actually work
 
 ##Implement:
   - queries - subfields on objects
@@ -50,7 +51,7 @@ figure out bus schedule test failure
 
 ##Meta:
  - find developers and projects
- - eat more databases
+ - eat more data
  - expand team
  - think about long term
 

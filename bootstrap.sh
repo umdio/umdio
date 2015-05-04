@@ -22,10 +22,10 @@ sudo apt-get -y install git
 #install nodejs and bower
 curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
 sudo apt-get install -y nodejs
-mkdir /home/vagrant/.npm-global
+mkdir ~/.npm-global
 npm config set prefix '~/.npm-global'
-echo 'export PATH=~/.npm-global/bin:$PATH' | sudo tee -a /home/vagrant/.profile
-source /home/vagrant/.profile
+echo 'export PATH=~/.npm-global/bin:$PATH' | sudo tee -a ~/.profile
+source ~/.profile
 cd /home/vagrant/umdio/docs
 npm install bower
 cd ..
@@ -71,4 +71,4 @@ bundle exec rake
 # start nginx with the right config
 sudo sed -i '1i127.0.0.1 api.localhost' /etc/hosts # add a line to hosts file for convenience
 sudo nginx -s stop
-sudo nginx -c /home/vagrant/umdio/nginx.conf
+sudo nginx -c ~/umdio/nginx.conf

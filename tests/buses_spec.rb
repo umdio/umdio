@@ -32,9 +32,9 @@ describe 'Bus Endpoint' do
     it_has_behavior 'error', url + '/routes/NOTAROUTE', bad_route_message
   end
 
-  describe 'get route schedule' do
-    it_has_behavior 'good status', url + '/routes/118/schedule'
-    it_has_behavior 'error', url + '/routes/NOTAROUTE/schedule', bad_route_message
+  describe 'get route schedules' do
+    it_has_behavior 'good status', url + '/routes/118/schedules'
+    it_has_behavior 'error', url + '/routes/NOTAROUTE/schedules', bad_route_message
   end
 
   describe 'get route predicted arrivals' do
