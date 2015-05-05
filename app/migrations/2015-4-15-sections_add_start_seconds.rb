@@ -2,7 +2,7 @@
 
 require 'mongo'
 include Mongo
-require './app/helpers/courses_helpers.rb'
+require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 # set up mongo database - code from ruby mongo driver tutorial

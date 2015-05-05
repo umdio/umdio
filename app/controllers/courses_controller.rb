@@ -123,7 +123,7 @@ module Sinatra
             course_id = "#{params[:course_id]}".upcase
 
             courses = find_courses @course_coll, course_id
-            section_ids = courses[0]['sections'].map { |e| e['section_id'] }
+            section_ids = flatten_sections courses[0]['sections']
 
             json find_sections @section_coll, section_ids
           end
@@ -147,7 +147,7 @@ module Sinatra
             json courses
           end
 
-          # returns a list of courses, with the full course objects. This is probably not what we want in the end
+          # returns a paginated list of courses, with the full course objects
           app.get '/v0/courses' do
             begin_paginate!
 

@@ -65,5 +65,4 @@ class UMDIO < Sinatra::Base
   register Sinatra::UMDIO::Routing::Bus
   register Sinatra::UMDIO::Routing::Map
   register Sinatra::UMDIO::Routing::Root
-
 end

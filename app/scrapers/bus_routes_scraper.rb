@@ -18,14 +18,13 @@ db = MongoClient.new(host, port).db('umdbus')
 # set up and clean the database collections
 routes_coll = db.collection('routes')
 stops_coll = db.collection('stops')
-routes_coll.remove
-stops_coll.remove
 
 apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
 address = apiRoot + '&command=routeList'
 response_hash = parse(Net::HTTP.get(URI(address)).to_s)
 route_array = response_hash["route"].map { |e| {"route_id"=>e["tag"],"title"=>e["title"]} }
 stops_set = Set.new []
+puts "Adding bus routes and stops to the database"
 route_array.each do |route|
   puts "getting #{route["route_id"]}"
   address = apiRoot + "&command=routeConfig&r=#{route["route_id"]}"
@@ -41,7 +40,9 @@ route_array.each do |route|
       "stops"=>e["stop"].map{|stop| stop["tag"] rescue e["stop"]}
     }
   end
-  routes_coll.insert({
+
+  routes_coll.update({route_id: route["route_id"]}, # match the route, if it exists
+  { "$set" => {
     route_id: route["route_id"],
     title: route["title"],
     stops: stops,
@@ -51,10 +52,10 @@ route_array.each do |route|
     lat_min: route_response["latMin"],
     lon_max: route_response["lonMax"],
     lon_min: route_response["lonMin"], 
-  })
+  }}, {upsert: true}) # update or insert route
 end
 
 stops_set.each do |stop|
-  puts stop
-  stops_coll.insert(stop)
+  puts "adding #{stop['title']}"
+  stops_coll.update({stop_id: stop["stop_id"]},{ "$set" => stop }, {upsert: true}) # update or insert stops
 end

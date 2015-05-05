@@ -71,4 +71,4 @@ bundle exec rake
 # start nginx with the right config
 sudo sed -i '1i127.0.0.1 api.localhost' /etc/hosts # add a line to hosts file for convenience
 sudo nginx -s stop
-sudo nginx -c ~/umdio/nginx.conf
+sudo nginx -c /home/vagrant/umdio/nginx.conf

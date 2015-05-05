@@ -7,13 +7,13 @@ category: courses
 
 List all the courses available (for the given semester, or the current semester by default).
 
-`http://api.umd.io/v0/courses`
+`http://api.umd.io/v0/courses/list`
 
 *Returns:* Array of objects with three properties: `course_id`, `name`, and `department`
 
 <!-- EXAMPLE -->
 
-Request: `GET http://api.umd.io/v0/courses`
+Request: `GET http://api.umd.io/v0/courses/list`
 Trimmed Response:
 {% highlight json %}
 [

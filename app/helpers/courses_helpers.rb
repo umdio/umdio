@@ -30,8 +30,13 @@ module Sinatra
         return res
       end
 
+      # returns an array of the section ids of an array of sections
       def flatten_sections sections_array
-        sections_array.map { |e| e['section_id'] } unless sections_array.nil?
+        if sections_array.nil?
+          []
+        else
+          sections_array.map { |e| e['section_id'] }
+        end
       end
 
       def begin_paginate! default_per_page=30, max_per_page=100
@@ -76,7 +81,7 @@ module Sinatra
 
       def params_sorting_array
         sorting = []
-        params['sort'] ||= []
+        params['sort'] ||= 'course_id' # default - sort by course_id
         params['sort'].split(',').each do |sort|
           order_str = '+'
           if sort[0] == '+' or sort[0] == '-'

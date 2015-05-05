@@ -1,6 +1,6 @@
 # Script for adding umd testudo courses to a mongodb database using open-uri and nokogiri
 # Use: ruby courses_scraper.rb <years> 
-# Runs in 3m20s on Rob's macbook for years 2014 and 2015. Not bad.
+# Runs in 7m31s on the vagrant vm for years 2013, 2014 and 2015. Not bad.
 
 require 'open-uri'
 require 'nokogiri'
@@ -18,19 +18,18 @@ db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
 years = ARGV
 semesters = years.map { |e| [e + '01', e + '05', e + '08', e + '12'] }.flatten # year plus starting month is term id
 
-
 # Get the urls for all the department pages
 dep_urls = []
 semesters.each do |semester|
-    puts "Searching for courses in term #{semester}"
+  puts "Searching for courses in term #{semester}"
 
-    base_url = "https://ntst.umd.edu/soc/#{semester}"
+  base_url = "https://ntst.umd.edu/soc/#{semester}"
     
-    Nokogiri::HTML(open(base_url)).search('span.prefix-abbrev').each do |e|
-      dep_urls << "https://ntst.umd.edu/soc/#{semester}/#{e.text}"
-    end
+  Nokogiri::HTML(open(base_url)).search('span.prefix-abbrev').each do |e|
+    dep_urls << "https://ntst.umd.edu/soc/#{semester}/#{e.text}"
+  end
     
-    puts "#{dep_urls.length} department/semesters so far"
+  puts "#{dep_urls.length} department/semesters so far"
 end
 
 # add the courses from each department to the database
@@ -39,21 +38,22 @@ dep_urls.each do |url|
   semester = url.split('/soc/')[1][0,6] 
   course_array = []
   coll = db.collection('courses' + semester)
+  bulk = coll.initialize_unordered_bulk_op
   page = Nokogiri::HTML(open(url))
   department = page.search('span.course-prefix-name').text.strip
 
   page.search('div.course').each do |course|
     description =  (course.css('div.approved-course-texts-container').text + course.css('div.course-texts-container').text).strip.gsub(/\t|\r\n/,'')
     relationships = {
-      coreqs: /Corequisite: ([^.]+)/.match(description).to_a[1],
-      prereqs: /Prerequisite: ([^.]+)/.match(description).to_a[1],
-      restrictions: /(Restriction: ([^.]+))/.match(description).to_a[1],
-      restricted_to: /Restricted to ([^.]+)/.match(description).to_a[1],
-      credit_only_granted_for: /Credit only granted for:([^.]+)/.match(description).to_a[1],
-      credit_granted_for: /Credit granted for([^.]+)/.match(description).to_a[1],
-      formerly: /Formerly:([^.]+)/.match(description).to_a[1],
-      also_offered_as: /Also offered as([^.]+)/.match(description).to_a[1]
-    }
+      coreqs: /Corequisite: ([^.]+)/.match(description).to_a[2],
+      prereqs: /Prerequisite: ([^.]+)/.match(description).to_a[2],
+      restrictions: /Restriction: ([^.]+)/.match(description).to_a[2],
+      restricted_to: /Restricted to ([^.]+)/.match(description).to_a[2],
+      credit_only_granted_for: /Credit only granted for:([^.]+)/.match(description).to_a[2],
+      credit_granted_for: /Credit granted for([^.]+)/.match(description).to_a[2],
+      formerly: /Formerly:([^.]+)/.match(description).to_a[2],
+      also_offered_as: /Also offered as([^.]+)/.match(description).to_a[2]
+    } 
 
     course_array << {
       course_id: course.search('div.course-id').text,
@@ -70,12 +70,11 @@ dep_urls.each do |url|
     }
 
   end
-  puts "inserting courses from #{dept_id}"
   
-  #should be upserts, if we can swing it. That way we can run this lots of times!
-  coll.insert(course_array) unless course_array.empty?
-
-  #bulk.find({course_id: course['course_id']}).upsert().update({ "$set" => { sections: sections} })
-
-
+  puts "inserting courses from #{dept_id} (#{semester})"
+  # bulk for speed, upsert so it can be run multiple times without worry
+  course_array.each do |course|
+    bulk.find({course_id: course[:course_id]}).upsert.update({ "$set" => course })
+  end
+  bulk.execute
 end

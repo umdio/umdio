@@ -1,5 +1,5 @@
 #Todo
-upsert + expire data + cron = permanent database goodness
+nginx logs - [management](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-nginx-on-an-ubuntu-vps) and analysis with [GoAccess](http://goaccess.io/) or [visitors](http://www.hping.org/visitors/) or maybe the [request-log-analyzer](https://github.com/wvanbergen/request-log-analyzer) gem.
 
 ##Docs:
   - License + Terms of Use
@@ -13,24 +13,25 @@ upsert + expire data + cron = permanent database goodness
   - how versioning will actually work
 
 ##Implement:
-  - queries - subfields on objects
-  - limits and filters 
+  - queries on subfields - look at subfield application
+  - limits and filters
   - 'near' search on locations (section meetings, buildings, buses?)
-  - paginate responses with headers (trim to 30 results, max 100)
-  - i18n to move all string messages to a en.yml file + refer to them as variables in controllers 
+  - [i18n](http://edgeguides.rubyonrails.org/i18n.html) to move all string messages to a en.yml file + refer to them as variables in controllers 
   - namespace the routes
   - expand:
     - sections - works
     - courses
+  - expire data: cron scrapers will not remove out of date objects
   - events:
     https://see.umd.edu/event/feed/
   https://see.umd.edu/feed/
-  [academic calendar](http://registrar.umd.edu/calendar.html) - maybe?
-  http://www.freestuff.umd.edu/events.cfm
-  http://theclarice.umd.edu/calendar
-  http://www.umterps.com/calendar/events/
-  http://www.careercenter.umd.edu/events.cfm
-  http://www.umdrightnow.umd.edu/spark
+  [academic calendar](http://registrar.umd.edu/calendar.html)
+  [fyi](https://www.umd.edu/fyi/)
+  [free events](http://www.freestuff.umd.edu/events.cfm)
+  [cspac](http://theclarice.umd.edu/calendar)
+  [terps calendar](http://www.umterps.com/calendar/events/)
+  [career center events](http://www.careercenter.umd.edu/events.cfm)
+  [umd right now](http://www.umdrightnow.umd.edu/spark)
   Twitter?
 
 ##Testing:

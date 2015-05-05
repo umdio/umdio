@@ -6,14 +6,14 @@
 if ENV['VAGRANT_TARGET'] && ENV['VAGRANT_TARGET'] == 'digitalocean' then
   Vagrant.configure(2) do |config|
     config.vm.box = "digital_ocean"
-    config.ssh.private_key_path = "~/.ssh/id_rsa"
+    config.ssh.private_key_path = "~/.ssh/umdio/id_rsa"
     config.vm.provider :digital_ocean do |provider|
-      provider.client_id = ENV['DO_CLIENT_ID']
-      provider.api_key = ENV['DO_API_KEY']
-      provider.image = "Ubuntu 14.04 x64"
-      provider.region = "New York 2"
+      provider.token = ENV['DO_TOKEN']
+      provider.image = "ubuntu-14-04-x64"
+      provider.region = "nyc2"
+      provider.ca_path = "/.crt"
     end
-    config.vm.synced_folder ".", "~/umdio"
+    config.vm.synced_folder ".", "/home/vagrant/umdio"
   end
 else
   Vagrant.configure(2) do |config|

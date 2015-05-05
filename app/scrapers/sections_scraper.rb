@@ -1,11 +1,11 @@
 # script for adding sections of umd classes to mongo
-# 4min on Rob's laptop
+# 4min on the VM
 
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
 include Mongo
-require './app/helpers/courses_helpers.rb'
+require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 # set up mongo database - code from ruby mongo driver tutorial
@@ -36,11 +36,11 @@ total = 0
 section_queries.each do |query|
   semester = query.scan(/soc\/(.+)\//)[0][0]
   coll = db.collection("sections#{semester}")
+  bulk = coll.initialize_unordered_bulk_op
   page = Nokogiri::HTML(open(query))
   course_divs = page.search("div.course-sections")
-
   section_array = []
-  
+
   # for each of the courses on the page
   course_divs.each do |course_div|
     course_id = course_div.attr('id')
@@ -68,7 +68,7 @@ section_queries.each do |query|
         :section_id => "#{course_id}-#{number}",
         :course => course_id,
         :number => number,
-        :instructors => section.search('span.section-instructors').text.strip.encode('UTF-8', :invalid => :replace).split(','),
+        :instructors => section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip),
         :seats  => section.search('span.total-seats-count').text,
         :semester => semester,
         :meetings => meetings
@@ -82,5 +82,9 @@ section_queries.each do |query|
   puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
   
   # Should be upsert not insert, so we can run multiple times without having to drop the database
-  coll.insert(section_array) unless section_array.empty?
+  # coll.insert(section_array) unless section_array.empty?
+  section_array.each do |section|
+    bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
+  end
+  bulk.execute unless section_array.empty?
 end
