@@ -79,9 +79,9 @@ module Sinatra
         headers['X-Total-Count'] = @course_coll.count.to_s
       end
 
-      def params_sorting_array
+      def params_sorting_array default=''
         sorting = []
-        params['sort'] ||= 'course_id' # default - sort by course_id
+        params['sort'] ||= default
         params['sort'].split(',').each do |sort|
           order_str = '+'
           if sort[0] == '+' or sort[0] == '-'

@@ -49,7 +49,7 @@ module Sinatra
             begin_paginate!
 
             # get parse the search and sort
-            sorting = params_sorting_array
+            sorting = params_sorting_array 'section_id'
             query   = params_search_query
 
             # adjust query if meeting property is specified without meetings qualifier
@@ -156,7 +156,7 @@ module Sinatra
             params['dept_id'] = params['dept_id'].upcase if params['dept_id']
 
             # get parse the search and sort
-            sorting = params_sorting_array
+            sorting = params_sorting_array 'course_id'
             query   = params_search_query
 
             courses = @course_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0}}).map{ |e| e }

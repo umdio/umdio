@@ -27,20 +27,33 @@ module Sinatra
             json buildings_collection.find({},{fields: {:_id => 0}}).map { |e| e }
           end
 
-          # get buildings by building id
+          # get buildings by building_id or code (supports mixed types)
           app.get '/v0/map/buildings/:building_id' do
             building_ids = params[:building_id].split(",")
-            building_ids.each {|building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id}             
-            buildings = buildings_collection.find({number: { '$in' => building_ids}},{fields: {:_id => 0}}).to_a
+            building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }             
+
+            # find building ids or building codes
+            expr = {
+              '$or' => [
+                { building_id: { '$in' => building_ids} },
+                { code: { '$in' => building_ids} },
+              ]
+            }
+            buildings = buildings_collection.find(expr, { fields: {:_id => 0} }).to_a
+
             # get rid of [] on single object return
             buildings = buildings[0] if building_ids.length == 1
+    
             # prevent null being returned
             if not buildings
-              halt 404, {error_code: 404, 
-                message: "Building number #{buildings[0]} isn't in our database, and probably doesn't exist.",
+              halt 404, {
+                error_code: 404, 
+                message: "Building number #{params[:building_id]} isn't in our database, and probably doesn't exist.",
                 available_buildings: "http://api.umd.io/map/buildings",
-                docs: "http://umd.io/map"}.to_json
+                docs: "http://umd.io/map"
+              }.to_json
             end
+
             json buildings
           end
 

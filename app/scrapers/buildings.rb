@@ -16,6 +16,8 @@ url = "https://gist.githubusercontent.com/zfogg/4bc03d7f71d5f740d028/raw/afe9f0b
 
 array = eval open(url).read
 array.each do |e|
-  buildings_coll.update({number: e[:number]},{"$set" => e},{upsert: true})
+  e[:building_id] = e[:number]
+  e.delete :number
+  buildings_coll.update({building_id: e[:building_id]},{"$set" => e}, {upsert: true})
   puts "inserted #{e[:name]}"
 end
