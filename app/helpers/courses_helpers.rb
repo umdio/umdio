@@ -115,12 +115,14 @@ module Sinatra
             else
               query[parts[0]] = { "$ne" => params[k] }
             end
-          elsif params[k].include? (',')
-            query[k] = { "$in" => params[k].split(',') }
-          elsif params[k].include? ('|')
-            query[k] = { "$all" => params[k].split('|') }
-          else
-            query[k] = params[k]
+          elsif not params[k].nil?
+            if params[k].include? (',')
+              query[k] = { "$in" => params[k].split(',') }
+            elsif params[k].include? ('|')
+              query[k] = { "$all" => params[k].split('|') }
+            else
+              query[k] = params[k]
+            end
           end
         end
         end

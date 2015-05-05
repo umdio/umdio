@@ -1,5 +1,5 @@
 require_relative '../../tests/spec_helper'
-# TODO: make sorting and searching spec
+# TODO: make sorting spec
 
 describe 'Pagination' do
   url = '/v0/courses'
