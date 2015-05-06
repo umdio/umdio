@@ -27,10 +27,10 @@ module Sinatra
             json buildings_collection.find({},{fields: {:_id => 0}}).map { |e| e }
           end
 
-          # get buildings by building_id or code (supports mixed types)
+          # get buildings by building_id or code
           app.get '/v0/map/buildings/:building_id' do
-            building_ids = params[:building_id].split(",")
-            building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }             
+            building_ids = params[:building_id].upcase.split(",")
+            building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }
 
             # find building ids or building codes
             expr = {
