@@ -1,20 +1,18 @@
 #Todo
 nginx logs - [management](https://www.digitalocean.com/community/tutorials/how-to-configure-logging-and-log-rotation-in-nginx-on-an-ubuntu-vps) and analysis with [GoAccess](http://goaccess.io/) or [visitors](http://www.hping.org/visitors/) or maybe the [request-log-analyzer](https://github.com/wvanbergen/request-log-analyzer) gem.
+Move cron setup into a shell script / use whenever gem
+Database consistency - add track + delete to scrapers
 
 ##Docs:
-  - License + Terms of Use
   - Tutorials for getting started with the API
-  - Styling:
-    - nav disappears?
-    - nav link highlighting at bottom of page
-    - nav too many items, bumps past bottom
-  - how parameters work, generally
+  - nav disappears, link highlighting at bottom of page, too many items
   - 'next page' link
-  - how versioning will actually work
+  - versioning
 
 ##Implement:
   - queries on subfields - look at subfield application
   - limits and filters
+  - search on buses or buildings? - buses at each stop?
   - 'near' search on locations (section meetings, buildings, buses?)
   - [i18n](http://edgeguides.rubyonrails.org/i18n.html) to move all string messages to a en.yml file + refer to them as variables in controllers 
   - namespace the routes
