@@ -44,14 +44,13 @@ module Sinatra
             json find_sections @section_coll, section_ids #using helper method
           end
 
-          # TODO: make searching work nicer with nested objects
-          # TODO: support fuzzy equals for sections like "MWF," give me all sections with class on Mondays. Should days be an array?
+          # TODO: allow for searching in meetings properties
           app.get '/v0/courses/sections' do
             begin_paginate! @section_coll
 
             # get parse the search and sort
             sorting = params_sorting_array 'section_id'
-            query   = params_search_query @special_params
+            query   = params_search_query  @special_params
 
             # adjust query if meeting property is specified without meetings qualifier
             meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
@@ -83,6 +82,13 @@ module Sinatra
             end_paginate! sections
 
             json sections
+          end
+
+          # all of the semesters that we have
+          app.get '/v0/courses/semesters' do
+            collection_names = app.settings.courses_db.collection_names()
+            semesters = collection_names.select { |e| e.start_with? "courses" }.map{ |e| e.slice(7,6) }
+            json semesters
           end
 
           app.get '/v0/courses/departments' do
@@ -158,7 +164,7 @@ module Sinatra
 
             # get parse the search and sort
             sorting = params_sorting_array 'course_id'
-            query   = params_search_query @special_params
+            query   = params_search_query  @special_params
 
             courses = @course_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0}}).map{ |e| e }
             courses = flatten_course_sections_expand @section_coll, courses unless courses.empty?
