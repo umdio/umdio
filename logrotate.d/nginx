@@ -1,0 +1,7 @@
+/var/log/nginx/*.log {
+  daily
+  rotate 365
+  compress
+  dateext
+  create 0640 root admin
+}
