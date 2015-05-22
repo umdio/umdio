@@ -94,7 +94,7 @@ module Sinatra
           app.get '/v0/courses/departments' do
             departments = @course_coll.aggregate([
               {'$group' => { '_id' => { dept_id: "$dept_id", department: "$department" }}},
-              {'$sort' => {'_id.dept_id': 1}}
+              {'$sort' => {'_id.dept_id' => 1}}
             ])
             departments = departments.map{ |e| e }
             json departments.map { |e| e['_id'] }
