@@ -11,7 +11,7 @@ module Sinatra
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
             # TODO: don't hard code the current semester
-            params[:semester] ||= '201508'
+            params[:semester] ||= '201608'
 
             # check for semester formatting
             if not (params[:semester].length == 6 and params[:semester].is_number?)

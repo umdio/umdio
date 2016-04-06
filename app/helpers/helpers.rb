@@ -39,11 +39,13 @@ module UMDIO
     def end_paginate! results
       # set the link headers
       link = ""
-      link += "<#{@next_page}>; rel=\"next\"" unless results.empty?
+      link += "<#{@next_page}>; rel=\"next\"" unless results.empty? or results.count < @limit
+      headers['X-Next-Page'] = @next_page unless results.empty? or results.count < @limit
       if not results.empty? and @page > 1
         link += ", "
       end
       link += "<#{@prev_page}>; rel=\"prev\"" unless @page == 1
+      headers['X-Prev-Page'] = @prev_page unless @page == 1
       headers['Link'] = link
       headers['X-Total-Count'] = @collection.count.to_s
     end

@@ -39,5 +39,5 @@ server {
   rewrite ^/(.*)/$ /$1 permanent;
 
   add_header Access-Control-Allow-Origin *;
-  add_header Access-Control-Expose-Headers 'Link, X-Total-Count';
+  add_header Access-Control-Expose-Headers 'Link, X-Total-Count, X-Next-Page, X-Prev-Page';
 }

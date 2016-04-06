@@ -30,11 +30,11 @@ end
 
 desc "Scrape to fill databases" # takes about 15 minutes
 task :scrape do
-  sh 'ruby app/scrapers/courses_scraper.rb 2013 2014 2015'
+  sh 'ruby app/scrapers/courses_scraper.rb 2013 2014 2015 2016'
   sh 'ruby app/scrapers/sections_scraper.rb'
   sh 'ruby app/scrapers/section_course_linker.rb'
   # TODO: don't hardcode semester_id
-  sh 'ruby app/scrapers/update_open_seats.rb 201508'
+  sh 'ruby app/scrapers/update_open_seats.rb 201608'
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
   sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
   sh 'ruby app/scrapers/buildings.rb'
