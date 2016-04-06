@@ -16,7 +16,16 @@ puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
 
 years = ARGV
-semesters = years.map { |e| [e + '01', e + '05', e + '08', e + '12'] }.flatten # year plus starting month is term id
+semesters = years.map do |e|
+  if e.length == 6
+    e
+  else
+    [e + '01', e + '05', e + '08', e + '12']
+  end
+end
+semesters = semesters.flatten # year plus starting month is term id
+
+puts semesters
 
 # Get the urls for all the department pages
 dep_urls = []
@@ -32,6 +41,14 @@ semesters.each do |semester|
   puts "#{dep_urls.length} department/semesters so far"
 end
 
+# safely formats to UTF-8
+def utf_safe text
+  if !text.valid_encoding?
+    text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
+  end
+  text
+end
+
 # add the courses from each department to the database
 dep_urls.each do |url|
   dept_id = url.split('/soc/')[1][7,10] 
@@ -43,7 +60,7 @@ dep_urls.each do |url|
   department = page.search('span.course-prefix-name').text.strip
 
   page.search('div.course').each do |course|
-    description =  (course.css('div.approved-course-texts-container').text + course.css('div.course-texts-container').text).strip.gsub(/\t|\r\n/,'')
+    description =  (utf_safe(course.css('div.approved-course-texts-container').text + course.css('div.course-texts-container').text)).strip.gsub(/\t|\r\n/,'')
     relationships = {
       coreqs: /Corequisite: ([^.]+)/.match(description).to_a[2],
       prereqs: /Prerequisite: ([^.]+)/.match(description).to_a[2],
@@ -63,8 +80,8 @@ dep_urls.each do |url|
       semester: semester,
       credits: course.css('span.course-min-credits').first.content,
       grading_method: course.at_css('span.grading-method abbr') ? course.at_css('span.grading-method abbr').attr('title').split(', ') : [],
-      core: course.css('div.core-codes-group').text.gsub(/\s/, '').delete('CORE:').split(','),
-      gen_ed: course.css('div.gen-ed-codes-group').text.gsub(/\s/, '').delete('General Education:').split(','),
+      core: utf_safe(course.css('div.core-codes-group').text).gsub(/\s/, '').delete('CORE:').split(','),
+      gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).gsub(/\s/, '').delete('General Education:').split(','),
       description: description,
       relationships: relationships
     }
