@@ -72,3 +72,28 @@ bundle exec rake
 sudo sed -i '1i127.0.0.1 api.localhost' /etc/hosts # add a line to hosts file for convenience
 sudo nginx -s stop
 sudo nginx -c /home/vagrant/umdio/nginx.conf
+
+# install logrotate if needed
+if [[ ! -f $(which logrotate) ]]
+then
+  sudo apt-get -y install logrotate
+fi
+
+# set up logrotate config
+# create config file if it doesn't exist
+if [[ ! -f /etc/logrotate.conf ]]
+then
+  sudo touch /etc/logrotate.conf
+fi
+
+# include extra config directory
+if [[ ! $(grep "include /etc/logrotate.d") /etc/logrotate.conf ]]
+then
+  echo "include /etc/logrotate.d" >> /etc/logrotate.conf
+fi
+sudo mkdir -p /etc/logrotate.d/
+
+# move nginx config
+sudo cp /home/vagrant/umdio/logrotate.d/nginx /etc/logrotate.d/
+sudo chown 644 /etc/logrotate.d/nginx
+
