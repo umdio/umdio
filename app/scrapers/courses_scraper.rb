@@ -62,14 +62,14 @@ dep_urls.each do |url|
   page.search('div.course').each do |course|
     description =  (utf_safe(course.css('div.approved-course-texts-container').text + course.css('div.course-texts-container').text)).strip.gsub(/\t|\r\n/,'')
     relationships = {
-      coreqs: /Corequisite: ([^.]+)/.match(description).to_a[2],
-      prereqs: /Prerequisite: ([^.]+)/.match(description).to_a[2],
-      restrictions: /Restriction: ([^.]+)/.match(description).to_a[2],
-      restricted_to: /Restricted to ([^.]+)/.match(description).to_a[2],
-      credit_only_granted_for: /Credit only granted for:([^.]+)/.match(description).to_a[2],
-      credit_granted_for: /Credit granted for([^.]+)/.match(description).to_a[2],
-      formerly: /Formerly:([^.]+)/.match(description).to_a[2],
-      also_offered_as: /Also offered as([^.]+)/.match(description).to_a[2]
+      coreqs: /Corequisite: ([^.]+)/.match(description).to_a[1],
+      prereqs: /Prerequisite: ([^.]+)/.match(description).to_a[1],
+      restrictions: /Restriction: ([^.]+)/.match(description).to_a[1],
+      restricted_to: /Restricted to ([^.]+)/.match(description).to_a[1],
+      credit_only_granted_for: /Credit only granted for: ([^.]+)/.match(description).to_a[1],
+      credit_granted_for: /Credit granted for ([^.]+)/.match(description).to_a[1],
+      formerly: /Formerly: ([^.]+)/.match(description).to_a[1],
+      also_offered_as: /Also offered as:? ([^.]+)/.match(description).to_a[1]
     } 
 
     course_array << {
