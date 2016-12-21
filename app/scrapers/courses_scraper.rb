@@ -54,7 +54,7 @@ dep_urls.each do |url|
   dept_id = url.split('/soc/')[1][7,10] 
   semester = url.split('/soc/')[1][0,6] 
   courses = []
-  coll = db.collection('testing')
+  coll = db.collection('courses' + semester)
   bulk = coll.initialize_unordered_bulk_op
 
   puts "Getting courses for #{dept_id} (#{semester})"
