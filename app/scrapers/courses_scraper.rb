@@ -152,7 +152,7 @@ dep_urls.each do |url|
       department: department,
       semester: semester,
       credits: course.css('span.course-min-credits').first.content,
-      grading_method: course.at_css('span.grading-method abbr')&.attr('title')&.split(', ') || [],
+      grading_method: course.at_css('span.grading-method abbr').attr('title') ? course.at_css('span.grading-method abbr').attr('title').split(', ') : [],
       core: utf_safe(course.css('div.core-codes-group').text).gsub(/\s/, '').delete('CORE:').split(','),
       gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).gsub(/\s/, '').delete('General Education:').split(','),
       description: description,
