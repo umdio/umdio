@@ -64,7 +64,7 @@ dep_urls.each do |url|
   department = page.search('span.course-prefix-name').text.strip
 
 
-  page.search('div.course').each { |course|
+  page.search('div.course').each do |course|
     course_id = course.search('div.course-id').text
     course_title = course.search('span.course-title').text
     credits = course.search('span.course-min-credits').text
@@ -84,7 +84,7 @@ dep_urls.each do |url|
     other = course.search('div.course-texts-container')
 
     # get all relationship text
-    if approved.css('> div').length > 1 then 
+    if approved.css('> div').length > 1 
       text = approved.css('> div:first-child').text.strip + other.css('> div').text.strip
     else 
       text = other.css('> div').text.strip
@@ -125,13 +125,13 @@ dep_urls.each do |url|
     additional_info = match ? match[1] : nil
 
     # if approved-course-texts held relationships, use 2nd child as description and leftover text as "additional info"
-    if approved.css('> div').length > 0 then
+    if approved.css('> div').length > 0 
 
       description = utf_safe approved.css('> div:last-child').text.strip.gsub(/\t|(\r\n)/, '')
       additional_info = additional_info ? additional_info += ' '+text : text
       additional_info = additional_info && additional_info.strip.empty? ? nil : additional_info.strip
 
-    elsif other.css('> div').length > 0 then
+    elsif other.css('> div').length > 0 
       description = text.strip.empty? ? nil : text.strip
     end
 
@@ -159,11 +159,11 @@ dep_urls.each do |url|
       description: description,
       relationships: relationships
     }
-  }
+  end
   
 
-  courses.each { |course|
+  courses.each do |course|
     bulk.find({course_id: course[:course_id]}).upsert.update({ "$set" => course })
-  }
+  end
   bulk.execute
 end
