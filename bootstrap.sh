@@ -41,8 +41,8 @@ echo $PATH
 eval "$(rbenv init -)"
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
 echo 'eval "$(rbenv init -)"' >> ~/.bashrc
-rbenv install 2.2.1
-rbenv global 2.2.1
+rbenv install 2.3.0
+rbenv global 2.3.0
 
 # so that rdoc and ri never get installed with gems
 echo "gem: --no-document" >> ~/.gemrc 
