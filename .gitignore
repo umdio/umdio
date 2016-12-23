@@ -4,6 +4,7 @@ css
 tmp
 docs/public/
 docs/node_modules
+node_modules
 
 # exclude database
 /data/*
