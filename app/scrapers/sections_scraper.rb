@@ -15,6 +15,7 @@ port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
 # announce connection and connect
 puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
+# profs_db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdprof')
 
 # Architecture:
 # build list of queries
@@ -36,6 +37,7 @@ total = 0
 section_queries.each do |query|
   semester = query.scan(/soc\/(.+)\//)[0][0]
   sections_coll = db.collection("sections#{semester}")
+  # prof_coll = profs_db.collection("profs#{semester}")
   prof_coll = db.collection("profs#{semester}")
   sections_bulk = sections_coll.initialize_unordered_bulk_op
   prof_bulk = prof_coll.initialize_unordered_bulk_op
