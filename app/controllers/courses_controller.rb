@@ -28,21 +28,6 @@ module Sinatra
 
             @course_coll = app.settings.courses_db.collection("courses#{params[:semester]}")
             @section_coll = app.settings.courses_db.collection("sections#{params[:semester]}")
-            @prof_coll = app.settings.courses_db.collection("profs#{params[:semester]}")
-          end
-
-
-          # Route for professors, use 'name' or 'course' to filter
-          app.get '/v0/courses/professors' do
-            begin_paginate! @prof_coll 
-            
-            query = params_search_query @special_params
-            
-            profs = @prof_coll.find(query, { :limit => @limit, :skip => (@page - 1)*@limit, :sort => ['name', 1], :fields => { :_id => 0 } }).map { |e| e }
-            
-            end_paginate! profs
-
-            json profs
           end
 
           # Returns sections of courses by their id

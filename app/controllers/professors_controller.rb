@@ -17,7 +17,7 @@ module Sinatra
             # check for semester formatting
             if not (params[:semester].length == 6 and params[:semester].is_number?)
               halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
-			end
+			      end
 
             # check if we have data for the requested semester
             collection_names = app.settings.courses_db.collection_names()
