@@ -15,7 +15,6 @@ port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
 # announce connection and connect
 puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
-# profs_db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdprof')
 
 # Architecture:
 # build list of queries
@@ -37,7 +36,6 @@ total = 0
 section_queries.each do |query|
   semester = query.scan(/soc\/(.+)\//)[0][0]
   sections_coll = db.collection("sections#{semester}")
-  # prof_coll = profs_db.collection("profs#{semester}")
   prof_coll = db.collection("profs#{semester}")
   sections_bulk = sections_coll.initialize_unordered_bulk_op
   prof_bulk = prof_coll.initialize_unordered_bulk_op
@@ -53,11 +51,13 @@ section_queries.each do |query|
     course_div.search("div.section").each do |section|
       # add section to array to add
       instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip)
-      
-      # add instructor to profs object, add course to prof's course set
+      dept = course_id.match(/^([A-Z]{4})\d{3}[A-Z]?$/)[1]
+
+      # add course and department to professor object for each instructor
       instructors.each do |x| 
-        profs[x] ||= []
-        profs[x] |= [course_id] # adds iff course_id not in profs[x]
+        profs[x] ||= {:courses => [], :depts => []}
+        profs[x][:courses] |= [course_id]
+        profs[x][:depts] |= [dept]
       end
 
       meetings = []
@@ -105,11 +105,13 @@ section_queries.each do |query|
   sections_bulk.execute unless section_array.empty?
 
   # sorts profs by name, insert to db
-  profs.sort.to_h.each do |name, courses|
+  profs.sort.to_h.each do |name, obj|
+    courses = obj[:courses]
+    depts = obj[:depts]
     # push all courses to prof's entry
     prof_bulk.find({name: name}).upsert.update(
       {"$set" => {name: name, semester: semester},
-       "$addToSet" => {course: {"$each" => courses} }
+       "$addToSet" => {course: {"$each" => courses}, department: {"$each" => depts} }
       }
   )
   end
