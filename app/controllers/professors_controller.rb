@@ -10,9 +10,10 @@ module Sinatra
           app.before '/v0/professors*' do
             @special_params = ['sort', 'semester', 'per_page', 'page']
 
-            check_semester app, 'profs' 
+            semester = params[:semester] || '201608'
+            check_semester app, semester, 'profs'
 
-            @prof_coll = app.settings.courses_db.collection("profs#{params[:semester]}")
+            @prof_coll = app.settings.courses_db.collection("profs#{semester}")
           end
 
           # Route for professors, use 'name' or 'course' to filter

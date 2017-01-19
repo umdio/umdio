@@ -13,9 +13,9 @@ category: professors
 
 ### Parameters:
 
-`sort` -- specify the field to sort professors by. Professors can either be sorted by `name` or `department`. Defaults to ASCENDING order, use a `-` prefix to sort by DESCENDING order. For example, `?sort=-department` will sort by departments in DESCENDING order.
+`sort` -- specify the field to sort professors by. Professors can either be sorted by `name` or `departments`. Defaults to ASCENDING order, use a `-` prefix to sort by DESCENDING order. For example, `?sort=-departments` will sort by departments in DESCENDING order.
 
-To **search** for professors, each property can be used as a parameter. For example, to search for all professors in the `CMSC` department in the Spring of 2016, the query would look like `?semester=201601&department=CMSC`. Separate values by commas to search for multiple values for a specific field.
+To **search** for professors, each property can be used as a parameter. For example, to search for all professors in the `CMSC` department in the Spring of 2016, the query would look like `?semester=201601&departments=CMSC`. Separate values by commas to search for multiple values for a specific field.
 
 *See the [Professor object](/#professor_object) for a full list of available properties.*
 
@@ -28,13 +28,13 @@ Trimmed Response:
   {
     "name": "Zhi-Long Chen",
     "semester": "201608",
-    "course": [
+    "courses": [
       "BMGT838R",
       "BUDT758R",
       "BUSI788C",
       "BUSM778C"
     ],
-    "department":[
+    "departments":[
       "BMGT",
       "BUDT",
       "BUSI",
@@ -44,11 +44,11 @@ Trimmed Response:
   {
     "name": "Zeinab Karake",
     "semester": "201608",
-    "course":[
+    "courses":[
       "BMGT301",
       "BMGT301F"
     ],
-    "department":[
+    "departments":[
       "BMGT"
     ]
   }

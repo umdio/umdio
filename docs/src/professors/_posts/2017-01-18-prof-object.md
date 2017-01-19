@@ -9,9 +9,9 @@ The professor object represents a UMD professor. The properties of a professor a
 
 `name` -- the name of a professor as it appears on Testudo..
 
-`course` -- An array of courses that the professor has taught in the given semester.
+`courses` -- An array of courses that the professor has taught in the given semester.
 
-`department` -- An array of the departments a professor has taught in the given semester.
+`departments` -- An array of the departments a professor has taught in the given semester.
 
 `semester` -- Six-digit number identifying the semester the course is offered. 
 
@@ -22,12 +22,12 @@ The professor object represents a UMD professor. The properties of a professor a
 {
   "name": "Mark Wellman",
   "semester": "201608",
-  "course": [
+  "courses": [
     "BMGT289B",
     "BMGT466",
     "CPBE225"
   ],
-  "department": [
+  "departments": [
     "BMGT",
     "CPBE"
   ]

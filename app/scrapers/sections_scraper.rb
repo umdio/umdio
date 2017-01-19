@@ -110,8 +110,8 @@ section_queries.each do |query|
     depts = obj[:depts]
     # push all courses to prof's entry
     prof_bulk.find({name: name}).upsert.update(
-      {"$set" => {name: name, semester: semester},
-       "$addToSet" => {course: {"$each" => courses}, department: {"$each" => depts} }
+      {"$set" => {name: name},
+       "$addToSet" => {semester: semester, courses: {"$each" => courses}, departments: {"$each" => depts} }
       }
   )
   end

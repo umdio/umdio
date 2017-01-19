@@ -10,11 +10,11 @@ module Sinatra
           app.before '/v0/courses*' do
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
-            check_semester app, 'courses'
-            check_semester app, 'sections'
+            semester = params[:semester] || '201608'
+            check_semester app, semester, 'courses'
 
-            @course_coll = app.settings.courses_db.collection("courses#{params[:semester]}")
-            @section_coll = app.settings.courses_db.collection("sections#{params[:semester]}")
+            @course_coll = app.settings.courses_db.collection("courses#{semester}")
+            @section_coll = app.settings.courses_db.collection("sections#{semester}")
           end
 
           # Returns sections of courses by their id
