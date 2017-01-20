@@ -3,6 +3,24 @@ module Sinatra
   module UMDIO
     module Helpers
 
+      # generalize logic for checking if semester param valid
+      def check_semester app, semester, coll_prefix
+        # TODO: don't hardcode this
+
+        # check for semester formatting
+        if not (semester.length == 6 and semester.is_number?)
+          halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
+        end
+
+        # check if we have data for the requested semester
+        collection_names = app.settings.courses_db.collection_names()
+        if not collection_names.index("#{coll_prefix}#{semester}")
+          semesters = collection_names.select { |e| e.start_with? coll_prefix }.map{ |e| e.slice(coll_prefix.length,6) }
+          msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo. Or try one of the available semester below:"
+          halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
+        end
+      end
+
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections section_coll, section_ids
         query = section_ids[0]

@@ -35,11 +35,14 @@ total = 0
 # Parse section data from pages
 section_queries.each do |query|
   semester = query.scan(/soc\/(.+)\//)[0][0]
-  coll = db.collection("sections#{semester}")
-  bulk = coll.initialize_unordered_bulk_op
+  sections_coll = db.collection("sections#{semester}")
+  prof_coll = db.collection("profs#{semester}")
+  sections_bulk = sections_coll.initialize_unordered_bulk_op
+  prof_bulk = prof_coll.initialize_unordered_bulk_op
   page = Nokogiri::HTML(open(query))
   course_divs = page.search("div.course-sections")
   section_array = []
+  profs = {} # hash of professor => array of courses
 
   # for each of the courses on the page
   course_divs.each do |course_div|
@@ -47,6 +50,16 @@ section_queries.each do |query|
     # for each section of the course
     course_div.search("div.section").each do |section|
       # add section to array to add
+      instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip)
+      dept = course_id.match(/^([A-Z]{4})\d{3}[A-Z]?$/)[1]
+
+      # add course and department to professor object for each instructor
+      instructors.each do |x| 
+        profs[x] ||= {:courses => [], :depts => []}
+        profs[x][:courses] |= [course_id]
+        profs[x][:depts] |= [dept]
+      end
+
       meetings = []
       section.search('div.class-days-container div.row').each do |meeting|
         start_time = meeting.search('span.class-start-time').text
@@ -79,12 +92,28 @@ section_queries.each do |query|
 
   # insert array of sections into mongo
   count += 1
-  puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
+
+  # nitpick: should be 'courses', not sure how many sections we're adding
+  # puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
+  puts "inserting set number #{count} of sections. 200 more courses in the database - #{semester} term. #{total} total."
   
   # Should be upsert not insert, so we can run multiple times without having to drop the database
   # coll.insert(section_array) unless section_array.empty?
   section_array.each do |section|
-    bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
+    sections_bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
   end
-  bulk.execute unless section_array.empty?
+  sections_bulk.execute unless section_array.empty?
+
+  # sorts profs by name, insert to db
+  profs.sort.to_h.each do |name, obj|
+    courses = obj[:courses]
+    depts = obj[:depts]
+    # push all courses to prof's entry
+    prof_bulk.find({name: name}).upsert.update(
+      {"$set" => {name: name},
+       "$addToSet" => {semester: semester, courses: {"$each" => courses}, departments: {"$each" => depts} }
+      }
+  )
+  end
+  prof_bulk.execute unless profs.empty?
 end

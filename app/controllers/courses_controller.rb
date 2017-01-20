@@ -10,24 +10,11 @@ module Sinatra
           app.before '/v0/courses*' do
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
-            # TODO: don't hard code the current semester
-            params[:semester] ||= '201608'
+            semester = params[:semester] || '201608'
+            check_semester app, semester, 'courses'
 
-            # check for semester formatting
-            if not (params[:semester].length == 6 and params[:semester].is_number?)
-              halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
-            end
-
-            # check if we have data for the requested semester
-            collection_names = app.settings.courses_db.collection_names()
-            if not collection_names.index("courses#{params[:semester]}")
-              semesters = collection_names.select { |e| e.start_with? "courses" }.map{ |e| e.slice(7,6) }
-              msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo. Or try one of the available semester below:"
-              halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
-            end
-
-            @course_coll = app.settings.courses_db.collection("courses#{params[:semester]}")
-            @section_coll = app.settings.courses_db.collection("sections#{params[:semester]}")
+            @course_coll = app.settings.courses_db.collection("courses#{semester}")
+            @section_coll = app.settings.courses_db.collection("sections#{semester}")
           end
 
           # Returns sections of courses by their id
