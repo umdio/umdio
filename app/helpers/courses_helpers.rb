@@ -165,13 +165,15 @@ module Sinatra
         time.to_i
       end
 
-      # TODO: make this line up with Testudo accurately and implement it in course controller
       def get_current_semester
-        time = Time.new
-        if time.month >= 3 && time.month < 10
-          time.year.to_s + '08'
+        # Testudo schedules updated mid/late September for Spring, mid/late Feb for fall
+        # advisor calendar found here http://registrar.umd.edu/faculty-staff/
+        month = Time.now.month
+        year = Time.now.year
+        if month >= 3 && month <= 10
+          year.to_s + '08'
         else
-          (time.year + 1).to_s + '01'
+          (year <= 12 ? year + 1 : year).to_s + '01'
         end
       end
 

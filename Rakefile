@@ -1,4 +1,7 @@
 require 'rspec/core/rake_task'
+require_relative 'app/helpers/courses_helpers.rb'
+
+include Sinatra::UMDIO::Helpers
 #require File.expand_path('../config/application', __FILE__)
  
 namespace :db do
@@ -30,11 +33,16 @@ end
 
 desc "Scrape to fill databases" # takes about 15 minutes
 task :scrape do
-  sh 'ruby app/scrapers/courses_scraper.rb 2013 2014 2015 2016'
+  # Testudo updated in September for Spring, Fed for fall
+  # if fall is updated, we want to get the next year's courses 
+  year = Time.now.month >= 10 || Time.now.month <= 3 ? Time.now.year : Time.now.year + 1
+  years = ((year - 3)..year).each.to_a.join ' '
+  semester = get_current_semester
+  sh "ruby app/scrapers/courses_scraper.rb #{years}"
   sh 'ruby app/scrapers/sections_scraper.rb'
   sh 'ruby app/scrapers/section_course_linker.rb'
   # TODO: don't hardcode semester_id
-  sh 'ruby app/scrapers/update_open_seats.rb 201608'
+  sh "ruby app/scrapers/update_open_seats.rb #{semester}"
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
   sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
   sh 'ruby app/scrapers/buildings.rb'

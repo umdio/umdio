@@ -10,7 +10,7 @@ module Sinatra
           app.before '/v0/courses*' do
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
-            semester = params[:semester] || '201608'
+            semester = params[:semester] || get_current_semester
             check_semester app, semester, 'courses'
 
             @course_coll = app.settings.courses_db.collection("courses#{semester}")
