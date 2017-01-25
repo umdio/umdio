@@ -36,7 +36,7 @@ task :scrape do
   # Testudo updated in September for Spring, Fed for fall
   # if fall is updated, we want to get the next year's courses 
   year = Time.now.month >= 10 || Time.now.month <= 3 ? Time.now.year : Time.now.year + 1
-  years = ((year - 3)..year).each.to_a.join ' '
+  years = ((year - 3)..year).to_a.join ' '
   semester = get_current_semester
   sh "ruby app/scrapers/courses_scraper.rb #{years}"
   sh 'ruby app/scrapers/sections_scraper.rb'
