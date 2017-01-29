@@ -173,7 +173,7 @@ module Sinatra
         if month >= 3 && month <= 10
           year.to_s + '08'
         else
-          (month <= 12 ? year + 1 : year).to_s + '01'
+          ([11,12].include?(month) ? year + 1 : year).to_s + '01'
         end
       end
 
