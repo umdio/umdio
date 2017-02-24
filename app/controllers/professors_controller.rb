@@ -10,7 +10,7 @@ module Sinatra
           app.before '/v0/professors*' do
             @special_params = ['sort', 'semester', 'per_page', 'page']
 
-            semester = params[:semester] || get_current_semester
+            semester = params[:semester] || current_semester
             check_semester app, semester, 'profs'
 
             @prof_coll = app.settings.courses_db.collection("profs#{semester}")
