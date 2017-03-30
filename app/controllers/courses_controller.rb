@@ -157,6 +157,19 @@ module Sinatra
             sorting = params_sorting_array 'course_id'
             query   = params_search_query  @special_params
 
+            # use regex instead of just 'gen_ed = DSHS'
+            # now gen ed code may be in the middle of a string (DSHS or DVUP, DSHS if taken with..., etc)
+            if query['gen_ed']
+              new_gened_query = {
+                '$regex': ".*#{query['gen_ed']}.*",
+                '$options': 'i'
+              }
+
+              query['gen_ed'] = new_gened_query
+            end
+
+            p query
+
             courses = @course_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0}}).map{ |e| e }
             courses = flatten_course_sections_expand @section_coll, courses unless courses.empty?
 

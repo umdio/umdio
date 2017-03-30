@@ -135,6 +135,16 @@ dep_urls.each do |url|
       description = text.strip.empty? ? nil : text.strip
     end
 
+    gen_ed = []
+    # remove unnecessary tabs, returns, newlines
+    s = utf_safe(course.css('div.gen-ed-codes-group').text.gsub(/[\t\r\n]/, ''))
+    s = s.gsub('(', ' (').gsub(')', ') ') # fix spacing with parentheses
+    s = s.gsub('or', ' or ') # fix spacing with 'or'
+    s = s.gsub('  ', ' ') # make sure no double spaces
+    s = s.split(':') # ignore 'GenEd:'
+    gen_ed = s[1].split(',') if s.length > 0 # split by commas
+    gen_ed.map! do |x| x.strip end # ignore leading, trailing spaces
+
     relationships = {
       prereqs: prereq,
       coreqs: coreq,
@@ -154,7 +164,7 @@ dep_urls.each do |url|
       credits: course.css('span.course-min-credits').first.content,
       grading_method: course.at_css('span.grading-method abbr') ? course.at_css('span.grading-method abbr').attr('title').split(', ') : [],
       core: utf_safe(course.css('div.core-codes-group').text).gsub(/\s/, '').delete('CORE:').split(','),
-      gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).gsub(/\s/, '').delete('General Education:').split(','),
+      gen_ed: gen_ed,
       description: description,
       relationships: relationships
     }
