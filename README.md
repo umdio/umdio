@@ -1,11 +1,12 @@
-#An API for UMD data 
+# [UMD.io](http://umd.io/) &middot; ![term](https://img.shields.io/badge/term-Fall_2017-brightgreen.svg) [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](Contributing.md#pull-requests)
 
-Status: We are live at [umd.io](http://umd.io)
+UMD.io is an open API for the University of Maryland. The main purpose is to allow developers to build awesome tools and projects. In turn, developers can improve the University of Maryland with the things they build.
 
-To use the API, check out the [docs](http://umd.io).
+## Resources
 
-Why umdio? Check out the [blog post](http://robcobb.me/2015/04/14/why-umdio.html). In short, we want to make university data more accessible for developers, who will make awesome tools and projects. In turn, school is better for everyone. 
+* [Docs](http://umd.io/)
+* [Contributing](https://github.com/umdio/umdio/blob/master/Contributing.md)
 
-If you want to help out, check out [Contributing](http://github.com/umdio/umdio/blob/master/Contributing.md) and [Todo](http://github.com/umdio/umdio/blob/master/Todo.md). 
+## License
 
-We use the [MIT License](http://github.com/umdio/umdio/blob/master/LICENSE) - do what you want, but don't hold us liable.
+We use the [MIT License](https://github.com/umdio/umdio/blob/master/License.txt) - do what you want, but don't hold us liable.
