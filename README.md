@@ -8,4 +8,4 @@ Why umdio? Check out the [blog post](http://robcobb.me/2015/04/14/why-umdio.html
 
 If you want to help out, check out [Contributing](http://github.com/umdio/umdio/blob/master/Contributing.md) and [Todo](http://github.com/umdio/umdio/blob/master/Todo.md). 
 
-We use the [MIT License](http://github.com/umdio/umdio/blob/master/License.txt) - do what you want, but don't hold us liable.
+We use the [MIT License](http://github.com/umdio/umdio/blob/master/LICENSE) - do what you want, but don't hold us liable.
