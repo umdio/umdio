@@ -127,7 +127,7 @@ dep_urls.each do |url|
     # if approved-course-texts held relationships, use 2nd child as description and leftover text as "additional info"
     if approved.css('> div').length > 0 
 
-      description = utf_safe approved.css('> div:last-child').text.strip.gsub(/\t|(\r\n)/, '')
+      description = (utf_safe approved.css('> div:last-child').text).strip.gsub(/\t|(\r\n)/, '')
       additional_info = additional_info ? additional_info += ' '+text : text
       additional_info = additional_info && additional_info.strip.empty? ? nil : additional_info.strip
 
