@@ -5,14 +5,16 @@
 
 If you want to install all the dependencies on your machine, you'll need at least ruby2.2 and mongo + node if you want to work on the docs, and nginx if you want do it the way we do it on the server. bootstrap.sh is an outline of the installs you'll need, or you can ust run it if you are on ubuntu 14.04. 
 
-Or, [install vagrant](http://docs.vagrantup.com/v2/installation/), and 
-`vagrant up` from the folder you cloned.
+~~Or, [install vagrant](http://docs.vagrantup.com/v2/installation/), and 
+`vagrant up` from the folder you cloned.~~
 
-This might take a while the first time (~30min), because it installs things and runs scrapers to fill the database. After the first time, it will be quicker. Plus, your config is now the same as everyone else's, and the same as the server. Fancy that.
+~~This might take a while the first time (~30min), because it installs things and runs scrapers to fill the database. After the first time, it will be quicker. Plus, your config is now the same as everyone else's, and the same as the server. Fancy that.~~
 
-While you are waiting, read over the project docs.
+~~While you are waiting, read over the project docs.~~
 
-You can get a shell on the virtual machine with `vagrant ssh`, then `cd umdio` and `bundle exec rake up` to run the server. You can see the api running at `localhost:3000` on your host machine.
+~~You can get a shell on the virtual machine with `vagrant ssh`, then `cd umdio` and `bundle exec rake up` to run the server. You can see the api running at `localhost:3000` on your host machine.~~
+
+The vagrant environment has been deprecated and will be removed soon. Going forward, new development should use the docker containers. Follow the directions in the README to get started with docker.
 
 Try a few things. Ponder the return of `localhost:3000/v0/courses/sections`.
 
@@ -48,3 +50,4 @@ Knowledge is power.
 - [Nginx](http://nginx.org/en/docs/)
 - [Passenger](https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html)
 - [Jekyll](http://jekyllrb.com/)
+- [Docker](https://www.docker.com/)
