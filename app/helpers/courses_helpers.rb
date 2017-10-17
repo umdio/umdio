@@ -177,6 +177,22 @@ module Sinatra
         end
       end
 
+      def current_and_next_semesters
+        month = Time.now.month
+        year = Time.now.year
+        if month >= 1 && month <= 2
+          ["#{year}01"]
+        elsif month >= 3 && month <= 5
+          ["#{year}01", "#{year}05", "#{year}08"]
+        elsif month >= 6 && month <= 8
+          ["#{year}05", "#{year}08"]
+        elsif month >= 9 && month <= 9
+          ["#{year}08"]
+        elsif month >= 10 && month <= 12
+          ["#{year}08", "#{year}12", "#{year+1}01"]
+        end
+      end
+
       def is_course_id? string
         /^[A-Z]{4}\d{3}[A-Z]?$/.match string #if the string is of this particular format
       end
