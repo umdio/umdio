@@ -32,6 +32,7 @@ class UMDIO < Sinatra::Base
     set :buses_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdbus')
     set :map_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmap')
     #set :profs_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdprof')
+    set :majors_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmajors')
   end
 
   configure :development do
@@ -66,5 +67,6 @@ class UMDIO < Sinatra::Base
   register Sinatra::UMDIO::Routing::Courses
   register Sinatra::UMDIO::Routing::Bus
   register Sinatra::UMDIO::Routing::Map
+  register Sinatra::UMDIO::Routing::Majors
   register Sinatra::UMDIO::Routing::Root
 end
