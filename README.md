@@ -6,6 +6,7 @@ UMD.io is an open API for the University of Maryland. The main purpose is to all
 
 * [Docs](http://umd.io/)
 * [Contributing](CONTRIBUTING.md)
+* [Twitter](https://twitter.com/UMD_io)
 
 ## License
 
