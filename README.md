@@ -5,7 +5,8 @@ UMD.io is an open API for the University of Maryland. The main purpose is to all
 ## Resources
 
 * [Docs](http://umd.io/)
-* [Contributing](CONTRIBUTING.md)
+* [Contributing Guide](CONTRIBUTING.md)
+* [Facebook Group](https://www.facebook.com/groups/121037971936590/)
 * [Twitter](https://twitter.com/UMD_io)
 
 ## License
