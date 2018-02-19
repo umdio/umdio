@@ -1,4 +1,4 @@
-# This pulls GIS data from this GitHub Repo
+# This pulls GIS data from this GitHub Repo, originally from zfogg
 # https://raw.githubusercontent.com/umdio/umdio/master/app/data/umd-building-gis.json
 # TODO: Find a UMD source to pull this data from, rather than manual updates
 
