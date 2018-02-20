@@ -1,5 +1,5 @@
 # This pulls GIS data from this GitHub Repo, originally from zfogg
-# https://raw.githubusercontent.com/umdio/umdio/master/app/data/umd-building-gis.json
+# https://gist.githubusercontent.com/McIntireEvan/34f7875ad0e302cbba8615f60460cdcb/raw/b177299262f53246c7404bbb1d2c2800dd1006c2/umd-building-gis.json
 # TODO: Find a UMD source to pull this data from, rather than manual updates
 
 require 'open-uri'
@@ -14,7 +14,7 @@ puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port).db('umdmap')
 buildings_coll = db.collection('buildings')
 
-url="https://raw.githubusercontent.com/umdio/umdio/master/app/data/umd-building-gis.json"
+url="https://gist.githubusercontent.com/McIntireEvan/34f7875ad0e302cbba8615f60460cdcb/raw/b177299262f53246c7404bbb1d2c2800dd1006c2/umd-building-gis.json"
 
 # drop buildings first
 buildings_coll.remove()
