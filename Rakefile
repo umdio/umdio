@@ -3,11 +3,14 @@ require_relative 'app/helpers/courses_helpers.rb'
 
 include Sinatra::UMDIO::Helpers
 #require File.expand_path('../config/application', __FILE__)
- 
+
 namespace :db do
   desc "Build Database"
   task :up => ['db:down'] do
-    sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongo/mongodb.log' #works on mac, but not ubuntu
+    # Create dirs and launch mongo
+    sh 'mkdir -p ./data/db/'
+    sh 'mkdir -p ./data/mongo/'
+    sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongo/mongodb.log'
   end
 
   desc "Shutdown mongo database server"
@@ -24,6 +27,7 @@ namespace :db do
   desc "clean database"
   task :clean do
     puts "DANGER: will remove everything in the database, including logs."
+    # TODO: Add prompt here
     `rm -r ./data/db`
     `rm -r ./data/mongo`
     `mkdir ./data/db`
@@ -34,7 +38,7 @@ end
 desc "Scrape to fill databases" # takes about 15 minutes
 task :scrape do
   # Testudo updated in September for Spring, Fed for fall
-  # if fall is updated, we want to get the next year's courses 
+  # if fall is updated, we want to get the next year's courses
   year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
   years = ((year - 3)..year).to_a.join ' '
   semesters = current_and_next_semesters

@@ -4,7 +4,7 @@ module Sinatra
   module UMDIO
     module Routing
       module Courses
-        
+
         def self.registered(app)
 
           app.before '/v0/courses*' do
@@ -13,8 +13,8 @@ module Sinatra
             semester = params[:semester] || current_semester
             check_semester app, semester, 'courses'
 
-            @course_coll = app.settings.courses_db.collection("courses#{semester}")
-            @section_coll = app.settings.courses_db.collection("sections#{semester}")
+            @course_coll = app.settings.courses_db["courses#{semester}"]
+            @section_coll = app.settings.courses_db["sections#{semester}"]
           end
 
           # Returns sections of courses by their id
@@ -73,7 +73,7 @@ module Sinatra
 
           # all of the semesters that we have
           app.get '/v0/courses/semesters' do
-            collection_names = app.settings.courses_db.collection_names()
+            collection_names = app.settings.courses_db.database.collection_names()
             semesters = collection_names.select { |e| e.start_with? "courses" }.map{ |e| e.slice(7,6) }
             json semesters
           end

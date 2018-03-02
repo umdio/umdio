@@ -8,9 +8,9 @@ module Sinatra
         def self.registered(app)
 
           # set the collections by grabbing the database from app.settings. We set this in server.rb.
-          routes_collection = app.settings.buses_db.collection('routes')
-          stops_collection = app.settings.buses_db.collection('stops')
-          schedules_collection = app.settings.buses_db.collection('schedules')
+          routes_collection = app.settings.buses_db['routes']
+          stops_collection = app.settings.buses_db['stops']
+          schedules_collection = app.settings.buses_db['schedules']
 
           #this should probably be a more specific error message where we error out!
           bad_route_message = "umd.io doesn't know the bus route in your url. Full list at http://api.umd.io/v0/bus/routes"
@@ -37,12 +37,12 @@ module Sinatra
           # in nextbus api terms, this is routeConfig - the info for a route
           app.get '/v0/bus/routes/:route_id' do
             route_ids = params[:route_id].downcase.split(",")
-            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id}             
+            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id}
             routes = routes_collection.find({route_id: { '$in' => route_ids}},{fields: {:_id => 0}}).to_a
             # get rid of [] on single object return
             routes = routes[0] if route_ids.length == 1
             # prevent null being returned
-            # Never gets hit, because we are checking a hard-coded list of routes. 
+            # Never gets hit, because we are checking a hard-coded list of routes.
             # We should be consistent in how we do this instead of this haphazard approach...
             routes = {} if not routes
             json routes
@@ -105,9 +105,9 @@ module Sinatra
 
           # get predicted arrivals for a stop -- this one isn't working because the NextBus API docs lie. Frustrating.
           # app.get 'v0/bus/stops/:stop_id/arrivals'
-            
+
           # end
-          
+
         end
       end
     end

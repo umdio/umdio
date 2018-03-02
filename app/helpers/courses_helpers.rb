@@ -13,7 +13,7 @@ module Sinatra
         end
 
         # check if we have data for the requested semester
-        collection_names = app.settings.courses_db.collection_names()
+        collection_names = app.settings.courses_db.database.collection_names()
         if not collection_names.index("#{coll_prefix}#{semester}")
           semesters = collection_names.select { |e| e.start_with? coll_prefix }.map{ |e| e.slice(coll_prefix.length,6) }
           msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo. Or try one of the available semester below:"
@@ -36,10 +36,10 @@ module Sinatra
           return res[0]
         end
 
-        if !res 
+        if !res
           halt 404, {
-            error_code: 404, 
-            message: "Section with section_id #{section_ids[0]} not found.", 
+            error_code: 404,
+            message: "Section with section_id #{section_ids[0]} not found.",
             available_sections: "http://api.umd.io/v0/courses/sections",
             docs: "http://umd.io/courses"
           }.to_json
