@@ -1,6 +1,6 @@
 # umdio api core application. brings in other dependencies as needed.
 ENV['RACK_ENV'] ||= 'development'
- 
+
 require 'bundler'
 Bundler.require :default, ENV['RACK_ENV'].to_sym
 
@@ -20,17 +20,18 @@ class UMDIO < Sinatra::Base
 
   # fix strange scraper bug by explicitly setting the server
   # reference: http://stackoverflow.com/questions/17334734/how-do-i-get-sinatra-to-work-with-httpclient
-  
-  
+
+
   configure do
-    # set up mongo database - code from ruby mongo driver tutorial
+    # Connect to MongoDB, if no port specified it picks the default
     host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-    port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
-    puts "Connecting to mongo on #{host}:#{port}"
+    port = ENV['MONGO_RUBY_DRIVER_PORT'] ? ':' + ENV['MONGO_RUBY_DRIVER_PORT'] : ''
+
+    puts "Connecting to #{host}:#{port}"
     # we might need other databases for other endpoints, but for now this is fine, with multiple collections
-    set :courses_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdclass') 
-    set :buses_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdbus')
-    set :map_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmap')
+    set :courses_db, Mongo::Client.new("mongodb://#{host}#{port}/umdclass", {:max_pool_size => 20, :wait_queue_timeout => 5})
+    set :buses_db, Mongo::Client.new("mongodb://#{host}#{port}/umdbus", {:max_pool_size => 20, :wait_queue_timeout => 5})
+    set :map_db, Mongo::Client.new("mongodb://#{host}#{port}/umdmap", {:max_pool_size => 20, :wait_queue_timeout => 5})
     #set :profs_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdprof')
   end
 

@@ -8,37 +8,40 @@ include Mongo
 require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
-# set up mongo database - code from ruby mongo driver tutorial
+# Connect to MongoDB, if no port specified it picks the default
 host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+port = ENV['MONGO_RUBY_DRIVER_PORT'] ? ':' + ENV['MONGO_RUBY_DRIVER_PORT'] : ''
 
-# announce connection and connect
 puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
+db = Mongo::Client.new("mongodb://#{host}#{port}/umdclass")
 
 # Architecture:
 # build list of queries
-course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
+course_collections = db.database.collection_names().select { |e| e.include?('courses') }.map { |name| db[name] }
 section_queries = []
 course_collections.each do |c|
   semester = c.name.scan(/courses(.+)/)[0]
   if not semester.nil?
     semester = semester[0]
     c.find({},{fields: {_id:0,course_id:1}}).to_a
-      .each_slice(200){|a| section_queries << 
-        "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"}
+      .each_slice(200){|a| section_queries <<
+        "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',') }"
+      }
   end
 end
 
+puts "Scraping sections"
 count = 0
 total = 0
 # Parse section data from pages
 section_queries.each do |query|
   semester = query.scan(/soc\/(.+)\//)[0][0]
-  sections_coll = db.collection("sections#{semester}")
-  prof_coll = db.collection("profs#{semester}")
-  sections_bulk = sections_coll.initialize_unordered_bulk_op
-  prof_bulk = prof_coll.initialize_unordered_bulk_op
+  sections_coll = db["sections#{semester}"]
+  prof_coll = db["profs#{semester}"]
+
+  sections_bulk = []
+  prof_bulk = []
+
   page = Nokogiri::HTML(open(query))
   course_divs = page.search("div.course-sections")
   section_array = []
@@ -54,7 +57,7 @@ section_queries.each do |query|
       dept = course_id.match(/^([A-Z]{4})\d{3}[A-Z]?$/)[1]
 
       # add course and department to professor object for each instructor
-      instructors.each do |x| 
+      instructors.each do |x|
         profs[x] ||= {:courses => [], :depts => []}
         profs[x][:courses] |= [course_id]
         profs[x][:depts] |= [dept]
@@ -96,24 +99,32 @@ section_queries.each do |query|
   # nitpick: should be 'courses', not sure how many sections we're adding
   # puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
   puts "inserting set number #{count} of sections. 200 more courses in the database - #{semester} term. #{total} total."
-  
+
   # Should be upsert not insert, so we can run multiple times without having to drop the database
   # coll.insert(section_array) unless section_array.empty?
   section_array.each do |section|
-    sections_bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
+    sections_bulk << { :update_one => {
+      :filter => { :section_id => section[:section_id] },
+      :update => {'$set' => { :section => section[:section_id] }},
+      :upsert => true
+    }}
   end
-  sections_bulk.execute unless section_array.empty?
+  sections_coll.bulk_write(sections_bulk, {:ordered => false}) unless section_array.empty?
 
   # sorts profs by name, insert to db
   profs.sort.to_h.each do |name, obj|
     courses = obj[:courses]
     depts = obj[:depts]
+
     # push all courses to prof's entry
-    prof_bulk.find({name: name}).upsert.update(
-      {"$set" => {name: name},
-       "$addToSet" => {semester: semester, courses: {"$each" => courses}, departments: {"$each" => depts} }
-      }
-  )
+    prof_bulk << { :update_one => {
+      :filter => { :name => name },
+      :update => {
+        '$set' => { :name => name },
+        "$addToSet" => {semester: semester, courses: {"$each" => courses}, departments: {"$each" => depts} }
+      },
+      :upsert => true
+    }}
   end
-  prof_bulk.execute unless profs.empty?
+  prof_coll.bulk_write(prof_bulk, {:ordered => false}) unless profs.empty?
 end
