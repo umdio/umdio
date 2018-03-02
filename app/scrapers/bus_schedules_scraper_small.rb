@@ -8,22 +8,22 @@ require 'json'
 include Mongo
 include JSON
 
-#set up mongo database - code from ruby mongo driver tutorial
+# Connect to MongoDB, if no port specified it picks the default
 host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+port = ENV['MONGO_RUBY_DRIVER_PORT'] ? ':' + ENV['MONGO_RUBY_DRIVER_PORT'] : ''
 
 puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port).db('umdbus')
+db = Mongo::Client.new("mongodb://#{host}#{port}/umdbus")
 
 # set up routes and schedules collections
-routes_coll = db.collection('routes')
-schedule_coll = db.collection('schedules')
+routes_coll = db['routes']
+schedule_coll = db['schedules']
 
 routes = routes_coll.find({},{fields:{_id:0,route_id:1}}).map{|e| e['route_id']}.flatten
 address = "http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule"
 routes.each do |route|
   page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
-  
+
   #schedules = []
   sch = page['route']
   sch.each do |service|
@@ -49,7 +49,7 @@ routes.each do |route|
             stop_id: stop['tag'],
             arrival_time: stop['content'],
             arrival_time_secs: stop['epochTime']
-          } 
+          }
         end
       else
         stop_times << {stop_id: trip['stop']['tag'], arrival_time: trip['stop']['content'], arrival_time_secs: trip['stop']['epochTime']}
@@ -57,7 +57,7 @@ routes.each do |route|
       trips << stop_times
     end
     puts "updating the #{days} schedule for route #{route} in the #{direction} direction"
-      schedule_coll.update({route: route, days: days, direction: direction}, {'$set' => {
+      schedule_coll.update_one({route: route, days: days, direction: direction}, {'$set' => {
         route: route,
         days: days,
         direction: direction,
