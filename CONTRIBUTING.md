@@ -33,7 +33,7 @@ The files in src/<endpoint>/_posts are written in markdown - you specify some me
 The files in each endpoint's folder each get rendered on the page as sections. The order of the sections is determined by the date in the name of the file - hence the strange names of the files.
 
 ## Read
-- [why umdio](https://web.archive.org/web/20160811182733/http://www.robcobb.me/2015/04/14/why-umdio.html)
+- [why umdio](https://github.com/umdio/umdio/blob/master/Motivations.md)
 - [ideas](https://docs.google.com/document/d/1WQ4w4_HSdkzNP1j0KqrHSYtiU8DEGoXnxHyC5FEp5sY/edit)
 - [design](https://docs.google.com/document/d/11uslF3ftvQ3It-NRXs7iRgI34S0MxvqV2S1jioXPcL0/edit?usp=sharing)
 - [todo](https://github.com/umdio/umdio/blob/master/Todo.md)

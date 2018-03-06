@@ -8,7 +8,7 @@ slug: intro
 
 Welcome to **umd.io**, the open-source API for University of Maryland data. If you are building a University data-focused app, hack, or project, you’re in the right place. This site will walk you through basic API use and document all supported API calls.
 
-Read more about the motivation and vision for the project in the [blog post](https://web.archive.org/web/20160811182733/http://www.robcobb.me/2015/04/14/why-umdio.html).
+Read more about the motivation and vision for the project in the [blog post](https://github.com/umdio/umdio/blob/master/Motivations.md).
 
 **umd.io** is a GETful API. It follows RESTful conventions, but for now, you can only get data -- you can’t create, update, or destroy.
 
