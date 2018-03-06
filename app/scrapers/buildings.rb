@@ -1,5 +1,6 @@
-# get umd building gis data from zfogg's github gist. Not really the ideal long-term solution...
-# https://gist.githubusercontent.com/zfogg/4bc03d7f71d5f740d028/raw/afe9f0baeda4ef6a7a64d99fa14bded8eb6bf3a8/umd-building-gis.json
+# This pulls GIS data from this GitHub Repo, originally from zfogg
+# https://gist.githubusercontent.com/McIntireEvan/34f7875ad0e302cbba8615f60460cdcb/raw/b177299262f53246c7404bbb1d2c2800dd1006c2/umd-building-gis.json
+# TODO: Find a UMD source to pull this data from, rather than manual updates
 
 require 'open-uri'
 require 'net/http'
@@ -13,7 +14,7 @@ puts "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port).db('umdmap')
 buildings_coll = db.collection('buildings')
 
-url = "https://gist.githubusercontent.com/zfogg/4bc03d7f71d5f740d028/raw/afe9f0baeda4ef6a7a64d99fa14bded8eb6bf3a8/umd-building-gis.json"
+url="https://gist.githubusercontent.com/McIntireEvan/34f7875ad0e302cbba8615f60460cdcb/raw/b177299262f53246c7404bbb1d2c2800dd1006c2/umd-building-gis.json"
 
 # drop buildings first
 buildings_coll.remove()
