@@ -1,0 +1,22 @@
+version: '2.0'
+services:
+  mongodb:
+    image: mongo:3.2.17
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db
+    ports:
+      - 27017:27017
+  umdio:
+    build: .
+    links:
+      - mongodb
+    environment:
+      - MONGO_RUBY_DRIVER_HOST=mongodb
+    volumes:
+      - ./:/umdio
+    ports:
+      - 3000:3000
+    command: bundle exec rake up

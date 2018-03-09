@@ -19,3 +19,6 @@ mime.types
 .DS_Store
 .vagrant
 *.log
+
+# editor configurations
+.idea/

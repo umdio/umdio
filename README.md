@@ -12,3 +12,11 @@ UMD.io is an open API for the University of Maryland. The main purpose is to all
 ## License
 
 We use the [MIT License](./LICENSE) - do what you want, but don't hold us liable.
+
+## Setting Up Your Environment With Docker
+1. [Install docker](https://docs.docker.com/engine/installation/)
+2. [Install docker-compose](https://docs.docker.com/compose/install/)
+3. Run `docker-compose up`
+   * You might need to run docker-related commands with `sudo` if you're a linux user
+4. Run the scrapers
+    * `docker exec -it umdio_umdio_1 bundle exec rake scrape`
