@@ -4,4 +4,4 @@ services:
   - mongodb
 env: RACK_ENV=test
 before_script:
-  - 'bundle exec rake scrape db:up'
+  - 'bundle exec rake scrape'
