@@ -1,8 +1,8 @@
+sudo: required
 language: ruby
 rvm: 2.1.1
 services:
   - docker
-  - mongodb
 env: RACK_ENV=test DOCKER_COMPOSE_VERSION=1.20.1
 before_install:
   - sudo rm /usr/local/bin/docker-compose
