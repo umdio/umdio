@@ -9,6 +9,7 @@ before_install:
   - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
   - chmod +x docker-compose
   - sudo mv docker-compose /usr/local/bin
+install: true
 before_script:
   - 'docker-compose up &'
-  - 'docker exec -it umdio_umdio_1 bundle exec rake scrape'
+  - 'sleep 5 && docker exec -it umdio_umdio_1 bundle exec rake scrape'
