@@ -13,4 +13,5 @@ install: true
 before_script:
   - 'docker-compose up &'
   - 'sleep 180'
-  - 'docker exec -it umdio_umdio_1 bundle exec rake scrape'
+  - 'docker exec -it umdio_umdio_1 bundle exec test_scrape'
+  - 'docker exec -it umdio_umdio_1 bundle exec rake'

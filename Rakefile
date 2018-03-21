@@ -3,7 +3,7 @@ require_relative 'app/helpers/courses_helpers.rb'
 
 include Sinatra::UMDIO::Helpers
 #require File.expand_path('../config/application', __FILE__)
- 
+
 namespace :db do
   desc "Build Database"
   task :up => ['db:down'] do
@@ -35,11 +35,27 @@ end
 desc "Scrape to fill databases" # takes about 15 minutes
 task :scrape do
   # Testudo updated in September for Spring, Fed for fall
-  # if fall is updated, we want to get the next year's courses 
+  # if fall is updated, we want to get the next year's courses
   year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
   years = ((year - 3)..year).to_a.join ' '
   semesters = current_and_next_semesters
   sh "ruby app/scrapers/courses_scraper.rb #{years}"
+  sh 'ruby app/scrapers/sections_scraper.rb'
+  sh 'ruby app/scrapers/section_course_linker.rb'
+  # TODO: don't hardcode semester_id
+  semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+  sh 'ruby app/scrapers/bus_routes_scraper.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
+  sh 'ruby app/scrapers/buildings.rb'
+end
+
+desc "Scrape to fill database for testing"
+task :test_scrape do
+  # Testudo updated in September for Spring, Fed for fall
+  # if fall is updated, we want to get the next year's courses
+  year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
+  semesters = [] << current_semester
+  sh "ruby app/scrapers/courses_scraper.rb #{year}"
   sh 'ruby app/scrapers/sections_scraper.rb'
   sh 'ruby app/scrapers/section_course_linker.rb'
   # TODO: don't hardcode semester_id
