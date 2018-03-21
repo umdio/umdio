@@ -7,6 +7,7 @@ include Sinatra::UMDIO::Helpers
 namespace :db do
   desc "Build Database"
   task :up => ['db:down'] do
+    sh 'mkdir -p ./data/mongo'
     sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongo/mongodb.log' #works on mac, but not ubuntu
   end
 

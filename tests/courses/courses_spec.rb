@@ -6,7 +6,7 @@ require_relative '../../tests/spec_helper.rb'
 describe 'Courses Endpoint' do  # Probably should be moved higher up the test ladder. For now!
   # TODO: make this an instance variable @url
   url = '/v0/courses'
-    
+
   shared_examples_for 'good status' do |url|
     before {head url}
     it 'has a good response' do
@@ -51,7 +51,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     end
 
     describe 'returns correct object' do
-      it_has_behavior "gets enes100", url + '/ENES100' 
+      it_has_behavior "gets enes100", url + '/ENES100'
     end
 
     describe 'returns error on misformed urls' do
@@ -62,11 +62,11 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
 
     #tests for case insensitivity can just check status (so long as bad tests give bad status!)
     describe 'Case insensitive' do
-      it_has_behavior "good status", url + '/ENES100' 
+      it_has_behavior "good status", url + '/ENES100'
       it_has_behavior "good status", url + '/enes100'
       it_has_behavior "good status", url + '/Enes100'
-      it_has_behavior "good status", url + '/bees608a'
-    end 
+      it_has_behavior "bad status", url + '/bees608a'
+    end
 
     describe 'get multiple courses' do
       it_has_behavior 'good status', url + '/ENES100,ENES102' #doesn't check return, could very well make a good corner case
@@ -77,7 +77,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it 'can expand section objects' do
         get url + '/ENES100?expand=sections'
         obj = JSON.parse(last_response.body)
-        expect(obj['sections'][0].kind_of?(Hash)).to be(true) 
+        expect(obj['sections'][0].kind_of?(Hash)).to be(true)
       end
     end
   end
@@ -89,7 +89,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
         # TODO: implement
       end
     end
-    
+
     it_has_behavior 'gets enes100 sections', url + '/enes100/sections'
 
     describe 'Case insensitive to course_id' do
@@ -97,7 +97,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior 'good status', url + '/enes100/sections'
       it_has_behavior 'good status', url + '/Enes100/sections'
     end
-      
+
     describe 'returns error on misformed urls' do
       it_has_behavior 'bad status', url + '/ene12/sections'
       it_has_behavior 'bad status', url + '/enes1000/sections'
@@ -106,7 +106,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
   end
 
   describe 'GET /courses/<course_id>/sections/<section_id>' do
-    
+
     describe 'returns section properly' do
       before {get url + '/enes100/sections/0101'}
       it 'returns the correct section' do
@@ -115,9 +115,9 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
     end
 
     describe 'Case insensitive to course_id' do
-      it_has_behavior 'good status', url + '/ENES100/sections/0201'
-      it_has_behavior 'good status', url + '/Enes100/sections/0201'
-      it_has_behavior 'good status', url + '/enes100/sections/0201'
+      it_has_behavior 'good status', url + '/ENES100/sections/0301'
+      it_has_behavior 'good status', url + '/Enes100/sections/0301'
+      it_has_behavior 'good status', url + '/enes100/sections/0301'
     end
 
     describe 'handles multiple arguments' do
@@ -155,7 +155,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       before {get url + '/sections/ENES100-0101,ENES100-0201,ENES100-0202,ENES100-0301,ENES100-0302,ENES100-0401,ENES100-0501,ENES100-0502,ENES100-0601,ENES100-0602,ENES100-0801'}
       it 'returns multiple sections on request' do
         # TODO: implement
-      end          
+      end
     end
 
     describe 'returns error on misformed urls' do
