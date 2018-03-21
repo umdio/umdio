@@ -1,7 +1,16 @@
 language: ruby
 rvm: 2.1.1
 services:
+  - docker
   - mongodb
-env: RACK_ENV=test
+env:
+  - RACK_ENV=test
+  - DOCKER_COMPOSE_VERSION=1.4.2
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 before_script:
-  - 'bundle exec rake scrape'
+  - 'docker-compose up'
+  - 'docker exec -it umdio_umdio_1 bundle exec rake scrape'
