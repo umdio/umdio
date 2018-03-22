@@ -14,4 +14,6 @@ before_script:
   - 'docker-compose up &'
   - 'sleep 180'
   - 'docker exec -it umdio_umdio_1 bundle exec rake test_scrape'
+
+script:
   - 'docker exec -it umdio_umdio_1 bundle exec rake'
