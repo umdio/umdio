@@ -9,18 +9,18 @@ describe 'Pagination' do
     describe 'per_page' do
 
       it 'should not be > 100' do
-        courses = get_json(url + '?per_page=1000')
+        courses = get_json(url + '?semester=201808&per_page=1000')
         expect(courses.length).to be 100
       end
 
       it 'should always at least return 1 course' do
-        courses = get_json(url + '?per_page=0&page=2')
+        courses = get_json(url + '?semester=201808&per_page=0&page=2')
         expect(courses.length).to be 1
       end
 
       it 'should return the number of courses requested (between 1 and 100)' do
         num = 37
-        courses = get_json(url + "?per_page=#{num}")
+        courses = get_json(url + "?semester=201808&per_page=#{num}")
         expect(courses.length).to be num
       end
     end
