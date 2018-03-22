@@ -1,4 +1,4 @@
-require_relative '../../tests/spec_helper'
+require_relative '../../tests/spec_helper.rb'
 # TODO: make sorting spec
 
 describe 'Pagination' do
