@@ -11,8 +11,9 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 install: true
 before_script:
-  - 'docker-compose up &'
-  - 'sleep 180'
+  - 'docker-compose pull'
+  - 'docker-compose build'
+  - 'docker-compose start'
   - 'docker exec -it umdio_umdio_1 bundle exec rake test_scrape'
 
 script:
