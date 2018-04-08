@@ -37,12 +37,12 @@ module Sinatra
           # in nextbus api terms, this is routeConfig - the info for a route
           app.get '/v0/bus/routes/:route_id' do
             route_ids = params[:route_id].downcase.split(",")
-            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id}             
+            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id}
             routes = routes_collection.find({route_id: { '$in' => route_ids}},{fields: {:_id => 0}}).to_a
             # get rid of [] on single object return
             routes = routes[0] if route_ids.length == 1
             # prevent null being returned
-            # Never gets hit, because we are checking a hard-coded list of routes. 
+            # Never gets hit, because we are checking a hard-coded list of routes.
             # We should be consistent in how we do this instead of this haphazard approach...
             routes = {} if not routes
             json routes
@@ -79,7 +79,7 @@ module Sinatra
 
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-            address = apiRoot + "&command=vehicleLocations"
+            address = apiRoot + "&command=vehicleLocations&t=0"
             Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
           end
 
@@ -100,14 +100,16 @@ module Sinatra
           app.get '/v0/bus/stops/:stop_id' do
             stop_id = params[:stop_id]
             halt 400, bad_url_error(bad_stop_message) unless is_stop_id? stop_id
-            json stops_collection.find({:stop_id => stop_id},{fields: {:_id => 0}}).to_a
+            stops = stops_collection.find({:stop_id => stop_id},{fields: {:_id => 0}}).to_a
+            halt 400, bad_url_error(bad_stop_message) unless stops != []
+            json stops
           end
 
           # get predicted arrivals for a stop -- this one isn't working because the NextBus API docs lie. Frustrating.
           # app.get 'v0/bus/stops/:stop_id/arrivals'
-            
+
           # end
-          
+
         end
       end
     end
