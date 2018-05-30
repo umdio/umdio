@@ -28,7 +28,7 @@ If you want to see how the server will run with nginx, check `localhost:4080`. F
 ## Documentation
 We are only as good as our docs.
 
-We're using Jekyll to make managing documentation easier. Edit files in docs/src, then run `jekyll serve` from the docs folder. See your work at `localhost:4000`.
+We're using Jekyll to make managing documentation easier. Edit files in docs/src, then run `jekyll serve` from the docs folder. See your work at `localhost:4000`. Alternatively, you can run `make run` to grab any dependencies and serve, or `make` if you plan to serve the output folder with nginx.
 
 The files in src/<endpoint>/_posts are written in markdown - you specify some metadata, and then write text as you would. Learn more about [markdown syntax](http://daringfireball.net/projects/markdown/syntax) to use all its power.
 

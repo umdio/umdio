@@ -12,8 +12,8 @@ permalink: none
 markdown: kramdown
 kramdown:
   parse_block_html: true
-source: .
-destination: ../public
+source: src
+destination: public
 sass:
   sass_dir: _sass
   style: compressed
