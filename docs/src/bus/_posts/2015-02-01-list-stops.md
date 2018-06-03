@@ -7,14 +7,14 @@ category: bus
 
 Get information about all the stops.
 
-Endpoint: `http://api.umd.io/v0/bus/stops`
+Endpoint: `https://api.umd.io/v0/bus/stops`
 
 *Returns*: Array of stops with stop_id and title.  
 
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/stops`
+`GET https://api.umd.io/v0/bus/stops`
 
 Trimmed Response:
 {% highlight json%}

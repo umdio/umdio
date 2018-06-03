@@ -7,7 +7,7 @@ category: bus
 
 Get the predicted arrivals for a particular stop on a route.
 
-Arrivals endpoint: `http://api.umd.io/v0/bus/routes/:route_id/arrivals/:stop_id`
+Arrivals endpoint: `https://api.umd.io/v0/bus/routes/:route_id/arrivals/:stop_id`
 
 *Returns*: Predicted arrivals for a stop on the route. 
 
@@ -15,7 +15,7 @@ Arrivals endpoint: `http://api.umd.io/v0/bus/routes/:route_id/arrivals/:stop_id`
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/routes/701/arrivals/greefaye`
+`GET https://api.umd.io/v0/bus/routes/701/arrivals/greefaye`
 
 Trimmed Response:
 {% highlight json%}

@@ -12,6 +12,6 @@ Get a list of the available buildings.
 <!-- EXAMPLE -->
 **List Buildings**
 
-`http://api.umd.io/v0/map/buildings`
+`https://api.umd.io/v0/map/buildings`
 
 <!-- END -->

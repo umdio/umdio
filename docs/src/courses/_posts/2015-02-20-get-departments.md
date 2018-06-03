@@ -7,7 +7,7 @@ category: courses
 
 Get a list of all department ids.
 
-`http://api.umd.io/v0/courses/departments`
+`https://api.umd.io/v0/courses/departments`
 
 <!-- EXAMPLE -->
 

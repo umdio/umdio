@@ -13,12 +13,12 @@ This endpoint lets you get data about university courses and their sections. You
 #### Parameters:
 `semester` -- a six-digit string `<year><month>`. For example, *"201401"* for 2014's Winter semester or *"201508"* for 2015's Fall semseter.
 
-*See `http://api.umd.io/v0/courses?semester=012345` for a list of available semesters.*
+*See `https://api.umd.io/v0/courses?semester=012345` for a list of available semesters.*
 
 <!-- EXAMPLE -->
 
 ### Courses Endpoint
 
-`http://api.umd.io/v0/courses`
+`https://api.umd.io/v0/courses`
 
 <!-- END -->

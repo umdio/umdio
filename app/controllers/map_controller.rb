@@ -49,7 +49,7 @@ module Sinatra
               halt 404, {
                 error_code: 404, 
                 message: "Building number #{params[:building_id]} isn't in our database, and probably doesn't exist.",
-                available_buildings: "http://api.umd.io/map/buildings",
+                available_buildings: "https://api.umd.io/map/buildings",
                 docs: "http://umd.io/map"
               }.to_json
             end

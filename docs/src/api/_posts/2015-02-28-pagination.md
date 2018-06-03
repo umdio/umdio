@@ -24,13 +24,13 @@ The possible `rel` values are:
 
 <!-- EXAMPLE -->
 
-*Example:* `http://api.umd.io/v0/courses?page=2&per_page=100`
+*Example:* `https://api.umd.io/v0/courses?page=2&per_page=100`
 
 <br><br><br><br><br><br><br>
 
 #### Response Link Header:
 ```
-Link: <http://api.umd.io/v0/courses?page=2&per_page=100>; rel=”next”, <http://api.umd.io/v0/courses?page=1&per_page=100>; rel=”prev”
+Link: <https://api.umd.io/v0/courses?page=2&per_page=100>; rel=”next”, <https://api.umd.io/v0/courses?page=1&per_page=100>; rel=”prev”
 ```
 
 <!-- END_EXAMPLE -->

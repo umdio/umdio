@@ -7,14 +7,14 @@ category: bus
 
 Get the locations of buses along a bus route. 
 
-Route Locations endpoint: `http://api.umd.io/v0/bus/routes/:route_id/locations`
+Route Locations endpoint: `https://api.umd.io/v0/bus/routes/:route_id/locations`
 
 *Returns*: Predicted arrivals for a stop on the route. 
 
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/routes/115/locations`
+`GET https://api.umd.io/v0/bus/routes/115/locations`
 
 Trimmed Response:
 {% highlight json%}

@@ -5,7 +5,7 @@ slug: search
 category: professors
 ---
 
-`http://api.umd.io/v0/professors`
+`https://api.umd.io/v0/professors`
 
 *Returns:* a [Paginated](/#pagination) array of [Professor objects](#professor_object).
 
@@ -21,7 +21,7 @@ To **search** for professors, each property can be used as a parameter. For exam
 
 <!-- EXAMPLE -->
 
-Request: `GET http://api.umd.io/v0/professors?department=CMSC,BMGT&sort=-name`
+Request: `GET https://api.umd.io/v0/professors?department=CMSC,BMGT&sort=-name`
 Trimmed Response:
 {% highlight json %}
 [

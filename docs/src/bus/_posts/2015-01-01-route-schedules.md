@@ -11,7 +11,7 @@ Each route has multiple schedules, because buses run differently on different da
 
 ----
 
-`http://api.umd.io/v0/bus/routes/:route_id/schedules`
+`https://api.umd.io/v0/bus/routes/:route_id/schedules`
 
 *Returns*: Array of bus schedules for the specified route. 
 
@@ -20,7 +20,7 @@ Each schedule has the days that schedule runs - 'f' for friday, 'th' for tuesday
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/routes/115/schedules`
+`GET https://api.umd.io/v0/bus/routes/115/schedules`
 
 Trimmed Response:
 {% highlight json%}

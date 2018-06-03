@@ -9,14 +9,14 @@ Get locations of all the umd buses.
 
 ----
 
-`http://api.umd.io/v0/bus/locations`
+`https://api.umd.io/v0/bus/locations`
 
 *Returns*: Object with several properties - meta information and the list of locations for vehicles.
 
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/locations`
+`GET https://api.umd.io/v0/bus/locations`
 
 Trimmed Response:
 {% highlight json%}

@@ -40,7 +40,7 @@ module Sinatra
           halt 404, {
             error_code: 404, 
             message: "Section with section_id #{section_ids[0]} not found.", 
-            available_sections: "http://api.umd.io/v0/courses/sections",
+            available_sections: "https://api.umd.io/v0/courses/sections",
             docs: "http://umd.io/courses"
           }.to_json
         end
@@ -141,7 +141,7 @@ module Sinatra
           halt 404, {
             error_code: 404,
             message: "Course#{s} with course_id#{s} #{course_ids.join(',')} not found!",
-            available_courses: "http://api.umd.io/v0/courses",
+            available_courses: "https://api.umd.io/v0/courses",
             docs: "http://umd.io/courses/"
           }.to_json
         end

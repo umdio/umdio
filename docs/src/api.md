@@ -20,7 +20,7 @@ We are actively looking for [contributors](https://github.com/umdio/umdio/blob/m
 
 ## API Endpoint
 ```
-http://api.umd.io/
+https://api.umd.io/
 ```
 
 <!-- END_EXAMPLE -->
