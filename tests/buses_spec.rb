@@ -23,6 +23,10 @@ describe 'Bus Endpoint' do
     end
   end
 
+  describe 'get bus root' do
+    it_has_behavior 'good status', url
+  end
+
   describe 'get list of routes' do
     it_has_behavior 'good status', url + '/routes'
   end
@@ -32,19 +36,28 @@ describe 'Bus Endpoint' do
     it_has_behavior 'error', url + '/routes/NOTAROUTE', bad_route_message
   end
 
+  describe 'get stops' do
+    it_has_behavior 'good status', url + '/stops'
+    it_has_behavior 'good status', url + '/stops/camb'
+    it_has_behavior 'error', url + '/stops/NOTASTOP', bad_stop_message
+  end
+
   describe 'get route schedules' do
     it_has_behavior 'good status', url + '/routes/118/schedules'
     it_has_behavior 'error', url + '/routes/NOTAROUTE/schedules', bad_route_message
   end
 
   describe 'get route predicted arrivals' do
-    it_has_behavior 'good status', url + '/routes/115/arrivals/stamsu_d' 
+    it_has_behavior 'good status', url + '/routes/115/arrivals/stamsu_d'
     it_has_behavior 'error', url + '/routes/NOTAROUTE/arrivals/stamsu_d', bad_route_message
   end
 
-  describe 'get locations of buses' do
+  describe 'get locations of buses on route' do
     it_has_behavior 'good status', url + '/routes/115/locations'
     it_has_behavior 'error', url + '/routes/NOTAROUTE/locations', bad_route_message
   end
 
+  describe 'get locations of buses' do
+    it_has_behavior 'good status', url + '/locations'
+  end
 end
