@@ -1,10 +1,10 @@
 @import "bourbon/bourbon";
 // Grid settings
-@import "neat/neat-helpers";
+@import "neat/neat";
 $grid-columns: 10;
 $gutter: em(40);
 $max-width: em(1140);
-@import "neat/neat";
+
 @import "normalize/normalize";
 @import "config";
 @import "utils";
@@ -29,7 +29,7 @@ div.container {
   > .col-8 {
     @include span-columns(8, block-collapse);
     @include omega;
-    
+
     /* hacky solution */
     &:last-child {
       width: 83.08366%;
@@ -60,7 +60,7 @@ body {
 a {
   text-decoration: none;
   color: $red;
-  
+
   &:hover {
     text-decoration: underline;
   }
@@ -70,16 +70,16 @@ header {
   @include clearfix;
   //border-bottom: 2px solid $red;
   width:100%;
-  
+
   position: fixed;
   z-index: 999999;
-  
+
   .logo {
     width: 104px;
     height: 64px;
     background: $red;
     position: relative;
-    
+
     // retina image
     img {
       padding: 6px 10px;
@@ -88,21 +88,21 @@ header {
       top: 14px;
     }
   }
-  
+
   > .wrap, > .nav {
     float: left;
     display: inline-block;
   }
-  
+
   .wrap {
   }
-  
-  @include media($mobile) { 
+
+  @include media($mobile) {
     .header-nav li a {
       padding: 8px;
     }
   }
-  
+
   .method {
     .header-section-description, .header-section-example {
       padding: 0;
@@ -128,12 +128,12 @@ header {
   margin: 0;
   padding: 0;
   list-style-type: none;
-  
+
   li {
     display: inline-block;
     float: left;
   }
-  
+
   a {
     color: inherit;
   }
@@ -152,7 +152,7 @@ header {
   position: relative;
   z-index: 999;
   min-height: 1px;
-  
+
   @include media($small-tablet) {
     margin-left: -400px;
     width: 400px;
@@ -162,12 +162,12 @@ header {
 .menu-wrapper {
   margin-top: 52px;
   min-width: 128px;
-  
+
   &.affix {
     position: fixed;
     top: 0;
   }
-  
+
   &.affix-bottom {
     position: absolute;
   }
@@ -184,35 +184,35 @@ nav .ref-title {
 .ref-section {
   margin: 0;
   padding: 0;
-  
+
   li {
     list-style-type: none;
-    
+
     a {
       display: block;
       padding: 5px 12px;
-      
+
       &:hover {
         color: $dark-gray;
       }
     }
-    
+
     &.active {
       > a {
         background: $red;
         color: white;
         font-weight: 600;
       }
-      
+
       > ul {
         display: block;
       }
     }
-    
+
     > ul {
       padding-left: 1em;
       display: none;
-      
+
       a {
         color: mix($light-gray, $red, 25%);
       }
@@ -223,17 +223,17 @@ nav .ref-title {
 .methods {
   position: relative;
   background: $code-bg;
-  
+
   // ??
   .lang-wrapper {
     display: table;
     width: 100%;
-    
+
     .lang-col {
       width: 50%;
       display: table-cell;
     }
-    
+
     @include media($mobile) {
       display: block;
       .lang-col {
@@ -287,7 +287,7 @@ div.container > .methods {
       padding-left: $gutter;
     }
   }
-  
+
   &:after {
     @extend %psuedo-element;
     width: 2px;
@@ -303,13 +303,13 @@ div.container > .methods {
   display: table;
   width: 100%;
   height: 100%;
-  
+
   .description, .example {
     width: 50%;
     height: 100%;
     display: table-cell;
   }
-  
+
   @include media($mobile) {
     display: block;
     .description, .example {
@@ -317,18 +317,18 @@ div.container > .methods {
       display: block;
     }
   }
-  
+
   h1, h2, h3, h4, h5 {
     margin: 0;
   }
-  
+
   .description {
     border-bottom: 1px solid $light-gray;
     padding: $gutter*2 $gutter $gutter $gutter;
     background: white;
     position: relative;
     z-index: 24;
-    
+
     h1, h2 {
       font-weight: 400;
       font-size: 1.5em;
@@ -343,14 +343,14 @@ div.container > .methods {
       color: $gray;
       font-weight: normal;
     }
-    
+
     p {
       font-family: $body-font;
       line-height: 1.7em;
       color: $gray;
       font-size: 0.92em;
     }
-    
+
     code {
       background: $light-gray;
       color: $dark-gray;
@@ -358,17 +358,17 @@ div.container > .methods {
       font-style: normal;
       word-break: break-all;
     }
-    
+
     pre {
       margin: 0;
     }
-    
+
     hr {
       border: none;
       border-bottom: 1px solid $light-gray;
     }
   }
-  
+
   .example {
     position: relative;
     background: $code-bg;
@@ -378,20 +378,20 @@ div.container > .methods {
     padding-top: $gutter*2;
     border-bottom: 1px solid darken($code-bg, 10%);
     border-top: 1px solid lighten($code-bg, 10%);
-    
+
     h3 {
       padding: $gutter 0 0 0;
       font-size: 1.25em;
-      
+
       &:first-child {
         padding-top: 0;
       }
     }
-    
+
     pre {
       white-space: pre-wrap;
     }
-    
+
     code {
       color: $light-gray;
       display: block;
@@ -400,23 +400,23 @@ div.container > .methods {
       line-height: 1.25em;
       font-style: normal;
       word-break: break-all;
-      
+
       .prompt:after {
         content: '$ ';
       }
     }
-    
+
     p {
       line-height: 1.25em;
     }
   }
-  
+
   &:first-child {
     .example {
       border-top: none;
     }
   }
-  
+
   &:last-child {
     .description {
       border-bottom: none;
@@ -475,7 +475,7 @@ small screens.
   span {
     position: relative;
     display: block;
-    
+
     & {
       @include transition(all .2s);
     }
@@ -523,11 +523,11 @@ small screens.
     left: 0;
     top: 0;
   }
-  
+
   body.active #menu {
     left: 194px;
   }
-  
+
   body.active #toggle {
     span {
       background-color: rgba(255,255,255,0);

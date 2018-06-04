@@ -1,6 +1,5 @@
 Gemfile.lock
 bower_components
-css
 tmp
 docs/public/
 docs/node_modules

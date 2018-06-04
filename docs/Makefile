@@ -1,7 +1,10 @@
 all: dependencies docs
 
 docs:
-	jekyll build -s src/ -d public/
+	jekyll build
+
+run:
+	jekyll serve
 
 bower:
 	which bower || npm install -g bower
