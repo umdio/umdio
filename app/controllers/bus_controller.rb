@@ -13,8 +13,8 @@ module Sinatra
           schedules_collection = app.settings.buses_db.collection('schedules')
 
           #this should probably be a more specific error message where we error out!
-          bad_route_message = "umd.io doesn't know the bus route in your url. Full list at http://api.umd.io/v0/bus/routes"
-          bad_stop_message = "umd.io doesn't know the stop in your url. Full list at http://api.umd.io/v0/bus/routes"
+          bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
+          bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
           apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 

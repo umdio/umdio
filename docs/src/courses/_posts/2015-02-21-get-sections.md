@@ -9,7 +9,7 @@ Get information about a section or multiple sections.
 
 ----
 
-`http://api.umd.io/v0/courses/sections/<section_id>`
+`https://api.umd.io/v0/courses/sections/<section_id>`
 
 To get information about a single section, append the `section_id` to the sections root URL.
 
@@ -17,7 +17,7 @@ To get information about a single section, append the `section_id` to the sectio
 
 ----
 
-`http://api.umd.io/v0/courses/sections/<section_ids>`
+`https://api.umd.io/v0/courses/sections/<section_ids>`
 
 To get information about multiple sections, append comma-separated `section_id`s to the sections root URL.
 

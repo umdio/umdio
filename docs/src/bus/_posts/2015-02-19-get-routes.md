@@ -9,12 +9,12 @@ Get detailed info about one or more bus routes.
 
 ----
 
-`http://api.umd.io/v0/bus/routes/<route_id>`
+`https://api.umd.io/v0/bus/routes/<route_id>`
 
 *Returns*: Specified [route object](#route_object).
 
 ---
-`http://api.umd.io/v0/bus/routes/<route_ids>`
+`https://api.umd.io/v0/bus/routes/<route_ids>`
 
 *Returns*: Specified [route objects](#route_object), where `route_ids` is a comma-separated list of route_ids, like `115,118,701`. 
 
@@ -22,7 +22,7 @@ Get detailed info about one or more bus routes.
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/routes/115`
+`GET https://api.umd.io/v0/bus/routes/115`
 
 Trimmed Response:
 {% highlight json %}

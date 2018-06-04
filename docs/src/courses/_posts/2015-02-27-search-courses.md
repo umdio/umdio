@@ -5,7 +5,7 @@ slug: search
 category: courses
 ---
 
-`http://api.umd.io/v0/courses`
+`https://api.umd.io/v0/courses`
 
 *Returns:* a [Paginated](/#pagination) array of [Course objects](#course_object).
 
@@ -28,7 +28,7 @@ When searching array properties, the `|` (pipe) delimeter may be used instead of
 
 <!-- EXAMPLE -->
 
-Request: `GET http://api.umd.io/v0/courses?dept_id=CMSC,BMGT&credits<2`
+Request: `GET https://api.umd.io/v0/courses?dept_id=CMSC,BMGT&credits<2`
 Trimmed Response:
 {% highlight json %}
 [

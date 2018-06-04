@@ -14,6 +14,6 @@ All map data is copyright University of Maryland 2015.
 
 ### Map Endpoint
 
-`http://api.umd.io/v0/map`
+`https://api.umd.io/v0/map`
 
 <!-- END -->

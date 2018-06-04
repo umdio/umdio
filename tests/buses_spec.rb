@@ -2,8 +2,8 @@ require_relative '../tests/spec_helper'
 
 describe 'Bus Endpoint' do
   url = "v0/bus"
-  bad_route_message = "umd.io doesn't know the bus route in your url. Full list at http://api.umd.io/v0/bus/routes"
-  bad_stop_message = "umd.io doesn't know the stop in your url. Full list at http://api.umd.io/v0/bus/routes"
+  bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
+  bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
 
   shared_examples_for 'good status' do |url|
     before {get url}

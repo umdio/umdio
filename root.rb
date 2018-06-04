@@ -15,7 +15,7 @@ module Sinatra
               versions: [
                 {
                   id: "v0",
-                  url: "http://api.umd.io/v0"
+                  url: "https://api.umd.io/v0"
                 }
               ],
             }
@@ -30,17 +30,17 @@ module Sinatra
               endpoints: [
                 {
                   name: 'Courses',
-                  url: 'http://api.umd.io/v0/courses',
+                  url: 'https://api.umd.io/v0/courses',
                   docs: 'http://umd.io/courses/'
                 },
                 {
                   name: 'Bus',
-                  url: 'http://api.umd.io/v0/bus',
+                  url: 'https://api.umd.io/v0/bus',
                   docs: 'http://umd.io/bus/'
                 },
                 {
                   name: 'Map',
-                  url: 'http://api.umd.io/v0/map',
+                  url: 'https://api.umd.io/v0/map',
                   docs: 'http://umd.io/map/'
                 },
               ]

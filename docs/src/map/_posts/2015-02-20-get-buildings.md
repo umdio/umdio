@@ -7,14 +7,14 @@ category: map
 
 Get location data about one or more buildings. Comma separated building numbers are the parameters.
 
-`http://api.umd.io/v0/map/buildings/:building_number`
+`https://api.umd.io/v0/map/buildings/:building_number`
 
 *Returns*: A list of complete [building objects](#building_object).
 
 <!-- EXAMPLE -->
 **Get Buildings**
 
-GET `http://api.umd.io/v0/map/buildings/251`
+GET `https://api.umd.io/v0/map/buildings/251`
 
 returns
 {% highlight json%}

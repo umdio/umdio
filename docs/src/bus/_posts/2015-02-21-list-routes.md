@@ -9,14 +9,14 @@ List all the bus routes. Returns the route ids and the names of the routes.
 
 ----
 
-`http://api.umd.io/v0/bus/routes`
+`https://api.umd.io/v0/bus/routes`
 
 *Returns*: Array of the bus routes as JSON Objects with 'route_id' and 'title' fields.
 
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/bus/routes`
+`GET https://api.umd.io/v0/bus/routes`
 
 Trimmed Response:
 {% highlight json%}

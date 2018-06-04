@@ -9,7 +9,7 @@ Get information about one or more courses.
 
 ----
 
-`http://api.umd.io/v0/courses/<course_id>`
+`https://api.umd.io/v0/courses/<course_id>`
 
 Get information about one course.
 
@@ -17,7 +17,7 @@ Get information about one course.
 
 ----
 
-`http://api.umd.io/v0/courses/<course_ids>`
+`https://api.umd.io/v0/courses/<course_ids>`
 
 Get information about multiple courses where `course_ids` is a comma-seperated list of `course_id`'s.
 
@@ -26,7 +26,7 @@ Get information about multiple courses where `course_ids` is a comma-seperated l
 <!-- EXAMPLE -->
 **Sample Request**
 
-`GET http://api.umd.io/v0/courses/ENES100`
+`GET https://api.umd.io/v0/courses/ENES100`
 
 Response:
 {% highlight json %}
