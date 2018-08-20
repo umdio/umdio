@@ -3,25 +3,22 @@
 ## Get Started
 `git clone https://github.com/umdio/umdio.git` (or download as a zip, we don't mind!)
 
-If you want to install all the dependencies on your machine, you'll need at least ruby2.2 and mongo + node if you want to work on the docs, and nginx if you want do it the way we do it on the server. bootstrap.sh is an outline of the installs you'll need, or you can ust run it if you are on ubuntu 14.04.
+## Setting Up Your Environment With Docker
+1. [Install docker](https://docs.docker.com/engine/installation/)
+2. [Install docker-compose](https://docs.docker.com/compose/install/)
+3. Run `docker-compose up`
+   * You might need to run docker-related commands with `sudo` if you're a linux user
+4. Run the scrapers
+    * `docker exec -it umdio_umdio_1 bundle exec rake scrape`
 
-~~Or, [install vagrant](http://docs.vagrantup.com/v2/installation/), and
-`vagrant up` from the folder you cloned.~~
-
-~~This might take a while the first time (~30min), because it installs things and runs scrapers to fill the database. After the first time, it will be quicker. Plus, your config is now the same as everyone else's, and the same as the server. Fancy that.~~
-
-~~While you are waiting, read over the project docs.~~
-
-~~You can get a shell on the virtual machine with `vagrant ssh`, then `cd umdio` and `bundle exec rake up` to run the server. You can see the api running at `localhost:3000` on your host machine.~~
-
-The vagrant environment has been deprecated and will be removed soon. Going forward, new development should use the docker containers. Follow the directions in the README to get started with docker.
+This will take a while, in the meantime, you can read up on our docs here.
 
 Try a few things. Ponder the return of `localhost:3000/v0/courses/sections`.
 
 ## Workflow
 Edit on your machine in your favorite text editor, and changes will automagically show in your machine's browser, so long as you leave the virtual machine shell open.
 
-Write tests that fail, write code that makes the tests pass. Run tests with `bundle exec rake` on the VM. If you are running scrapers or managing the database, remember that mongo is running on the VM, so run your scrapers there too.
+Write tests that fail, write code that makes the tests pass. Run tests with `docker exec -it umdio_umdio_1 bundle exec rake` on the VM. If you are running scrapers or managing the database, remember that mongo is running on the VM, so run your scrapers there too.
 
 If you want to see how the server will run with nginx, check `localhost:4080`. From the VM shell, `nginx -s reload` to update. Cool to check this once in a while, like before a commit. (Tough to view the api from your machine's browser, unless you update your hosts file with a line like `api.localhost 127.0.0.1`. This shouldn't really matter, but if you want, it's there.)
 
