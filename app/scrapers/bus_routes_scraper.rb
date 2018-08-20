@@ -1,4 +1,4 @@
-# script for getting route info from nextbus api, dumping into Mongo database. 
+# script for getting route info from nextbus api, dumping into Mongo database.
 # run  every ~month
 
 require 'mongo'
@@ -19,8 +19,13 @@ db = MongoClient.new(host, port).db('umdbus')
 routes_coll = db.collection('routes')
 stops_coll = db.collection('stops')
 
+if ARGV[0] == "rebuild"
+  routes_coll.remove()
+  stops_coll.remove()
+end
+
 apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
-address = apiRoot + '&command=routeList'
+address = apiRoot + '&command=routeList&t=0'
 response_hash = parse(Net::HTTP.get(URI(address)).to_s)
 route_array = response_hash["route"].map { |e| {route_id: e["tag"], title: e["title"]} }
 puts "Adding bus routes and stops to the database"
@@ -31,7 +36,7 @@ route_array.each do |route|
   stops = []
   route_response["stop"].each do |stop|
     puts "inserting #{stop["title"]}"
-    stops_coll.update({stop_id: stop["stop_id"]},{ 
+    stops_coll.update({stop_id: stop["stop_id"]},{
       "$set" =>
         {
           stop_id: stop["tag"],
@@ -46,7 +51,7 @@ route_array.each do |route|
     }, {upsert: true}) # update or insert stops to mongo
     stops << stop["tag"]
   end
-  
+
   paths = route_response["path"].map {|e| e["point"] }
   directions = [].push(route_response["direction"]).flatten
   directions = directions.map do |e|
@@ -67,6 +72,6 @@ route_array.each do |route|
     lat_max: route_response["latMax"],
     lat_min: route_response["latMin"],
     lon_max: route_response["lonMax"],
-    lon_min: route_response["lonMin"], 
+    lon_min: route_response["lonMin"],
   }}, {upsert: true}) # update or insert route
 end

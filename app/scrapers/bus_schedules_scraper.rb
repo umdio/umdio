@@ -22,7 +22,7 @@ routes = routes_coll.find({},{fields:{_id:0,route_id:1}}).map{|e| e['route_id']}
 address = "http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule"
 routes.each do |route|
   page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
-  
+
   schedules = []
   sch = page['route']
   sch.each do |service|
@@ -48,7 +48,7 @@ routes.each do |route|
             stop_id: stop['tag'],
             arrival_time: stop['content'],
             arrival_time_secs: stop['epochTime']
-          } 
+          }
         end
       else
         stop_times << {stop_id: trip['stop']['tag'], arrival_time: trip['stop']['content'], arrival_time_secs: trip['stop']['epochTime']}
