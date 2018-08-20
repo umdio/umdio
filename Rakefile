@@ -33,7 +33,7 @@ namespace :db do
 end
 
 namespace :scrapers do
-  desc "Run indiviual scrapers"
+  desc "Run bus route scrapers"
   task :bus do
     sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
     sh 'ruby app/scrapers/bus_schedules_scraper_small.rb rebuild'
