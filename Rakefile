@@ -32,6 +32,14 @@ namespace :db do
   end
 end
 
+namespace :scrapers do
+  desc "Run bus route scrapers"
+  task :bus do
+    sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
+    sh 'ruby app/scrapers/bus_schedules_scraper_small.rb rebuild'
+  end
+end
+
 desc "Scrape to fill databases" # takes about 15 minutes
 task :scrape do
   # Testudo updated in September for Spring, Fed for fall
