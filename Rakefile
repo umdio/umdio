@@ -38,6 +38,20 @@ namespace :scrapers do
     sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
     sh 'ruby app/scrapers/bus_schedules_scraper_small.rb rebuild'
   end
+
+  task :courses do
+    year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
+    years = ((year - 3)..year).to_a.join ' '
+    semesters = current_and_next_semesters
+    sh "ruby app/scrapers/courses_scraper.rb #{years}"
+    sh 'ruby app/scrapers/sections_scraper.rb'
+    sh 'ruby app/scrapers/section_course_linker.rb'
+    semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+  end
+
+  task :buildings do
+    sh 'ruby app/scrapers/buildings.rb'
+  end
 end
 
 desc "Scrape to fill databases" # takes about 15 minutes

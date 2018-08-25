@@ -65,7 +65,7 @@ describe 'Courses Endpoint' do  # Probably should be moved higher up the test la
       it_has_behavior "good status", url + '/ENES100'
       it_has_behavior "good status", url + '/enes100'
       it_has_behavior "good status", url + '/Enes100'
-      it_has_behavior "bad status", url + '/bees608a'
+      it_has_behavior "bad status", url + '/abcd608a'
     end
 
     describe 'get multiple courses' do
