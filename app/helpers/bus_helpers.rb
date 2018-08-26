@@ -2,14 +2,13 @@ module Sinatra
   module UMDIO
     module Helpers
 
-      def is_route_id? string
-        # this is a hard-coded list of the routes. If the routes change, we'll error out. That's sucky, but I couldn't think of a smart way to do it. We should just take over everything.
-        # we could get from the database, but that's ugly
-        # route_ids = ['701','702','703','104','105','108','109','110','111','113','114','115','116','117','118','122','124','125','126','127','128','129','130','131','132','133']
-        # route_ids.include?(string)
-
-        # TODO: add actual logic here again
-        true
+      def is_route_id?(coll, route)
+        routes = coll.find({},{fields: {:_id => 0, :route_id => 1, :title => 1}}).to_a
+        route_ids = []
+        routes.each {|route|
+          route_ids.push(route['route_id'])
+        }
+        route_ids.include?(route)
       end
 
       def is_stop_id? string
