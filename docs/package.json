@@ -1,8 +1,0 @@
-{
-	"name": "umdio-docs",
-	"dependencies": {
-		"highlightjs": "^9.10.0",
-		"html5shiv": "^3.7.3",
-		"jquery": "^3.3.1"
-	}
-}
