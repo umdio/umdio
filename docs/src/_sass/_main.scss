@@ -1,40 +1,23 @@
-@import "bourbon/bourbon";
-// Grid settings
-@import "neat/neat";
-$grid-columns: 10;
-$gutter: em(40);
-$max-width: em(1140);
-
-@import "normalize/normalize";
 @import "config";
 @import "utils";
 @import "syntax-highlighting";
 
-// device sizes
-$desktop: new-breakpoint(min-width 1141px 10);
-$tablet: new-breakpoint(max-width 1140px 8);
-$large-tablet: new-breakpoint(min-width 861px 8);
-$small-tablet: new-breakpoint(max-width 860px 8);
-$not-mobile: new-breakpoint(min-width 701px 4);
-$mobile: new-breakpoint(max-width 700px 4);
+// Pre-defined sizes
+$gutter: 20px;
+$gutter-two: 40px;
+$max-width: em(1140);
+
+// Media queries
+$desktop: "only screen and (min-width: 1141px)";
+$tablet: "only screen and (max-width: 1140px)";
+$large-tablet: "only screen and (min-width: 861px)";
+$small-tablet: "only screen and (max-width: 860px)";
+$not-mobile: "only screen and (min-width: 701px)";
+$mobile: "only screen and (max-width: 700px)";
 
 div.container {
   margin: 0 auto;
   overflow: hidden;
-  > .col-2 {
-    @include span-columns(2);
-    @include omega;
-  }
-  > .col-4 { @include span-columns(4); }
-  > .col-8 {
-    @include span-columns(8, block-collapse);
-    @include omega;
-
-    /* hacky solution */
-    &:last-child {
-      width: 83.08366%;
-    }
-  }
 }
 
 html {
@@ -55,6 +38,7 @@ html, body {
 
 body {
   color: $dark-gray;
+  margin-top: 0px;
 }
 
 a {
@@ -67,8 +51,6 @@ a {
 }
 
 header {
-  @include clearfix;
-  //border-bottom: 2px solid $red;
   width:100%;
 
   position: fixed;
@@ -82,7 +64,6 @@ header {
 
     // retina image
     img {
-      padding: 6px 10px;
       width: 100%;
       position: absolute;
       top: 14px;
@@ -90,14 +71,10 @@ header {
   }
 
   > .wrap, > .nav {
-    float: left;
     display: inline-block;
   }
 
-  .wrap {
-  }
-
-  @include media($mobile) {
+  @media #{$mobile} {
     .header-nav li a {
       padding: 8px;
     }
@@ -131,7 +108,6 @@ header {
 
   li {
     display: inline-block;
-    float: left;
   }
 
   a {
@@ -139,7 +115,7 @@ header {
   }
 }
 
-@include media($desktop) {
+@media #{$desktop} {
   .page {
     padding: 0 60px;
   }
@@ -149,13 +125,17 @@ header {
 .menu {
   font-family: $header-font;
   font-size: 0.92em;
-  position: relative;
+  position: fixed;
   z-index: 999;
   min-height: 1px;
 
-  @include media($small-tablet) {
+  @media #{$small-tablet} {
     margin-left: -400px;
     width: 400px;
+  }
+
+  div {
+    max-width: 200px;
   }
 }
 
@@ -223,6 +203,10 @@ nav .ref-title {
 .methods {
   position: relative;
   background: $code-bg;
+  font-family: $body-font;
+
+  width: 50vw;
+  margin-left: 400px;
 
   // ??
   .lang-wrapper {
@@ -234,7 +218,7 @@ nav .ref-title {
       display: table-cell;
     }
 
-    @include media($mobile) {
+    @media #{$mobile} {
       display: block;
       .lang-col {
         width: 100%;
@@ -257,10 +241,8 @@ nav .ref-title {
     height: 52px;
     padding: 7px;
     z-index: 20;
-    //background: lighten($code-bg, 8%);
-    //background: $code-bg;
 
-    @include media($mobile) {
+    @media #{$mobile} {
       width: 100%;
       left: 0;
     }
@@ -278,7 +260,7 @@ nav .ref-title {
 }
 
 div.container > .methods {
-  @include media($small-tablet) {
+  @media #{$small-tablet} {
     width: 100%;
     &:last-child {
       width: 100%;
@@ -310,7 +292,7 @@ div.container > .methods {
     display: table-cell;
   }
 
-  @include media($mobile) {
+  @media #{$mobile} {
     display: block;
     .description, .example {
       width: 100%;
@@ -324,7 +306,7 @@ div.container > .methods {
 
   .description {
     border-bottom: 1px solid $light-gray;
-    padding: $gutter*2 $gutter $gutter $gutter;
+    padding: $gutter-two $gutter $gutter $gutter;
     background: white;
     position: relative;
     z-index: 24;
@@ -375,7 +357,7 @@ div.container > .methods {
     color: $light-gray;
     font-size: 0.92em;
     padding: $gutter;
-    padding-top: $gutter*2;
+    padding-top: $gutter-two;
     border-bottom: 1px solid darken($code-bg, 10%);
     border-top: 1px solid lighten($code-bg, 10%);
 
@@ -454,7 +436,7 @@ footer .footer-text {
 small screens.
 */
 .menu-link {
-  @include transition(left 0.2s ease-out);
+  transition: left 0.2s ease-out;
   cursor: pointer;
   position: fixed;
   display: block; /* show this only on small screens */
@@ -477,7 +459,7 @@ small screens.
     display: block;
 
     & {
-      @include transition(all .2s);
+      transition: all .2s;
     }
 
     &, &:before, &:after {
@@ -487,8 +469,8 @@ small screens.
     }
 
     &:before, &:after {
-      @include transition(all .4s);
-      @include transform(rotate(deg));
+      transition: all .4s;
+      transform: rotate(deg);
       position: absolute;
       margin-top: -0.6em;
       content: " ";
@@ -505,16 +487,16 @@ small screens.
   }
 }
 
-@include media($large-tablet) {
+@media #{$not-mobile} {
   .menu-link {
     display: none;
   }
 }
 
-@include media($small-tablet) {
+@media #{$small-tablet} {
   #menu {
-    @include transition(left 0.2s cubic-bezier(0.165, 0.840, 0.440, 1.000));
-    -webkit-transform: translate3d(0,0,0); // new layer hack
+    transition: left 0.2s cubic-bezier(0.165, 0.840, 0.440, 1.000);
+    transform: translate3d(0,0,0); // new layer hack
     position: fixed;
     margin-left: -194px;
     background: white;
@@ -533,11 +515,11 @@ small screens.
       background-color: rgba(255,255,255,0);
 
       &:before {
-        @include transform(rotate(45deg));
+        transform: rotate(45deg);
         top:6px;
       }
       &:after {
-        @include transform(rotate(-45deg));
+        transform: rotate(-45deg);
         top:-6px;
       }
     }
