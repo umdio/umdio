@@ -6,8 +6,7 @@ docs:
 run:
 	jekyll serve
 
-bower:
-	which bower || npm install -g bower
-	bower install
+npm:
+	npm install
 
-dependencies: bower
+dependencies: npm
