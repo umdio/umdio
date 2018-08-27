@@ -24,7 +24,6 @@ address = "http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=s
 routes.each do |route|
   page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
 
-  #schedules = []
   next if !(page['route'])
   sch = page['route']
   sch.each do |service|
