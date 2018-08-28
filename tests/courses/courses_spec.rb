@@ -3,13 +3,13 @@
 
 require_relative '../../tests/spec_helper.rb'
 
-describe 'Courses Endpoint' do  # Probably should be moved higher up the test ladder. For now!
+describe 'Courses Endpoint' do
   # TODO: make this an instance variable @url
   url = '/v0/courses'
 
   describe 'Listing courses' do
 
-    describe 'GET /courses' do #this test takes most of the time in our test suite right now (80%)
+    describe 'GET /courses' do
       before { get url }
       it_has_behavior 'good status', url
       it 'returns a list of courses' do

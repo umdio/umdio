@@ -5,8 +5,6 @@ module Sinatra
 
       # generalize logic for checking if semester param valid
       def check_semester app, semester, coll_prefix
-        # TODO: don't hardcode this
-
         # check for semester formatting
         if not (semester.length == 6 and semester.is_number?)
           halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
@@ -36,10 +34,10 @@ module Sinatra
           return res[0]
         end
 
-        if !res 
+        if !res
           halt 404, {
-            error_code: 404, 
-            message: "Section with section_id #{section_ids[0]} not found.", 
+            error_code: 404,
+            message: "Section with section_id #{section_ids[0]} not found.",
             available_sections: "https://api.umd.io/v0/courses/sections",
             docs: "http://umd.io/courses"
           }.to_json
