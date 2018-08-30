@@ -21,7 +21,7 @@ module UMDIO
       # create the next & prev page links
       path = request.fullpath.split('?')[0]
       base = base_url + path + '?'
-      
+
       # next page
       params['page'] += 1
       @next_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
@@ -68,6 +68,10 @@ module UMDIO
     end
 
     def params_search_query ignore=nil
+      # Sinatra adds this param in some cases, and we don't want it
+      # TODO: Is there a better way we can delete this?
+      params.delete(:captures) if params.key?(:captures)
+
       query = {}
       params.keys.each do |k| unless ignore.include?(k)
         e = ''
