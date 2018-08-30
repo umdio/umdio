@@ -1,17 +1,9 @@
-# tests/root_spec.rb
-# tests for the root of the api
+# Tests for root of api
 
 require_relative '../tests/spec_helper'
 
-describe 'UMDIO API Version 0' do  # Probably should be moved higher up the test ladder. For now!
+describe 'UMDIO API Version 0' do
   url = '/'
-  
-  shared_examples_for 'good status' do |url|
-    before {head url}
-    it 'has a good response' do
-      expect(last_response.status).to be == 200
-    end
-  end
 
   describe 'Root' do
     it_has_behavior 'good status', url
@@ -23,12 +15,10 @@ describe 'UMDIO API Version 0' do  # Probably should be moved higher up the test
   end
 
   describe 'v0' do
-    it_has_behavior'good status', (url + 'v0')
-    before {get url + 'v0'}
-    it 'returns v0 message' do
-      # TODO
-      # expect(last_response.body).to be == version_message
-    end
+    it_has_behavior 'good status', (url + 'v0')
   end
 
+  describe 'Bad route' do
+    it_has_behavior 'bad status', (url + 'zzzz')
+  end
 end
