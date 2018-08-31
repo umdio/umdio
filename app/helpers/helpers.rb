@@ -29,7 +29,7 @@ module UMDIO
       # prev page
       params['page'] -= 2
       if (params['page']*@limit > collection.count)
-        params['page'] = (collection.count.to_f / limit).ceil.to_i
+        params['page'] = (collection.count.to_f / @limit).ceil.to_i
       end
       @prev_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
     end
