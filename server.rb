@@ -27,7 +27,6 @@ class UMDIO < Sinatra::Base
     set :courses_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdclass')
     set :buses_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdbus')
     set :map_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmap')
-    set :profs_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdprof')
     set :majors_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmajors')
   end
 
