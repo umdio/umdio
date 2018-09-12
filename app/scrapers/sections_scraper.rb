@@ -56,9 +56,10 @@ section_queries.each do |query|
       # add course and department to professor object for each instructor
       instructors.each do |x|
         if x != 'Instructor: TBA'
-          profs[x] ||= {:courses => [], :depts => []}
-          profs[x][:courses] |= [course_id]
-          profs[x][:depts] |= [dept]
+          professor_name = x.squeeze()
+          profs[professor_name] ||= {:courses => [], :depts => []}
+          profs[professor_name][:courses] |= [course_id]
+          profs[professor_name][:depts] |= [dept]
         end
       end
 
