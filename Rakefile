@@ -26,9 +26,7 @@ namespace :db do
   task :clean do
     puts "DANGER: will remove everything in the database, including logs."
     `rm -r ./data/db`
-    `rm -r ./data/mongo`
     `mkdir ./data/db`
-    `mkdir ./data/mongo`
   end
 end
 
