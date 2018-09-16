@@ -41,11 +41,8 @@ module Sinatra
             }
             buildings = buildings_collection.find(expr, { fields: {:_id => 0} }).to_a
 
-            # get rid of [] on single object return
-            buildings = buildings[0] if building_ids.length == 1
-    
-            # prevent null being returned
-            if not buildings
+            # throw 404 if empty
+            if buildings == []
               halt 404, {
                 error_code: 404, 
                 message: "Building number #{params[:building_id]} isn't in our database, and probably doesn't exist.",
