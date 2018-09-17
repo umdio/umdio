@@ -16,18 +16,17 @@ majors_coll.remove()
 
 url = "https://www.admissions.umd.edu/explore/majors"
 page = Nokogiri::HTML(open(url))
-major_divs = page.css("div.panel-body > div")
+major_divs = page.css("div.panel-body a")
 
 majors = []
-major_divs.each do |div|
-  puts div
+major_divs.each do |link|
   # parse the name to grab the major's name and its college
-  major_parts = div.text.sub(')', '').split('(')
+  major_parts = link.text.sub(')', '').split('(')
   major_name = major_parts[0].squeeze(' ')
   major_college = major_parts[1] ? major_parts[1].strip : ''
 
   # parse the url
-  major_url = div.css('a')[0]['href']
+  major_url = link['href']
 
   majors << {
     name: major_name,
