@@ -16,15 +16,14 @@ majors_coll.remove()
 
 url = "https://www.admissions.umd.edu/explore/majors"
 page = Nokogiri::HTML(open(url))
-major_divs = page.css("div[style='padding:0 0 3px 10px; line-height:17px;']")
+major_divs = page.css("div.panel-body > div")
 
 majors = []
 major_divs.each do |div|
-
+  puts div
   # parse the name to grab the major's name and its college
   major_parts = div.text.sub(')', '').split('(')
-  # TODO: this is currently a hacky fix to major names ending in a strange space character I couldn't remove
-  major_name = major_parts[0][0...-1]
+  major_name = major_parts[0].squeeze(' ')
   major_college = major_parts[1] ? major_parts[1].strip : ''
 
   # parse the url
@@ -43,3 +42,4 @@ majors.each do |major|
   major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
   majors_coll.update({ major_id: major[:major_id] }, { "$set" => major }, { upsert: true })
 end
+puts "Inserted #{majors.length} majors"
