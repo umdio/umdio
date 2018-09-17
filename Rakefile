@@ -32,7 +32,7 @@ end
 
 ###### Scraping
 desc "Scrape to fill databases (takes ~20 minutes)"
-task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings']
+task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
 desc "Scrapes enough to run the tests"
 task :test_scrape do
@@ -47,6 +47,7 @@ task :test_scrape do
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
   sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
   sh 'ruby app/scrapers/buildings.rb'
+  sh 'ruby app/scrapers/majors_scraper.rb'
 end
 
 namespace :scrape do
