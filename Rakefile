@@ -81,6 +81,11 @@ namespace :scrape do
   task :buildings do
     sh 'ruby app/scrapers/buildings.rb'
   end
+
+  desc "Majors scraper"
+  task :majors do
+    sh 'ruby app/scrapers/majors_scraper.rb'
+  end
 end
 
 ###### Server
