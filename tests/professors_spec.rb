@@ -14,9 +14,10 @@ describe 'Professors Endpoint' do
     # Test for TBA Instructor
     it_has_behavior 'bad status', url + '?name=Instructor: TBA'
 
-    #Test for professor with space in name
+    # Test for professor with space in name
     it_has_behavior 'bad status', url + '?name=Daniel  Contreras'
 
+    # Test for professor with double characters
+    it_has_behavior 'good status', url + '?name=Jason Filippou'
   end
-
 end
