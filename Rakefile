@@ -1,6 +1,5 @@
 require 'rspec/core/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
-
 include Sinatra::UMDIO::Helpers
 
 ###### Database
@@ -25,8 +24,15 @@ namespace :db do
   desc "Cleans databases (by deleting all the data)"
   task :clean do
     puts "DANGER: will remove everything in the database, including logs."
-    `rm -r ./data/db`
-    `mkdir ./data/db`
+    puts "Continue? [y/N]"
+    prompt = STDIN.gets.chomp
+    if prompt == 'y'
+      `rm -r ./data/db`
+      `mkdir ./data/db`
+      puts "Database successfully deleted."
+    else
+      puts "Deletion aborted"
+    end
   end
 end
 
