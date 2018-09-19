@@ -31,7 +31,7 @@ module Sinatra
             if profs == []
               halt 404, {
                 error_code: 404, 
-                message: "Professor isn't in our database, and probably doesn't exist.",
+                message: "There were no professors that matched your search.",
                 docs: "https://umd.io/professors"
               }.to_json
             end
