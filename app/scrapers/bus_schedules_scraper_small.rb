@@ -22,8 +22,12 @@ schedule_coll = db.collection('schedules')
 routes = routes_coll.find({},{fields:{_id:0,route_id:1}}).map{|e| e['route_id']}.flatten
 address = "http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule"
 routes.each do |route|
-  page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
-
+  begin
+    page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
+  rescue JSON::ParserError
+    puts "Retrying..."
+    retry
+  end
   next if !(page['route'])
   sch = page['route']
   sch.each do |service|
