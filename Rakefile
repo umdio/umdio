@@ -43,7 +43,7 @@ task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:maj
 desc "Scrapes enough to run the tests"
 task :test_scrape do
   # Get the current semester
-  year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
+  year = Time.now.month <= 10 ? Time.now.year : Time.now.year + 1
   semesters = [] << current_semester
   sh "ruby app/scrapers/courses_scraper.rb #{year}"
   sh 'ruby app/scrapers/sections_scraper.rb'
