@@ -5,14 +5,19 @@
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
+require 'logger'
+
 include Mongo
+
+logger = Logger.new(STDOUT)
+logger.level = Logger::INFO
 
 #set up mongo database - code from ruby mongo driver tutorial
 host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
 port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
 
 #announce connection and connect
-puts "Connecting to #{host}:#{port}"
+logger.info "Connecting to #{host}:#{port}"
 db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
 
 years = ARGV
@@ -25,12 +30,12 @@ semesters = years.map do |e|
 end
 semesters = semesters.flatten # year plus starting month is term id
 
-puts semesters
+logger.info semesters
 
 # Get the urls for all the department pages
 dep_urls = []
 semesters.each do |semester|
-  puts "Searching for courses in term #{semester}"
+  logger.info "Searching for courses in term #{semester}"
 
   base_url = "https://ntst.umd.edu/soc/#{semester}"
     
@@ -38,7 +43,7 @@ semesters.each do |semester|
     dep_urls << "https://ntst.umd.edu/soc/#{semester}/#{e.text}"
   end
     
-  puts "#{dep_urls.length} department/semesters so far"
+  logger.info "#{dep_urls.length} department/semesters so far"
 end
 
 # safely formats to UTF-8
@@ -57,7 +62,7 @@ dep_urls.each do |url|
   coll = db.collection('courses' + semester)
   bulk = coll.initialize_unordered_bulk_op
 
-  puts "Getting courses for #{dept_id} (#{semester})"
+  logger.info "Getting courses for #{dept_id} (#{semester})"
 
   page = Nokogiri::HTML(open(url), nil, "UTF-8")
 
