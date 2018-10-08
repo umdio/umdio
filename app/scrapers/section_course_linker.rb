@@ -1,17 +1,16 @@
-# Script to link the sections to the courses. 
-# Only run after courses and sections are scraped. 
+# Script to link the sections to the courses.
+# Only run after courses and sections are scraped.
 # Can be run in parallel to the update open seats scraper
 
 require 'mongo'
-include Mongo
 
 #set up mongo database - code from ruby mongo driver tutorial
 host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+port = ENV['MONGO_RUBY_DRIVER_PORT'] || Mongo::DEFAULT_PORT
 
 #announce connection and connect
 puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
+db = Mongo::MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
 
 course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
 

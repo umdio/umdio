@@ -4,17 +4,14 @@
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
-include Mongo
 require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
-# set up mongo database - code from ruby mongo driver tutorial
-host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+require_relative 'scraper_common.rb'
+include ScraperCommon
 
-# announce connection and connect
-puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
+logger = ScraperCommon::logger
+db = ScraperCommon::database 'umdclass'
 
 # Architecture:
 # build list of queries

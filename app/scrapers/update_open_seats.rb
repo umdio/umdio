@@ -1,20 +1,17 @@
 # Update open seat information on sections in a mongo database
-# Ran in 3 minutes on Rob's Laptop, updating the 6000 or so sections. 
+# Ran in 3 minutes on Rob's Laptop, updating the 6000 or so sections.
 
 ENV['RACK_ENV'] ||= 'scrape'
 
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
-include Mongo
 
-#set up mongo database - code from ruby mongo driver tutorial
-host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+require_relative 'scraper_common.rb'
+include ScraperCommon
 
-#announce connection and connect8
-puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
+logger = ScraperCommon::logger
+db = ScraperCommon::database 'umdclass'
 
 # Read in a section from the command line
 semester = ARGV[0]
@@ -25,7 +22,7 @@ c = db.collection("courses#{semester}")
 sect = db.collection("sections#{semester}")
 
 section_queries = []
-c.find({},{fields: {_id:0,course_id:1}}).to_a.each_slice(200) do |a| 
+c.find({},{fields: {_id:0,course_id:1}}).to_a.each_slice(200) do |a|
   section_queries << "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"
 end
 
@@ -50,7 +47,7 @@ section_queries.each do |query|
       count += 1
       total += 1
       print "."
-      bulk.find({section_id: sec_id}).upsert().update( { "$set" => { open_seats: open, waitlist: wait} } ) 
+      bulk.find({section_id: sec_id}).upsert().update( { "$set" => { open_seats: open, waitlist: wait} } )
     end
   end
   # execute the bulk update for the slice of sections
