@@ -205,8 +205,10 @@ nav .ref-title {
   background: $code-bg;
   font-family: $body-font;
 
-  width: 50vw;
-  margin-left: 400px;
+  @media #{$desktop} {
+    width: 50vw;
+    margin-left: 400px;
+  }
 
   @media #{mobile} {
     width: 100vw;
