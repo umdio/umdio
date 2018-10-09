@@ -5,15 +5,13 @@
 require 'mongo'
 require 'net/http'
 require 'json'
-include Mongo
 include JSON
 
-#set up mongo database - code from ruby mongo driver tutorial
-host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+require_relative 'scraper_common.rb'
+include ScraperCommon
 
-puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port).db('umdbus')
+logger = ScraperCommon::logger
+db = ScraperCommon::database 'umdbus'
 
 # set up routes and schedules collections
 routes_coll = db.collection('routes')

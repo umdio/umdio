@@ -5,13 +5,12 @@
 require 'open-uri'
 require 'net/http'
 require 'mongo'
-include Mongo
-#set up mongo database - code from ruby mongo driver tutorial
-host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
 
-puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port).db('umdmap')
+require_relative 'scraper_common.rb'
+include ScraperCommon
+
+logger = ScraperCommon::logger
+db = ScraperCommon::database 'umdmap'
 buildings_coll = db.collection('buildings')
 
 url="https://gist.githubusercontent.com/McIntireEvan/34f7875ad0e302cbba8615f60460cdcb/raw/b177299262f53246c7404bbb1d2c2800dd1006c2/umd-building-gis.json"

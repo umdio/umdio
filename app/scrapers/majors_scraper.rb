@@ -1,15 +1,12 @@
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
-include Mongo
 
-#set up mongo database - code from ruby mongo driver tutorial
-host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
+require_relative 'scraper_common.rb'
+include ScraperCommon
 
-# announce connection and connect
-puts "Connecting to #{host}:#{port}"
-db = MongoClient.new(host, port).db('umdmajors')
+logger = ScraperCommon::logger
+db = ScraperCommon::database 'umdmajors'
 majors_coll = db.collection('majors')
 
 majors_coll.remove()
