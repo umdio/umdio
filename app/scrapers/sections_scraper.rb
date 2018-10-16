@@ -1,9 +1,9 @@
-# script for adding sections of umd classes to mongo
-# 4min on the VM
+# Scrapes sections and puts them into mongo
 
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
+
 require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
@@ -13,29 +13,39 @@ include ScraperCommon
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdclass'
 
-# Architecture:
-# build list of queries
+
+# Find all the course collections
 course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
 section_queries = []
+
+num_groups = 0
+
+# Find the sections we have to parse
 course_collections.each do |c|
   semester = c.name.scan(/courses(.+)/)[0]
   if not semester.nil?
     semester = semester[0]
     c.find({},{fields: {_id:0,course_id:1}}).to_a
-      .each_slice(200){|a| section_queries <<
-        "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"}
+      .each_slice(200){|a|
+      num_groups += 1
+        section_queries << "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"
+      }
   end
 end
 
 count = 0
 total = 0
+
 # Parse section data from pages
 section_queries.each do |query|
+  # Get needed Mongo collections
   semester = query.scan(/soc\/(.+)\//)[0][0]
   sections_coll = db.collection("sections#{semester}")
   prof_coll = db.collection("profs#{semester}")
   sections_bulk = sections_coll.initialize_unordered_bulk_op
   prof_bulk = prof_coll.initialize_unordered_bulk_op
+
+  # Parse with Nokogiri
   page = Nokogiri::HTML(open(query))
   course_divs = page.search("div.course-sections")
   section_array = []
@@ -90,15 +100,10 @@ section_queries.each do |query|
     end
   end
 
-  # insert array of sections into mongo
   count += 1
 
-  # nitpick: should be 'courses', not sure how many sections we're adding
-  # puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
-  puts "inserting set number #{count} of sections. 200 more courses in the database - #{semester} term. #{total} total."
+  puts "inserting set number #{count} of sections. #{num_groups - count} sets remaining - #{semester} term. #{total} total."
 
-  # Should be upsert not insert, so we can run multiple times without having to drop the database
-  # coll.insert(section_array) unless section_array.empty?
   section_array.each do |section|
     sections_bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
   end
