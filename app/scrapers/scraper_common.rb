@@ -4,6 +4,10 @@ module ScraperCommon
     def logger
         @logger = Logger.new(STDOUT)
         @logger.level = Logger::INFO
+        @logger.formatter = proc do |severity, datetime, progname, msg|
+            date_format = datetime.strftime("%Y-%m-%d %H:%M:%S")
+            "[#{date_format}] #{severity}  (#{progname}): #{msg}\n"
+        end
         @logger
     end
 

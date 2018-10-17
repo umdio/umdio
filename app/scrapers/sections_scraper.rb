@@ -10,6 +10,8 @@ include Sinatra::UMDIO::Helpers
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "sections_scraper"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdclass'
 
@@ -95,7 +97,7 @@ section_queries.each do |query|
 
   # nitpick: should be 'courses', not sure how many sections we're adding
   # puts "inserting set number #{count} of sections. 200 more sections in the database - #{semester} term. #{total} total."
-  puts "inserting set number #{count} of sections. 200 more courses in the database - #{semester} term. #{total} total."
+  logger.info(prog_name) { "inserting set number #{count} of sections. 200 more courses in the database - #{semester} term. #{total} total."}
 
   # Should be upsert not insert, so we can run multiple times without having to drop the database
   # coll.insert(section_array) unless section_array.empty?

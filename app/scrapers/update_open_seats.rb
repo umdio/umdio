@@ -10,6 +10,8 @@ require 'mongo'
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "update_open_seats"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdclass'
 
@@ -46,12 +48,10 @@ section_queries.each do |query|
       # build a mongo update
       count += 1
       total += 1
-      print "."
       bulk.find({section_id: sec_id}).upsert().update( { "$set" => { open_seats: open, waitlist: wait} } )
     end
   end
   # execute the bulk update for the slice of sections
-  puts ""
-  puts "updating sections of courses #{course_ids[1]} through #{course_ids[-1]}. #{count} sections. #{total} so far."
+  logger.info(prog_name) {"updating sections of courses #{course_ids[1]} through #{course_ids[-1]}. #{count} sections. #{total} so far."}
   bulk.execute unless count == 0
 end

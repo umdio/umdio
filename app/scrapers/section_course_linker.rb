@@ -4,13 +4,13 @@
 
 require 'mongo'
 
-#set up mongo database - code from ruby mongo driver tutorial
-host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
-port = ENV['MONGO_RUBY_DRIVER_PORT'] || Mongo::DEFAULT_PORT
+require_relative 'scraper_common.rb'
+include ScraperCommon
 
-#announce connection and connect
-puts "Connecting to #{host}:#{port}"
-db = Mongo::MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db('umdclass')
+prog_name = "section_course_linker"
+
+logger = ScraperCommon::logger
+db = ScraperCommon::database 'umdclass'
 
 course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
 
@@ -25,7 +25,7 @@ course_collections.each do |coll|
       sections = sect_coll.find({course: course['course_id']},{fields: {_id: 1, section_id: 1}}).to_a
       bulk.find({course_id: course['course_id']}).upsert().update({ "$set" => { sections: sections} })
     end
-    puts "executing a batch insert for #{semester}"
+    logger.info(prog_name) {"executing a batch insert for #{semester}"}
     bulk.execute
   end
 end

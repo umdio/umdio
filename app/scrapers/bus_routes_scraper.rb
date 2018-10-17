@@ -10,6 +10,8 @@ include JSON
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "bus_routes_scraper"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdbus'
 
@@ -26,16 +28,16 @@ apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
 address = apiRoot + '&command=routeList&t=0'
 response_hash = parse(Net::HTTP.get(URI(address)).to_s)
 route_array = response_hash["route"].map { |e| {route_id: e["tag"], title: e["title"]} }
-puts "Adding bus routes and stops to the database"
+logger.info(prog_name) {"Adding bus routes and stops to the database"}
 unless route_array.nil?
   route_array.each do |route|
-    puts "getting #{route[:route_id]}"
+    logger.info(prog_name) {"getting #{route[:route_id]}"}
     address = apiRoot + "&command=routeConfig&r=#{route[:route_id]}"
     route_response = parse(Net::HTTP.get(URI(address)).to_s)["route"]
     stops = []
     unless route_response.nil?
       route_response["stop"].each do |stop|
-        puts "inserting #{stop["title"]}"
+        logger.info(prog_name) {"inserting #{stop["title"]}"}
         stops_coll.update({stop_id: stop["stop_id"]},{
           "$set" =>
             {

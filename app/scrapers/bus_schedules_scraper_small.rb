@@ -6,9 +6,10 @@ require 'mongo'
 require 'net/http'
 require 'json'
 include JSON
-
 require_relative 'scraper_common.rb'
 include ScraperCommon
+
+prog_name = "bus_schedules_scraper"
 
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdbus'
@@ -23,7 +24,7 @@ routes.each do |route|
   begin
     page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
   rescue JSON::ParserError
-    puts "Retrying..."
+    logger.info(prog_name) { "Retrying..."}
     retry
   end
   next if !(page['route'])
@@ -58,7 +59,7 @@ routes.each do |route|
       end
       trips << stop_times
     end
-    puts "updating the #{days} schedule for route #{route} in the #{direction} direction"
+    logger.info(prog_name) {"updating the #{days} schedule for route #{route} in the #{direction} direction"}
       schedule_coll.update({route: route, days: days, direction: direction}, {'$set' => {
         route: route,
         days: days,
