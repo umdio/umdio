@@ -5,6 +5,8 @@ require 'mongo'
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "majors_scraper"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdmajors'
 majors_coll = db.collection('majors')
@@ -33,9 +35,9 @@ major_divs.each do |link|
 end
 
 majors.each do |major|
-  puts "inserting #{major[:name]}"
+  logger.info(prog_name) { "inserting #{major[:name]}"}
 
   major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
   majors_coll.update({ major_id: major[:major_id] }, { "$set" => major }, { upsert: true })
 end
-puts "Inserted #{majors.length} majors"
+logger.info(prog_name) {"Inserted #{majors.length} majors"}

@@ -9,6 +9,8 @@ require 'mongo'
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "buildings"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdmap'
 buildings_coll = db.collection('buildings')
@@ -32,5 +34,5 @@ array.each do |e|
   e.delete :number
   buildings_coll.update({building_id: e[:building_id]}, {"$set" => e}, {upsert: true})
 
-  puts "inserted #{e[:name]}"
+  logger.info(prog_name) {"inserted #{e[:name]}"}
 end

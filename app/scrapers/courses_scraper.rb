@@ -8,6 +8,8 @@ require 'mongo'
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "courses_scraper"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdclass'
 
@@ -23,12 +25,12 @@ semesters = years.map do |e|
 end
 semesters = semesters.flatten
 
-logger.info semesters
+logger.info(prog_name) {semesters}
 
 # Get the urls for all the department pages
 dep_urls = []
 semesters.each do |semester|
-  logger.info "Searching for courses in term #{semester}"
+  logger.info(prog_name) {"Searching for courses in term #{semester}"}
 
   base_url = "https://ntst.umd.edu/soc/#{semester}"
 
@@ -36,7 +38,7 @@ semesters.each do |semester|
     dep_urls << "https://ntst.umd.edu/soc/#{semester}/#{e.text}"
   end
 
-  logger.info "#{dep_urls.length} department/semesters so far"
+  logger.info(prog_name) {"#{dep_urls.length} department/semesters so far"}
 end
 
 # safely formats to UTF-8
@@ -55,7 +57,7 @@ dep_urls.each do |url|
   coll = db.collection('courses' + semester)
   bulk = coll.initialize_unordered_bulk_op
 
-  logger.info "Getting courses for #{dept_id} (#{semester})"
+  logger.info(prog_name) {"Getting courses for #{dept_id} (#{semester})"}
 
   page = Nokogiri::HTML(open(url), nil, "UTF-8")
 

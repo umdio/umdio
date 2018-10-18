@@ -10,6 +10,8 @@ include Sinatra::UMDIO::Helpers
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+prog_name = "sections_scraper"
+
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdclass'
 
@@ -102,7 +104,7 @@ section_queries.each do |query|
 
   count += 1
 
-  puts "inserting set number #{count} of sections. #{num_groups - count} sets remaining - #{semester} term. #{total} total."
+  logger.info(prog_name) {"inserting set number #{count} of sections. #{num_groups - count} sets remaining - #{semester} term. #{total} total."}
 
   section_array.each do |section|
     sections_bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
