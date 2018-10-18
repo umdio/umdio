@@ -10,7 +10,7 @@
     <li><a href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
     {% endfor %}
     </ul>
-    <p class="ref-title">METHODS</p>
+    <p class="ref-title">ENDPOINTS</p>
     <ul class="ref-section">
     {% for p in site.pages %}
       {% if p.layout == 'page' and p.category != 'api' %}
