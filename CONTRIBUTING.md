@@ -31,6 +31,25 @@ The files in src/<endpoint>/_posts are written in markdown - you specify some me
 
 The files in each endpoint's folder each get rendered on the page as sections. The order of the sections is determined by the date in the name of the file - hence the strange names of the files.
 
+## Logging
+We use Ruby's built-in logger to output messages to standard output. Learn more about [Ruby's logging module](https://ruby-doc.org/stdlib-2.1.0/libdoc/logger/rdoc/Logger.html)
+
+Here's an example of output from the courses scraper:
+```
+[2018-10-18 01:35:01] INFO  (courses_scraper): Searching for courses in term 201801
+[2018-10-18 01:35:02] INFO  (courses_scraper): 178 department/semesters so far
+[2018-10-18 01:35:02] INFO  (courses_scraper): Searching for courses in term 201805
+[2018-10-18 01:35:03] INFO  (courses_scraper): 301 department/semesters so far
+```
+The formatting for outputted messages is as follows:`[DATE TIME] LOG_LEVEL (PROGRAM_NAME): {MESSAGE}`
+
+An example of a log call in ruby:
+`logger.info(prog_name) {"MESSAGE"}`
+
+You should use Ruby's built-in log-levels where appropriate, when displaying errors you should use logger.error, when displaying information you should use logger.info, and so on.
+
+Our logger implementation is located at the `scraper_common.rb` file located at `$app/scraper_common.rb`
+
 ## Read
 - [why umdio](https://github.com/umdio/umdio/blob/master/Motivations.md)
 - [ideas](https://docs.google.com/document/d/1WQ4w4_HSdkzNP1j0KqrHSYtiU8DEGoXnxHyC5FEp5sY/edit)
