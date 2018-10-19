@@ -1,4 +1,4 @@
-<div id="menu" class="menu-wrapper" style="width:194px">
+<div id="menu" class="menu-wrapper">
   <nav>
     <p class="ref-title">API</p>
     {% assign api_posts = site.posts | where: "category", "api" %}
@@ -17,13 +17,13 @@
       {% assign classes = '' %}
       {% if page.url == p.permalink %}{% assign classes = 'active' %}{% endif %}
       <li class="{{ classes }}">
-        <a href="{{ p.permalink | prepend: site.baseurl }}">{{ p.title }}</a>
-        <ul class="ref-methods">
+        <a class="ref-subsection" href="{{ p.permalink | prepend: site.baseurl }}">{{ p.title }}</a>
+        <ul class="ref-endpoints">
         {% assign posts = site.posts | where: "category", p.category %}
         {% for post in posts %}
           {% assign base = p.permalink %}
           {% if page.url == p.permalink %}{% assign base = '' %}{% endif %}
-          <li><a href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
+          <li><a class="menu-item" href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
         {% endfor %}
         </ul>
       </li>
