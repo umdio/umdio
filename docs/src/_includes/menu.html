@@ -16,9 +16,9 @@
       {% if p.layout == 'page' and p.category != 'api' %}
       {% assign classes = '' %}
       {% if page.url == p.permalink %}{% assign classes = 'active' %}{% endif %}
-      <li class="{{ classes }}">
+      <li class="ref-endpoint {{ classes }}">
         <a class="ref-subsection" href="{{ p.permalink | prepend: site.baseurl }}">{{ p.title }}</a>
-        <ul class="ref-endpoints">
+        <ul class="ref-endpoint-item">
         {% assign posts = site.posts | where: "category", p.category %}
         {% for post in posts %}
           {% assign base = p.permalink %}

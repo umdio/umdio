@@ -38,7 +38,7 @@ html {
 
 body {
   height: 100%;
-  font-size: 16px;
+  font-size: 15px;
   font-family: $body-font;
   color: $gray;
 }
@@ -161,19 +161,28 @@ img {
 
 
 .menu {
-  padding: 2rem;
-  .ref-title {
-    font-size: 1.5rem;
+  padding: 50px 20px;
+  .ref-title { //Title. "API, ENDPOINTS"
+    font-size: 1.3rem;
     padding: 5px;
     color: white;
   }
 
-  .ref-subsection {
+  .ref-section { //Margin between "API and ENDPOINTS"
+    margin-bottom: 40px;
+  }
+
+  .ref-endpoint {
+    margin-bottom: 40px; //Margin between "endpoints"
+  }
+
+  .ref-subsection { //Endpoint name
     font-size: 1.2rem;
   }
 
-  .ref-endpoints a{
+  .ref-endpoint-item a{ //Endpoint items themselves.
     margin-left: 10px;
+    color: $subdued-red;
   }
 
   ul {
@@ -186,6 +195,7 @@ img {
           background: $red;
           color: white;
           font-weight: 600;
+          border-radius: 4px;
         }
   
         > ul {
@@ -195,10 +205,11 @@ img {
     }
     a {
       display: block;
-      padding: 5px 12px;
+      padding: 2px 10px;
       &:hover {
         color: white;
         text-decoration: solid underline;
+        transition: .5s;
       }
     }
   }
@@ -262,7 +273,6 @@ pre, code {
     padding: 0;
     img {
       background-color: $red;
-      padding-left: 50px;
       height: 5vh;
       margin: 0;
     }
@@ -279,22 +289,26 @@ pre, code {
 
 
   .menu {
+    margin: 0;
     margin-left: auto;
-    margin-right: 10px;
-    padding: 0 20px;
     .ref-title {
       color: $dark-gray;
     }
 
     ul a {
+      padding-right: 80px; //Size of the menu item.
       &:hover {
         color: $dark-gray;
       }
     }
   }
 
+  .ref-title {
+    margin-top: 10px;
+  }
 
-  .ref-endpoints li {
+
+  .ref-endpoint-item li {
     font-size: 1rem;
     margin: 0;
     padding: 0;
