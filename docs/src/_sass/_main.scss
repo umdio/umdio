@@ -262,8 +262,8 @@ pre, code {
     padding: 0;
     img {
       background-color: $red;
-      padding-left: 20vw;
-      height: auto;
+      padding-left: 50px;
+      height: 5vh;
       margin: 0;
     }
   }
@@ -333,6 +333,18 @@ pre, code {
 }
 
 @media(min-width: 1800px) {
+
+
+  header {
+    width: 100%;
+    div {
+      margin: auto;
+      width: 60%;
+      img {
+        margin: 0;
+      }
+    }
+  }
 
   .sidebar {
     flex: 1 0 30%;

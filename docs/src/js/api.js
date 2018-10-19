@@ -15,14 +15,14 @@ $(document).ready(function(){
     var sidebar = document.getElementById('sidebar');
     $(this).toggleClass("active");
     $(sidebar).toggleClass("active");
-  });
+  })
 
-  $('.menu-item').click(function(e){
+  $('.menu-item').click(function(){
     var sidebar = document.getElementById('sidebar');
     var btn = document.getElementById('btn');
     $(btn).toggleClass("active");
     $(sidebar).toggleClass("active");
-  });
+  })
 
 
   //NOT WORKING YET
