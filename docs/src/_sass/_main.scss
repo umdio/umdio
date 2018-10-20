@@ -1,31 +1,8 @@
-@import "normalize.scss";
-@import "config";
+@import "colors";
 @import "syntax-highlighting";
 
-@mixin transitionAll() {
-  transition: all .3s ease-out;
-}
-
-// * {
-//   background: #000 !important;
-//   color: #0f0 !important;
-//   outline: solid #f00 1px !important;
-// }
-
 // Pre-defined sizes
-$gutter: 20px;
-$gutter-two: 40px;
-$max-width: em(1140);
-
 $header-size: 2.5rem;
-
-// Media queries
-$desktop: "only screen and (min-width: 1141px)";
-$tablet: "only screen and (max-width: 1140px)";
-$large-tablet: "only screen and (min-width: 861px)";
-$small-tablet: "only screen and (max-width: 860px)";
-$not-mobile: "only screen and (min-width: 701px)";
-$mobile: "only screen and (max-width: 700px)";
 
 html {
   box-sizing: border-box;
@@ -102,14 +79,14 @@ img {
     width: 20px;
     height: 3px;
     margin-bottom: 4px;
-    background-color: $dark-gray;
+    background-color: white;
     transition: transform 500ms cubic-bezier(.1, .05, .28, .91), opacity 500ms, background-color 250ms;
   }
 }
 
 .btn.active {
   div {
-    background-color: $dark-gray;
+    background-color: white;
   }
   .btn-top {
     transform: translateY(7px) rotate(-135deg);
@@ -131,8 +108,7 @@ img {
   list-style: none;
   color: $red;
   overflow-y: scroll;
-  //@media (max-width: 767px){
-  @media(max-width: 700px){
+  @media(max-width: 767px){
     position: fixed;
     flex-direction: column;
     top: $header-size;

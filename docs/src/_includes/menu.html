@@ -5,9 +5,9 @@
     {% assign base = '/' %}
     {% if page.url == '/' %}{% assign base = '' %}{% endif %}
     <ul class="ref-section">
-      <li><a href="{{ base }}#intro">Introduction</a></li>
+      <li><a class="menu-item" href="{{ base }}#intro">Introduction</a></li>
     {% for post in api_posts %}
-    <li><a href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
+    <li><a class="menu-item" href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
     {% endfor %}
     </ul>
     <p class="ref-title">ENDPOINTS</p>
