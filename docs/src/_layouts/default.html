@@ -1,19 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
   {% include head.html %}
-  <body data-spy="scroll" data-target="#menu">
-    <div class="page">
+  <body>
+    <div class="header">
+      <div id="btn" class="btn">
+        <div class='btn-top'></div>
+        <div class='btn-middle'></div>
+        <div class='btn-bottom'></div>
+      </div>
       {% include header.html %}
-      <div id="docs" class="container">
-        <div id="toggle" class="menu-link"><a href="#"><span></span></a></div>
-        <div class="menu col-2">
-          {% include menu.html %}
+    </div>
+    <div class="container">
+      <div class="content">
+        <div class="sidebar" id="sidebar">
+          <div class="menu">
+            {% include menu.html %}
+          </div>
         </div>
-        <div class="methods col-8">
-          {{ content }}
+        <div class="docs">
+          {{content}}
+          {% include footer.html %}
         </div>
       </div>
-      {% include footer.html %}
     </div>
   </body>
 </html>

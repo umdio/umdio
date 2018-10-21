@@ -1,13 +1,13 @@
-<div id="menu" class="menu-wrapper" style="width:194px">
+<div id="menu" class="menu-wrapper">
   <nav>
     <p class="ref-title">API</p>
     {% assign api_posts = site.posts | where: "category", "api" %}
     {% assign base = '/' %}
     {% if page.url == '/' %}{% assign base = '' %}{% endif %}
     <ul class="ref-section">
-      <li><a href="{{ base }}#intro">Introduction</a></li>
+      <li><a class="menu-item" href="{{ base }}#intro">Introduction</a></li>
     {% for post in api_posts %}
-    <li><a href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
+    <li><a class="menu-item" href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
     {% endfor %}
     </ul>
     <p class="ref-title">ENDPOINTS</p>
@@ -16,14 +16,14 @@
       {% if p.layout == 'page' and p.category != 'api' %}
       {% assign classes = '' %}
       {% if page.url == p.permalink %}{% assign classes = 'active' %}{% endif %}
-      <li class="{{ classes }}">
-        <a href="{{ p.permalink | prepend: site.baseurl }}">{{ p.title }}</a>
-        <ul class="ref-methods">
+      <li class="ref-endpoint {{ classes }}">
+        <a class="ref-subsection" href="{{ p.permalink | prepend: site.baseurl }}">{{ p.title }}</a>
+        <ul class="ref-endpoint-item">
         {% assign posts = site.posts | where: "category", p.category %}
         {% for post in posts %}
           {% assign base = p.permalink %}
           {% if page.url == p.permalink %}{% assign base = '' %}{% endif %}
-          <li><a href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
+          <li><a class="menu-item" href="{{ base }}#{{ post.slug }}">{{ post.title }}</a></li>
         {% endfor %}
         </ul>
       </li>
