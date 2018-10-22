@@ -13,25 +13,25 @@ majors_coll = db.collection('majors')
 
 majors_coll.remove()
 
-url = "https://www.admissions.umd.edu/explore/majors"
+url = "https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically"
 page = Nokogiri::HTML(open(url))
-major_divs = page.css("div.panel-body a")
-
+major_divs = page.css(".page--inner-content a")
 majors = []
 major_divs.each do |link|
   # parse the name to grab the major's name and its college
-  major_parts = link.text.sub(')', '').split('(')
-  major_name = major_parts[0].squeeze(' ')
-  major_college = major_parts[1] ? major_parts[1].strip : ''
+  major_parts = /(.+)\s?\((.+)\)/.match(link.text)
+  if major_parts != nil then
+    logger.info(prog_name) {major_parts[1]}
+    major_name = major_parts[1]
+    major_college = major_parts[2]
+    major_url = link['href']
 
-  # parse the url
-  major_url = link['href']
-
-  majors << {
-    name: major_name,
-    college: major_college,
-    url: major_url
-  }
+    majors << {
+      name: major_name,
+      college: major_college,
+      url: major_url
+    }
+  end
 end
 
 majors.each do |major|
