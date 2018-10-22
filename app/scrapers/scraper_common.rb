@@ -18,4 +18,13 @@ module ScraperCommon
         self.logger.info "Connecting to #{host}:#{port}"
         db = Mongo::MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db(table)
     end
+
+    def postgres
+        PG.connect(
+            dbname: 'umdio',
+            host: 'postgres',
+            port: '5432',
+            user: 'postgres'
+        )
+    end
 end

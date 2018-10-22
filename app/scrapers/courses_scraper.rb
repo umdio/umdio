@@ -4,6 +4,7 @@
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
+require 'pg'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
@@ -11,7 +12,10 @@ include ScraperCommon
 prog_name = "courses_scraper"
 
 logger = ScraperCommon::logger
-db = ScraperCommon::database 'umdclass'
+
+db = ScraperCommon::postgres
+sql = File.open(File.join(File.dirname(__FILE__), '/sql/courses.sql'), 'rb') { |file| file.read }
+db.exec(sql)
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
@@ -30,6 +34,7 @@ logger.info(prog_name) {semesters}
 # Get the urls for all the department pages
 dep_urls = []
 semesters.each do |semester|
+  db.exec("CREATE TABLE IF NOT EXISTS courses#{semester} ( like courses including all)")
   logger.info(prog_name) {"Searching for courses in term #{semester}"}
 
   base_url = "https://ntst.umd.edu/soc/#{semester}"
@@ -54,15 +59,32 @@ dep_urls.each do |url|
   dept_id = url.split('/soc/')[1][7,10]
   semester = url.split('/soc/')[1][0,6]
   courses = []
-  coll = db.collection('courses' + semester)
-  bulk = coll.initialize_unordered_bulk_op
+  table_name = "courses#{semester}"
+  begin
+    db.prepare("insert_#{semester}", "
+      INSERT INTO #{table_name} (
+        course_id, name, dept_id, department, semester, credits, grading_method, core, gen_ed, description, relationships
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+      ON CONFLICT (course_id) DO UPDATE SET
+        course_id = $1,
+        name = $2,
+        dept_id = $3,
+        department = $4,
+        semester = $5,
+        credits = $6,
+        grading_method = $7,
+        core = $8,
+        gen_ed = $9,
+        description = $10,
+        relationships = $11")
+    rescue PG::DuplicatePstatement
+    end
 
   logger.info(prog_name) {"Getting courses for #{dept_id} (#{semester})"}
 
   page = Nokogiri::HTML(open(url), nil, "UTF-8")
 
   department = page.search('span.course-prefix-name').text.strip
-
 
   page.search('div.course').each do |course|
     course_id = course.search('div.course-id').text
@@ -161,8 +183,20 @@ dep_urls.each do |url|
   end
 
   courses.each do |course|
-    bulk.find({course_id: course[:course_id]}).upsert.update({ "$set" => course })
-  end
+    core =
 
-  bulk.execute
+    db.exec_prepared("insert_#{semester}", [
+      course[:course_id],
+      course[:name],
+      course[:dept_id],
+      course[:department],
+      course[:semester],
+      course[:credit],
+      course[:grading_method],
+      PG::TextEncoder::Array.new.encode(course[:core]),
+      PG::TextEncoder::Array.new.encode(course[:gen_ed]),
+      course[:description],
+      course[:relationships]
+    ])
+  end
 end
