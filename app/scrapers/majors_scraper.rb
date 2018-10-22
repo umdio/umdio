@@ -19,10 +19,9 @@ major_divs = page.css(".page--inner-content a")
 majors = []
 major_divs.each do |link|
   # parse the name to grab the major's name and its college
-  major_parts = /(.+)\s?\((.+)\)/.match(link.text)
+  major_parts = /(.+)\((.+)\)/.match(link.text)
   if major_parts != nil then
-    logger.info(prog_name) {major_parts[1]}
-    major_name = major_parts[1]
+    major_name = major_parts[1].rstrip #Removes trailing space.
     major_college = major_parts[2]
     major_url = link['href']
 
