@@ -15,7 +15,6 @@ prog_name = "sections_scraper"
 logger = ScraperCommon::logger
 db = ScraperCommon::database 'umdclass'
 
-
 # Find all the course collections
 course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
 section_queries = []
@@ -32,6 +31,15 @@ course_collections.each do |c|
       num_groups += 1
         section_queries << "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"
       }
+  end
+
+  # Command line args to 'clean' some semesters
+  # This is needed because sometimes sections are deleted/changed, and we want to reflect that
+  if ARGV.length > 0
+    if (ARGV.include? semester)
+      logger.info(prog_name) { "Dropping semester #{semester}" }
+      db.collection("sections#{semester}").drop()
+    end
   end
 end
 
