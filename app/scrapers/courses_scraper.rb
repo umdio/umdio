@@ -54,6 +54,8 @@ def utf_safe text
   text
 end
 
+queries = []
+
 # add the courses from each department to the database
 dep_urls.each do |url|
   dept_id = url.split('/soc/')[1][7,10]
@@ -61,22 +63,25 @@ dep_urls.each do |url|
   courses = []
   table_name = "courses#{semester}"
   begin
-    db.prepare("insert_#{semester}", "
-      INSERT INTO #{table_name} (
-        course_id, name, dept_id, department, semester, credits, grading_method, core, gen_ed, description, relationships
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-      ON CONFLICT (course_id) DO UPDATE SET
-        course_id = $1,
-        name = $2,
-        dept_id = $3,
-        department = $4,
-        semester = $5,
-        credits = $6,
-        grading_method = $7,
-        core = $8,
-        gen_ed = $9,
-        description = $10,
-        relationships = $11")
+    if not queries.include? "insert_#{semester}"
+      db.prepare("insert_#{semester}", "
+        INSERT INTO #{table_name} (
+          course_id, name, dept_id, department, semester, credits, grading_method, core, gen_ed, description, relationships
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        ON CONFLICT (course_id) DO UPDATE SET
+          course_id = $1,
+          name = $2,
+          dept_id = $3,
+          department = $4,
+          semester = $5,
+          credits = $6,
+          grading_method = $7,
+          core = $8,
+          gen_ed = $9,
+          description = $10,
+          relationships = $11")
+        queries << "insert_#{semester}"
+      end
     rescue PG::DuplicatePstatement
     end
 

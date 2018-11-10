@@ -13,7 +13,7 @@ include ScraperCommon
 prog_name = "sections_scraper"
 
 logger = ScraperCommon::logger
-db = ScraperCommon::database 'umdclass'
+db = ScraperCommon::postgres
 
 
 # Find all the course collections
