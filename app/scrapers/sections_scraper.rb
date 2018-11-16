@@ -3,6 +3,7 @@
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
+require 'pg'
 
 require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
@@ -10,45 +11,12 @@ include Sinatra::UMDIO::Helpers
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
-prog_name = "sections_scraper"
-
-logger = ScraperCommon::logger
-db = ScraperCommon::postgres
-
-
-# Find all the course collections
-course_collections = db.collection_names().select { |e| e.include?('courses') }.map { |name| db.collection(name) }
-section_queries = []
-
-num_groups = 0
-
-# Find the sections we have to parse
-course_collections.each do |c|
-  semester = c.name.scan(/courses(.+)/)[0]
-  if not semester.nil?
-    semester = semester[0]
-    c.find({},{fields: {_id:0,course_id:1}}).to_a
-      .each_slice(200){|a|
-      num_groups += 1
-        section_queries << "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{a.map{|e| e['course_id']}.join(',')}"
-      }
-  end
-end
-
-count = 0
-total = 0
-
-# Parse section data from pages
-section_queries.each do |query|
-  # Get needed Mongo collections
-  semester = query.scan(/soc\/(.+)\//)[0][0]
-  sections_coll = db.collection("sections#{semester}")
-  prof_coll = db.collection("profs#{semester}")
-  sections_bulk = sections_coll.initialize_unordered_bulk_op
-  prof_bulk = prof_coll.initialize_unordered_bulk_op
-
+# Parses a given section page
+# Returns [sections, professors]
+# TODO: Remove semester param, infer from url
+def parse_sections(url, semester)
   # Parse with Nokogiri
-  page = Nokogiri::HTML(open(query))
+  page = Nokogiri::HTML(open(url))
   course_divs = page.search("div.course-sections")
   section_array = []
   profs = {} # hash of professor => array of courses
@@ -98,29 +66,115 @@ section_queries.each do |query|
         :semester => semester,
         :meetings => meetings
       }
-      total += 1
     end
   end
 
-  count += 1
+  # Sort profs
+  profs = profs.sort
+  return [section_array, profs]
+end
 
-  logger.info(prog_name) {"inserting set number #{count} of sections. #{num_groups - count} sets remaining - #{semester} term. #{total} total."}
-
-  section_array.each do |section|
-    sections_bulk.find({section_id: section[:section_id]}).upsert.update({ "$set" => section })
-  end
-  sections_bulk.execute unless section_array.empty?
-
-  # sorts profs by name, insert to db
-  profs.sort.to_h.each do |name, obj|
-    courses = obj[:courses]
-    depts = obj[:depts]
-    # push all courses to prof's entry
-    prof_bulk.find({name: name}).upsert.update(
-      {"$set" => {name: name},
-       "$addToSet" => {semester: semester, courses: {"$each" => courses}, departments: {"$each" => depts} }
-      }
+# Generatres prepared statements for inserting sections and profs into a semester
+def prepare_statements(db, semester)
+  db.prepare(
+    "insert_#{semester}",
+    "INSERT INTO sections#{semester} (
+      section_id,
+      course_id,
+      number,
+      instructors,
+      seats,
+      semester,
+      meetings,
+      open_seats,
+      waitlist
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (section_id) DO UPDATE SET
+      section_id = $1,
+      course_id = $2,
+      number = $3,
+      instructors = $4,
+      seats = $5,
+      semester = $6,
+      meetings = $7,
+      open_seats = $8,
+      waitlist = $9"
   )
+
+  db.prepare("insert_prof_#{semester}", "INSERT INTO professors (name, semester, courses, departments)
+  VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO UPDATE SET
+  name = $1,
+  semester = $2,
+  courses = $3,
+  departments = $4")
+end
+
+# Inital setup
+prog_name = "sections_scraper"
+logger = ScraperCommon::logger
+db = ScraperCommon::postgres
+
+semesters = ScraperCommon::get_semesters(ARGV)
+courses = []
+
+# Loop through the semesters we want to parse
+semesters.each do |semester|
+  # Arrays to hold the things we want to insert
+  sections = []
+  profs = []
+
+  # Create our tables, if they don't exist
+  db.exec("CREATE TABLE IF NOT EXISTS sections#{semester} ( like sections including all)")
+  db.exec("CREATE TABLE IF NOT EXISTS professors#{semester} ( like professors including all)")
+
+  # Prepare inserts
+  prepare_statements(db, semester)
+  logger.info(prog_name) {"Searching for sections in term #{semester}"}
+
+  # Loop through all courses from that semester's courses table
+  db.exec("SELECT * FROM courses#{semester}") do |result|
+    result.each do |row|
+      course_id = row.values_at('course_id')
+      courses << course_id
+
+      # Every 200, parse a sections page, reset courses
+      if courses.length == 200
+        query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+        res = parse_sections(query, semester)
+        courses = []
+        sections.concat(res[0])
+        profs.concat(res[1])
+      end
+    end
+
+    # parse the last entries
+    query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+    res = parse_sections(query, semester)
+    sections.concat(res[0])
+    profs.concat(res[1])
+    courses = []
   end
-  prof_bulk.execute unless profs.empty?
+
+  # Now, insert all our stuff to the db
+  sections.each do |section|
+    db.exec_prepared("insert_#{semester}", [
+      section[:section_id],
+      section[:course_id],
+      section[:number],
+      PG::TextEncoder::Array.new.encode(section[:instructors]),
+      section[:seats],
+      section[:semester],
+      PG::TextEncoder::Array.new.encode(section[:meetings].map{|e| PG::TextEncoder::JSON.new.encode(e)}),
+      section[:open_seats],
+      section[:waitlist]
+    ])
+  end
+
+  profs.each do |prof|
+    db.exec_prepared("insert_prof_#{semester}", [
+      prof[0],
+      PG::TextEncoder::Array.new.encode([semester]),
+      PG::TextEncoder::Array.new.encode(prof[1][:courses]),
+      PG::TextEncoder::Array.new.encode(prof[1][:depts])
+    ])
+  end
 end

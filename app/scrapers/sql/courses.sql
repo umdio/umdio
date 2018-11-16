@@ -14,20 +14,21 @@ CREATE TABLE IF NOT EXISTS courses (
     relationships json
 );
 
+DROP TABLE sections;
 CREATE TABLE IF NOT EXISTS sections (
     section_id text PRIMARY KEY,
     course_id text,
     number text,
     instructors text[],
     seats text,
-    semester text[],
+    semester text,
     meetings json[],
     open_seats text,
     waitlist text
 );
 
 CREATE TABLE IF NOT EXISTS professors (
-    name text,
+    name text PRIMARY KEY,
     semester text[],
     courses text[],
     departments text[]

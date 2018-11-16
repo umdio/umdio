@@ -19,15 +19,7 @@ db.exec(sql)
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
-years = ARGV
-semesters = years.map do |e|
-  if e.length == 6
-    e
-  else
-    [e + '01', e + '05', e + '08', e + '12']
-  end
-end
-semesters = semesters.flatten
+semesters = ScraperCommon::get_semesters(ARGV)
 
 logger.info(prog_name) {semesters}
 
@@ -188,8 +180,6 @@ dep_urls.each do |url|
   end
 
   courses.each do |course|
-    core =
-
     db.exec_prepared("insert_#{semester}", [
       course[:course_id],
       course[:name],
