@@ -14,8 +14,6 @@ prog_name = "courses_scraper"
 logger = ScraperCommon::logger
 
 db = ScraperCommon::postgres
-sql = File.open(File.join(File.dirname(__FILE__), '/sql/courses.sql'), 'rb') { |file| file.read }
-db.exec(sql)
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
