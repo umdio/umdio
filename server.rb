@@ -11,6 +11,7 @@ require 'sinatra/param'
 require 'sinatra/namespace'
 require 'mongo'
 require 'json'
+require 'pg'
 
 include Mongo
 
@@ -23,11 +24,21 @@ class UMDIO < Sinatra::Base
     host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
     port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
     puts "Connecting to mongo on #{host}:#{port}"
+
+    db = PG.connect(
+      dbname: 'umdio',
+      host: 'postgres',
+      port: '5432',
+      user: 'postgres'
+    )
+    puts "Connecting to postgres on 5432"
+
     # we might need other databases for other endpoints, but for now this is fine, with multiple collections
     set :courses_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdclass')
     set :buses_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdbus')
     set :map_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmap')
     set :majors_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmajors')
+    set :postgres, db
   end
 
   # before application/request starts

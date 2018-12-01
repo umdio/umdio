@@ -4,35 +4,32 @@ module Sinatra
     module Helpers
 
       # generalize logic for checking if semester param valid
-      def check_semester app, semester, coll_prefix
+      def check_semester app, semester, table
         # check for semester formatting
         if not (semester.length == 6 and semester.is_number?)
           halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
         end
 
-        # check if we have data for the requested semester
-        collection_names = app.settings.courses_db.collection_names()
-        if not collection_names.index("#{coll_prefix}#{semester}")
-          semesters = collection_names.select { |e| e.start_with? coll_prefix }.map{ |e| e.slice(coll_prefix.length,6) }
-          msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo. Or try one of the available semester below:"
-          halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
+        # check if table exists
+        begin
+          app.settings.postgres.exec("SELECT * from #{table}#{semester} LIMIT 1")
+        rescue PG::UndefinedTable
+          msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo"
+          halt 404, {error_code: 404, message: msg}.to_json
         end
+
+        true
       end
 
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
-      def find_sections section_coll, section_ids
-        query = section_ids[0]
-        query = { '$in' => section_ids } if section_ids.length > 1
+      def find_sections db, semester, section_ids
 
-        res = section_coll.find(
-          { section_id: query },
-          { fields: {_id: 0, 'meetings.start_seconds' => 0, 'meetings.end_seconds' => 0} }
-        ).map { |e| e }
+        # Turn section_ids into string
+        sections = (section_ids.map {|e| "'#{e}'"}).join ','
 
-        # is returning the single object without [] weird? should we return the array without []?
-        if section_ids.length == 1
-          return res[0]
-        end
+        # This is proably ok, because we know that semester and section_ids both match expected formats
+        # TODO: Take another look here, for security purposes
+        res = db.exec("SELECT * FROM sections#{semester} WHERE section_id in (#{sections})")
 
         if !res
           halt 404, {
@@ -43,7 +40,17 @@ module Sinatra
           }.to_json
         end
 
-        return res
+        cleaned_rows = []
+
+        # Decode arrays and json
+        res.each do |row|
+          row[:instructors] = PG::TextDecoder::Array.new.decode(row[:instructors])
+          row[:meetings] = PG::TextDecoder::Array.new.decode(row[:meetings])
+          #row[:meetings].map{|e| PG::TextDecoder::JSON.new.decode(row[:meetings])}
+          cleaned_rows << row
+        end
+
+        return ['{"test": "a"}', '{"test2": "a"}']
       end
 
       # returns an array of the section ids of an array of sections

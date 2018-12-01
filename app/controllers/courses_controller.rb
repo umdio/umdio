@@ -4,17 +4,14 @@ module Sinatra
   module UMDIO
     module Routing
       module Courses
-        
         def self.registered(app)
-
           app.before '/v0/courses*' do
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
             semester = params[:semester] || current_semester
             check_semester app, semester, 'courses'
 
-            @course_coll = app.settings.courses_db.collection("courses#{semester}")
-            @section_coll = app.settings.courses_db.collection("sections#{semester}")
+            @db = app.settings.postgres
           end
 
           # Returns sections of courses by their id
@@ -28,7 +25,15 @@ module Sinatra
               end
             end
 
-            json find_sections @section_coll, section_ids #using helper method
+            res = find_sections @db, (params[:semester] || current_semester), section_ids
+
+            # If we only have 1 result, we have to just return it (for compatibility)
+            # TODO (v1): Fix this
+            if res.length == 1
+              return json res[0]
+            end
+
+            json (res.map {|e| JSON.parse(e)})
           end
 
           # TODO: allow for searching in meetings properties
@@ -88,8 +93,8 @@ module Sinatra
           end
 
           app.get '/v0/courses/list' do
-            courses = @course_coll.find({}, {:sort => ['course_id', 1], :fields =>{:_id => 0, :department => 1, :course_id => 1, :name => 1}}).map{ |e| e }
-            json courses
+            semester = params['semester']
+            json ()
           end
 
           # Returns section info about particular sections of a course, comma separated
