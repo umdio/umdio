@@ -44,13 +44,15 @@ module Sinatra
 
         # Decode arrays and json
         res.each do |row|
-          row[:instructors] = PG::TextDecoder::Array.new.decode(row[:instructors])
-          row[:meetings] = PG::TextDecoder::Array.new.decode(row[:meetings])
-          #row[:meetings].map{|e| PG::TextDecoder::JSON.new.decode(row[:meetings])}
+          instructors = PG::TextDecoder::Array.new.decode(row['instructors'])
+          row['instructors'] = instructors
+
+          meetings = PG::TextDecoder::JSON.new.decode(row['meetings'])
+          row['meetings'] = meetings
           cleaned_rows << row
         end
 
-        return ['{"test": "a"}', '{"test2": "a"}']
+        return cleaned_rows
       end
 
       # returns an array of the section ids of an array of sections

@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS courses (
 );
 
 DROP TABLE sections;
+DROP TABLE IF EXISTS sections210901;
 CREATE TABLE IF NOT EXISTS sections (
     section_id text PRIMARY KEY,
     course_id text,
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS sections (
     instructors text[],
     seats text,
     semester text,
-    meetings json[],
+    meetings json,
     open_seats text,
     waitlist text
 );

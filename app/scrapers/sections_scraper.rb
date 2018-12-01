@@ -57,14 +57,18 @@ def parse_sections(url, semester)
         }
       end
       number = section.search('span.section-id').text.gsub(/\s/, '')
+      open_seats = section.search('span.open-seats-count').text
+      waitlist = section.search('span.waitlist-count').text
       section_array << {
         :section_id => "#{course_id}-#{number}",
-        :course => course_id,
+        :course_id => course_id,
         :number => number,
         :instructors => section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip),
         :seats  => section.search('span.total-seats-count').text,
         :semester => semester,
-        :meetings => meetings
+        :meetings => meetings,
+        :open_seats => open_seats,
+        :waitlist => waitlist
       }
     end
   end
@@ -163,7 +167,7 @@ semesters.each do |semester|
       PG::TextEncoder::Array.new.encode(section[:instructors]),
       section[:seats],
       section[:semester],
-      PG::TextEncoder::Array.new.encode(section[:meetings].map{|e| PG::TextEncoder::JSON.new.encode(e)}),
+      PG::TextEncoder::JSON.new.encode(section[:meetings]),
       section[:open_seats],
       section[:waitlist]
     ])

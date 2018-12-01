@@ -33,7 +33,7 @@ module Sinatra
               return json res[0]
             end
 
-            json (res.map {|e| JSON.parse(e)})
+            json res
           end
 
           # TODO: allow for searching in meetings properties
