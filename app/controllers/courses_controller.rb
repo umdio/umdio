@@ -138,10 +138,9 @@ module Sinatra
             # parse params
             course_ids = "#{params[:course_id]}".upcase.split(',')
 
-            courses = find_courses @course_coll, course_ids
+            courses = find_courses @db, (params[:semester] || current_semester), course_ids
 
-            courses = flatten_course_sections_expand @section_coll, courses
-
+            # TODO: get rid of this
             # get rid of [] on single object return
             courses = courses[0] if course_ids.length == 1
             # prevent null being returned

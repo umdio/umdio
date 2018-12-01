@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS courses (
     department text,
     semester text,
     credits text,
-    grading_method text,
+    grading_method text[],
     core text[],
     gen_ed text[],
     description text,
@@ -15,7 +15,6 @@ CREATE TABLE IF NOT EXISTS courses (
 );
 
 DROP TABLE sections;
-DROP TABLE IF EXISTS sections210901;
 CREATE TABLE IF NOT EXISTS sections (
     section_id text PRIMARY KEY,
     course_id text,

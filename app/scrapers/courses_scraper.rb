@@ -184,12 +184,12 @@ dep_urls.each do |url|
       course[:dept_id],
       course[:department],
       course[:semester],
-      course[:credit],
-      course[:grading_method],
+      course[:credits],
+      PG::TextEncoder::Array.new.encode(course[:grading_method]),
       PG::TextEncoder::Array.new.encode(course[:core]),
       PG::TextEncoder::Array.new.encode(course[:gen_ed]),
       course[:description],
-      course[:relationships]
+      PG::TextEncoder::JSON.new.encode(course[:relationships])
     ])
   end
 end
