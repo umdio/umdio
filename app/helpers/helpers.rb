@@ -4,9 +4,9 @@ module UMDIO
   module Helpers
     # adds instance variables to start the pagitaion based on params['page'] and params['per_page']
     # the following instance variables are reserved: collection, limit, page, next_page, and prev_page
-    # @param Mongo::Collection collection the collection to paginate on
-    def begin_paginate! collection, default_per_page=30, max_per_page=100
-      @collection = collection
+    def begin_paginate! db, table, default_per_page=30, max_per_page=100
+      @db = db
+      @table = table
       # clamp page and per_page params
       params['page'] = (params['page'] || 1).to_i
       params['page'] = 1 if params['page'] < 1
@@ -26,16 +26,17 @@ module UMDIO
       params['page'] += 1
       @next_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
 
+      @count = @db.exec("SELECT COUNT(*) FROM #{@table}").first.count
+
       # prev page
       params['page'] -= 2
-      if (params['page']*@limit > collection.count)
-        params['page'] = (collection.count.to_f / @limit).ceil.to_i
+      if (params['page']*@limit > @count)
+        params['page'] = (@count.count.to_f / @limit).ceil.to_i
       end
       @prev_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
     end
 
     # sets the response headers Link and X-Total-Count based on the results
-    # @param Mongo::CollectionView results
     def end_paginate! results
       # set the link headers
       link = ""
@@ -47,7 +48,7 @@ module UMDIO
       link += "<#{@prev_page}>; rel=\"prev\"" unless @page == 1
       headers['X-Prev-Page'] = @prev_page unless @page == 1
       headers['Link'] = link
-      headers['X-Total-Count'] = @collection.count.to_s
+      headers['X-Total-Count'] = @count
     end
 
     def params_sorting_array default=''
@@ -67,38 +68,44 @@ module UMDIO
       return sorting
     end
 
-    def params_search_query ignore=nil
+    def params_search_query db, ignore=nil
       # Sinatra adds this param in some cases, and we don't want it
       # TODO: Is there a better way we can delete this?
       params.delete(:captures) if params.key?(:captures)
 
-      query = {}
-      params.keys.each do |k| unless ignore.include?(k)
-        e = ''
-        if k.include? ('<') or k.include? ('>')
-          delim = ((k.include? ('<')) ? '<' : '>')
-          cmp   = ((delim ==    '<')  ? 'l' : 'g')
-          parts = k.split(delim)
+      query = []
+      params.keys.each do |key| unless ignore.include?(key)
+        if key.include? ('<') or key.include? ('>')
+          # Check which delim
+          delim = (key.include? ('<')) ? '<' : '>'
+
+          # Check for =
+          parts = key.split(delim)
           if parts.length == 1
-            parts[1] = params[k]
-            e = 'e'
+            parts[1] = params[key]
+            delim += '='
           end
-          query[parts[0]] = { "$#{cmp}t#{e}" => parts[1] }
-        elsif k.include? ('!')
-          parts = k.split('!')
-          if params[k].include? (',') or params[k].include? ('|')
-            delim = (params[k].include?(',') ? ',' : '|')
-            query[parts[0]] = { "$nin" => params[k].split(delim) }
+
+          # Build sql
+          query << db::escape_string(parts[0]) + delim + db::escape_string(parts[1])
+        elsif key.include? ('!')
+          # Delete !
+          parts = key.split('!')
+
+          # Now look at the other side of the !=
+          if params[key].include? (',') or params[key].include? ('|')
+            delim = (params[key].include?(',') ? ',' : '|')
+            query[parts[0]] = { "$nin" => params[key].split(delim) }
           else
-            query[parts[0]] = { "$ne" => params[k] }
+            query << db::escape_string(parts[0]) + "!=" + db::escape_string(params[key])
           end
-        elsif not params[k].nil?
-          if params[k].include? (',')
-            query[k] = { "$in" => params[k].split(',') }
-          elsif params[k].include? ('|')
-            query[k] = { "$all" => params[k].split('|') }
+        elsif not params[key].nil?
+          if params[key].include? (',')
+            query[key] = { "$in" => params[key].split(',') }
+          elsif params[key].include? ('|')
+            query[key] = { "$all" => params[key].split('|') }
           else
-            query[k] = params[k]
+            query[key] = params[key]
           end
         end
       end

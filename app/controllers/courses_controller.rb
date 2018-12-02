@@ -38,11 +38,15 @@ module Sinatra
 
           # TODO: allow for searching in meetings properties
           app.get '/v0/courses/sections' do
-            begin_paginate! @section_coll
+            semester = params[:semester] || current_semester
+
+            begin_paginate! @db, "sections#{semester}"
 
             # get parse the search and sort
             sorting = params_sorting_array 'section_id'
-            query   = params_search_query  @special_params
+            query   = params_search_query  @db, @special_params
+
+            halt 404, ::JSON.generate(query)
 
             # adjust query if meeting property is specified without meetings qualifier
             meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
@@ -168,9 +172,7 @@ module Sinatra
 
             json courses
           end
-
         end
-
       end
     end
   end

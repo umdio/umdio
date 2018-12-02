@@ -82,7 +82,7 @@ module Sinatra
 
       # gets a single course or an array or courses and halts if none are found
       # @return: Array of courses
-      def find_courses db, semester, course_ids
+      def find_courses db, semester, course_ids, parmas
         course_ids = [course_ids] if course_ids.is_a?(String)
 
         validate_course_ids course_ids
