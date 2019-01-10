@@ -80,30 +80,6 @@ end
 
 # Generatres prepared statements for inserting sections and profs into a semester
 def prepare_statements(db, semester)
-  db.prepare(
-    "insert_#{semester}",
-    "INSERT INTO sections#{semester} (
-      section_id,
-      course_id,
-      number,
-      instructors,
-      seats,
-      semester,
-      meetings,
-      open_seats,
-      waitlist
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON CONFLICT (section_id) DO UPDATE SET
-      section_id = $1,
-      course_id = $2,
-      number = $3,
-      instructors = $4,
-      seats = $5,
-      semester = $6,
-      meetings = $7,
-      open_seats = $8,
-      waitlist = $9"
-  )
-
   db.prepare("insert_prof_#{semester}", "INSERT INTO professors (name, semester, courses, departments)
   VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO UPDATE SET
   name = $1,
@@ -125,10 +101,6 @@ semesters.each do |semester|
   # Arrays to hold the things we want to insert
   sections = []
   profs = []
-
-  # Create our tables, if they don't exist
-  db.exec("CREATE TABLE IF NOT EXISTS sections#{semester} ( like sections including all)")
-  db.exec("CREATE TABLE IF NOT EXISTS professors#{semester} ( like professors including all)")
 
   # Prepare inserts
   prepare_statements(db, semester)
@@ -158,13 +130,14 @@ semesters.each do |semester|
     courses = []
   end
 
+  # TODO: Update to work with new schema
+
   # Now, insert all our stuff to the db
   sections.each do |section|
     db.exec_prepared("insert_#{semester}", [
       section[:section_id],
       section[:course_id],
       section[:number],
-      PG::TextEncoder::Array.new.encode(section[:instructors]),
       section[:seats],
       section[:semester],
       PG::TextEncoder::JSON.new.encode(section[:meetings]),

@@ -8,7 +8,12 @@ require 'pg'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
-
+db = PG.connect(
+      dbname: 'umdio',
+      host: 'postgres',
+      port: '5432',
+      user: 'postgres'
+    )
 prog_name = "courses_scraper"
 
 logger = ScraperCommon::logger
@@ -24,7 +29,6 @@ logger.info(prog_name) {semesters}
 # Get the urls for all the department pages
 dep_urls = []
 semesters.each do |semester|
-  db.exec("CREATE TABLE IF NOT EXISTS courses#{semester} ( like courses including all)")
   logger.info(prog_name) {"Searching for courses in term #{semester}"}
 
   base_url = "https://ntst.umd.edu/soc/#{semester}"
@@ -51,34 +55,17 @@ dep_urls.each do |url|
   dept_id = url.split('/soc/')[1][7,10]
   semester = url.split('/soc/')[1][0,6]
   courses = []
-  table_name = "courses#{semester}"
-  begin
-    if not queries.include? "insert_#{semester}"
-      db.prepare("insert_#{semester}", "
-        INSERT INTO #{table_name} (
-          course_id, name, dept_id, department, semester, credits, grading_method, core, gen_ed, description, relationships
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        ON CONFLICT (course_id) DO UPDATE SET
-          course_id = $1,
-          name = $2,
-          dept_id = $3,
-          department = $4,
-          semester = $5,
-          credits = $6,
-          grading_method = $7,
-          core = $8,
-          gen_ed = $9,
-          description = $10,
-          relationships = $11")
-        queries << "insert_#{semester}"
-      end
-    rescue PG::DuplicatePstatement
-    end
+  table_name = "courses"
 
   logger.info(prog_name) {"Getting courses for #{dept_id} (#{semester})"}
 
   page = Nokogiri::HTML(open(url), nil, "UTF-8")
-
+  db = PG.connect(
+    dbname: 'umdio',
+    host: 'postgres',
+    port: '5432',
+    user: 'postgres'
+  )
   department = page.search('span.course-prefix-name').text.strip
 
   page.search('div.course').each do |course|
@@ -178,18 +165,38 @@ dep_urls.each do |url|
   end
 
   courses.each do |course|
-    db.exec_prepared("insert_#{semester}", [
+    res = db.exec_prepared("insert_courses", [
       course[:course_id],
+      course[:semester],
       course[:name],
       course[:dept_id],
       course[:department],
-      course[:semester],
       course[:credits],
-      PG::TextEncoder::Array.new.encode(course[:grading_method]),
-      PG::TextEncoder::Array.new.encode(course[:core]),
-      PG::TextEncoder::Array.new.encode(course[:gen_ed]),
       course[:description],
       PG::TextEncoder::JSON.new.encode(course[:relationships])
     ])
+
+    id = res.first['id']
+
+    course[:grading_method].each do |method|
+      db.exec_prepared('insert_courses_grading_method', [
+        id,
+        method
+      ])
+    end
+
+    course[:core].each do |core|
+      db.exec_prepared('insert_courses_core', [
+        id,
+        core
+      ])
+    end
+
+    course[:grading_method].each do |gen_ed|
+      db.exec_prepared('insert_courses_gen_ed', [
+        id,
+        gen_ed
+      ])
   end
+end
 end

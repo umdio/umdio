@@ -12,7 +12,7 @@ module Sinatra
 
         # check if table exists
         begin
-          app.settings.postgres.exec("SELECT * from #{table}#{semester} LIMIT 1")
+          app.settings.postgres.exec("SELECT * from #{table} WHERE semester=#{semester} LIMIT 1")
         rescue PG::UndefinedTable
           msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo"
           halt 404, {error_code: 404, message: msg}.to_json
@@ -96,11 +96,14 @@ module Sinatra
 
         courses = []
 
+        # Grab grading method, core, and gen_ed from respective tables
+        grading_method = db.exec("SELECT")
+        row['grading_method'] = PG::TextDecoder::Array.new.decode(row['grading_method'])
+        row['core'] = PG::TextDecoder::Array.new.decode(row['core'])
+        row['gen_ed'] = PG::TextDecoder::Array.new.decode(row['gen_ed'])
+
         # Decode arrays and json
         res.each do |row|
-          row['grading_method'] = PG::TextDecoder::Array.new.decode(row['grading_method'])
-          row['core'] = PG::TextDecoder::Array.new.decode(row['core'])
-          row['gen_ed'] = PG::TextDecoder::Array.new.decode(row['gen_ed'])
           row['relationships'] = PG::TextDecoder::JSON.new.decode(row['relationships'])
           row['sections'] = find_sections_for_course db, semester, row['course_id'], params[:expand]
           courses << row
