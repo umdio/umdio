@@ -60,12 +60,6 @@ dep_urls.each do |url|
   logger.info(prog_name) {"Getting courses for #{dept_id} (#{semester})"}
 
   page = Nokogiri::HTML(open(url), nil, "UTF-8")
-  db = PG.connect(
-    dbname: 'umdio',
-    host: 'postgres',
-    port: '5432',
-    user: 'postgres'
-  )
   department = page.search('span.course-prefix-name').text.strip
 
   page.search('div.course').each do |course|
@@ -101,7 +95,6 @@ dep_urls.each do |url|
     match = /Prerequisite: ([^.]+\.)/.match(text)
     text = match ? text.gsub(match[0], '') : text
     prereq = match ? match[1] : nil
-
 
     match = /Corequisite: ([^.]+\.)/.match(text)
     text = match ? text.gsub(match[0], '') : text
@@ -173,10 +166,10 @@ dep_urls.each do |url|
       course[:department],
       course[:credits],
       course[:description],
-      PG::TextEncoder::JSON.new.encode(course[:relationships])
+      course[:relationships]
     ])
 
-    id = res.first['id']
+    id = res.first
 
     course[:grading_method].each do |method|
       db.exec_prepared('insert_courses_grading_method', [
@@ -185,18 +178,12 @@ dep_urls.each do |url|
       ])
     end
 
-    course[:core].each do |core|
-      db.exec_prepared('insert_courses_core', [
-        id,
-        core
-      ])
-    end
-
     course[:grading_method].each do |gen_ed|
       db.exec_prepared('insert_courses_gen_ed', [
         id,
         gen_ed
       ])
+    end
+
   end
-end
 end
