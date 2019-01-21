@@ -19,7 +19,6 @@ def parse_sections(url, semester)
   page = Nokogiri::HTML(open(url))
   course_divs = page.search("div.course-sections")
   section_array = []
-  profs = {} # hash of professor => array of courses
 
   # for each of the courses on the page
   course_divs.each do |course_div|
@@ -31,12 +30,11 @@ def parse_sections(url, semester)
       dept = course_id.match(/^([A-Z]{4})\d{3}[A-Z]?$/)[1]
 
       # add course and department to professor object for each instructor
+      profs = []
       instructors.each do |x|
         if x != 'Instructor: TBA'
           professor_name = x.squeeze(' ')
-          profs[professor_name] ||= {:courses => [], :depts => []}
-          profs[professor_name][:courses] |= [course_id]
-          profs[professor_name][:depts] |= [dept]
+          profs << professor_name
         end
       end
 
@@ -46,46 +44,34 @@ def parse_sections(url, semester)
         end_time = meeting.search('span.class-end-time').text
 
         meetings << {
-          :days => meeting.search('span.section-days').text,
-          :start_time => start_time,
-          :end_time => end_time,
-          :start_seconds => time_to_int(start_time),
-          :end_seconds => time_to_int(end_time),
-          :building => meeting.search('span.building-code').text,
-          :room => meeting.search('span.class-room').text,
-          :classtype => meeting.search('span.class-type').text || "Lecture"
+          days: meeting.search('span.section-days').text,
+          start_time: start_time,
+          end_time: end_time,
+          start_seconds: time_to_int(start_time),
+          end_seconds: time_to_int(end_time),
+          building: meeting.search('span.building-code').text,
+          room: meeting.search('span.class-room').text,
+          classtype: meeting.search('span.class-type').text || "Lecture"
         }
       end
       number = section.search('span.section-id').text.gsub(/\s/, '')
       open_seats = section.search('span.open-seats-count').text
       waitlist = section.search('span.waitlist-count').text
       section_array << {
-        :section_id => "#{course_id}-#{number}",
-        :course_id => course_id,
-        :number => number,
-        :instructors => section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip),
-        :seats  => section.search('span.total-seats-count').text,
-        :semester => semester,
-        :meetings => meetings,
-        :open_seats => open_seats,
-        :waitlist => waitlist
+        section_id: "#{course_id}-#{number}",
+        course_id: course_id,
+        number: number,
+        instructors: profs,
+        seats: section.search('span.total-seats-count').text,
+        semester: semester,
+        meetings: meetings,
+        open_seats: open_seats,
+        waitlist: waitlist
       }
     end
   end
 
-  # Sort profs
-  profs = profs.sort
-  return [section_array, profs]
-end
-
-# Generatres prepared statements for inserting sections and profs into a semester
-def prepare_statements(db, semester)
-  db.prepare("insert_prof_#{semester}", "INSERT INTO professors (name, semester, courses, departments)
-  VALUES ($1, $2, $3, $4) ON CONFLICT (name) DO UPDATE SET
-  name = $1,
-  semester = $2,
-  courses = $3,
-  departments = $4")
+  return section_array
 end
 
 # Inital setup
@@ -100,14 +86,11 @@ courses = []
 semesters.each do |semester|
   # Arrays to hold the things we want to insert
   sections = []
-  profs = []
 
-  # Prepare inserts
-  prepare_statements(db, semester)
   logger.info(prog_name) {"Searching for sections in term #{semester}"}
 
   # Loop through all courses from that semester's courses table
-  db.exec("SELECT * FROM courses#{semester}") do |result|
+  db.exec("SELECT * FROM courses WHERE semester=#{semester}") do |result|
     result.each do |row|
       course_id = row.values_at('course_id')
       courses << course_id
@@ -117,41 +100,36 @@ semesters.each do |semester|
         query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
         res = parse_sections(query, semester)
         courses = []
-        sections.concat(res[0])
-        profs.concat(res[1])
+        sections.concat(res)
       end
     end
 
     # parse the last entries
     query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
     res = parse_sections(query, semester)
-    sections.concat(res[0])
-    profs.concat(res[1])
+    sections.concat(res)
     courses = []
   end
 
-  # TODO: Update to work with new schema
-
   # Now, insert all our stuff to the db
   sections.each do |section|
-    db.exec_prepared("insert_#{semester}", [
+    res = db.exec_prepared("insert_section", [
       section[:section_id],
       section[:course_id],
+      section[:semester],
       section[:number],
       section[:seats],
-      section[:semester],
-      PG::TextEncoder::JSON.new.encode(section[:meetings]),
+      section[:meetings].to_json,
       section[:open_seats],
       section[:waitlist]
     ])
-  end
 
-  profs.each do |prof|
-    db.exec_prepared("insert_prof_#{semester}", [
-      prof[0],
-      PG::TextEncoder::Array.new.encode([semester]),
-      PG::TextEncoder::Array.new.encode(prof[1][:courses]),
-      PG::TextEncoder::Array.new.encode(prof[1][:depts])
-    ])
+    row_id = res.first
+    section[:instructors].each do |prof|
+      res2 = db.exec_prepared("insert_professor", [prof])
+      prof_id = res2.first
+
+      db.exec_prepared("insert_section_professors", [prof_id, row_id])
+    end
   end
 end

@@ -1,13 +1,3 @@
-/* Drops tables (for debug purposes)
- * TODO: Remove before release
- */
-DROP TABLE IF EXISTS courses_grading_method;
-DROP TABLE IF EXISTS courses_gen_ed;
-DROP TABLE IF EXISTS courses;
-DROP TABLE IF EXISTS section_professors;
-DROP TABLE IF EXISTS professors;
-DROP TABLE IF EXISTS sections;
-
 CREATE TABLE IF NOT EXISTS courses (
     id SERIAL PRIMARY KEY,
     course_id text NOT NULL,
@@ -44,13 +34,14 @@ CREATE TABLE IF NOT EXISTS sections (
     meetings jsonb NOT NULL,
     open_seats text NOT NULL,
     waitlist text,
-    UNIQUE(id, section_id, course_id)
+    UNIQUE(section_id, course_id, semester)
 );
 CREATE INDEX on sections(semester);
 
 CREATE TABLE IF NOT EXISTS professors (
     id SERIAL PRIMARY KEY,
-    name text NOT NULL
+    name text NOT NULL,
+    UNIQUE(name)
 );
 
 CREATE TABLE IF NOT EXISTS section_professors (
@@ -86,7 +77,7 @@ PREPARE insert_section (text, text, int, text, text, jsonb, text, text) as
     INSERT INTO sections (
       section_id, course_id, semester, number, seats, meetings, open_seats, waitlist
     ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-    ON CONFLICT (section_id) DO UPDATE SET
+    ON CONFLICT (section_id, course_id, semester) DO UPDATE SET
         section_id = $1,
         course_id = $2,
         semester = $3,
@@ -96,3 +87,9 @@ PREPARE insert_section (text, text, int, text, text, jsonb, text, text) as
         open_seats = $7,
         waitlist = $8
     RETURNING id;
+
+PREPARE insert_professor (text) as
+    INSERT INTO professors(name) VALUES ($1) ON CONFLICT(name) DO NOTHING RETURNING id;
+
+PREPARE insert_section_professors(int, int) as
+    INSERT INTO section_professors(professor_id, section) VALUES ($1, $2) ON CONFLICT(professor_id, section) DO NOTHING;
