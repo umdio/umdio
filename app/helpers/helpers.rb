@@ -1,4 +1,3 @@
-$stdout.sync = true
 # general helper methods for controllers
 module Sinatra
 module UMDIO

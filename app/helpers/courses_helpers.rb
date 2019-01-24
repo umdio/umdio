@@ -142,9 +142,7 @@ module Sinatra
       def find_sections_for_course db, semester, course_id, expand
         sections = []
 
-        puts expand
-
-        if expand
+        if expand == true
           res = db.exec("SELECT * FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")
           res.each do |row|
             row['meetings'] = ::JSON.parse(row['meetings'])

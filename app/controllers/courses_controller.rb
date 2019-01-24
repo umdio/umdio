@@ -1,5 +1,4 @@
 # Module for the courses endpoint is defined. Relies on helpers in courses_helpers.rb
-$stdout.sync = true
 module Sinatra
   module UMDIO
     module Routing
@@ -8,11 +7,12 @@ module Sinatra
           app.before '/v0/courses*' do
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
-            semester = params[:semester] || current_semester
-            check_semester app, semester, 'courses'
+            params[:semester] ||= current_semester
+            check_semester app, params[:semester], 'courses'
 
+            # TODO: This could be more concise
             if params['expand']
-              params['expand'] = params['expand'].to_s == "true"
+              params['expand'] = params['expand'].to_s == 'true'
             end
 
             @db = app.settings.postgres
