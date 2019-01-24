@@ -166,7 +166,7 @@ dep_urls.each do |url|
       course[:department],
       course[:credits],
       course[:description],
-      course[:relationships]
+      course[:relationships].to_json
     ])
 
     id = res.first

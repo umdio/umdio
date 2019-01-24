@@ -28,7 +28,7 @@ module Sinatra
 
         # This is proably ok, because we know that semester and section_ids both match expected formats
         # TODO: Take another look here, for security purposes
-        res = db.exec("SELECT * FROM sections#{semester} WHERE section_id in (#{sections})")
+        res = db.exec("SELECT * FROM sections WHERE semester=#{semester} AND section_id in (#{sections})")
 
         if !res
           halt 404, {
@@ -43,8 +43,9 @@ module Sinatra
 
         # Decode arrays and json
         res.each do |row|
-          row['instructors'] = PG::TextDecoder::Array.new.decode(row['instructors'])
-          row['meetings'] = PG::TextDecoder::JSON.new.decode(row['meetings'])
+          row['instructors'] = find_instructors_for_section db, semester, row['id']
+          row['meetings'] = ::JSON.parse(row['meetings'])
+          row.delete('id')
           cleaned_rows << row
         end
 
@@ -80,9 +81,20 @@ module Sinatra
         return true
       end
 
+      def find_courses_in_sem db, semester
+        res = db.exec("SELECT course_id, name, dept_id FROM courses WHERE semester=#{semester} ORDER BY course_id ASC;")
+        courses = []
+
+        res.each do |row|
+          courses << row
+        end
+
+        courses
+      end
+
       # gets a single course or an array or courses and halts if none are found
       # @return: Array of courses
-      def find_courses db, semester, course_ids, parmas
+      def find_courses db, semester, course_ids, params
         course_ids = [course_ids] if course_ids.is_a?(String)
 
         validate_course_ids course_ids
@@ -92,21 +104,10 @@ module Sinatra
 
         # This is proably ok, because we know that semester and sectcourse_idsion_ids both match expected formats
         # TODO: Take another look here, for security purposes
-        res = db.exec("SELECT * FROM courses#{semester} WHERE course_id in (#{courses_ids_string})")
-
+        res = db.exec("SELECT * FROM courses WHERE semester=#{semester} AND course_id in (#{courses_ids_string})")
         courses = []
-
-        # Grab grading method, core, and gen_ed from respective tables
-        grading_method = db.exec("SELECT")
-        row['grading_method'] = PG::TextDecoder::Array.new.decode(row['grading_method'])
-        row['core'] = PG::TextDecoder::Array.new.decode(row['core'])
-        row['gen_ed'] = PG::TextDecoder::Array.new.decode(row['gen_ed'])
-
-        # Decode arrays and json
         res.each do |row|
-          row['relationships'] = PG::TextDecoder::JSON.new.decode(row['relationships'])
-          row['sections'] = find_sections_for_course db, semester, row['course_id'], params[:expand]
-          courses << row
+          courses << (clean_course db, semester, row)
         end
 
         # check if found
@@ -123,26 +124,44 @@ module Sinatra
         courses
       end
 
+      # Takes a course row from the database and formats it into a response
+      def clean_course db, semester, row
+        # Grab grading method, core, and gen_ed from respective tables
+        grading_methods = db.exec("SELECT grading_method FROM courses_grading_method WHERE id=#{row['id']};").values
+        gen_ed = db.exec("SELECT gen_ed_code FROM courses_gen_ed WHERE id=#{row['id']};").values
+
+        row['sections'] = find_sections_for_course db, semester, row['course_id'], params[:expand]
+        row['grading_method'] = grading_methods
+        row['gen_ed'] = gen_ed
+        row['relationships'] = ::JSON.parse(row['relationships'])
+        row.delete('id')
+
+        row
+      end
+
       def find_sections_for_course db, semester, course_id, expand
         sections = []
-        if expand
-          cleaned = []
-          res = db.exec("SELECT * FROM sections#{semester} WHERE course_id='#{course_id}'")
-          res.each do |row|
-            row['instructors'] = PG::TextDecoder::Array.new.decode(row['instructors'])
-            row['meetings'] = PG::TextDecoder::JSON.new.decode(row['meetings'])
-            cleaned << row
-          end
 
-          sections = cleaned
-        else
-          res = db.exec("SELECT section_id FROM sections#{semester} WHERE course_id='#{course_id}'")
+        puts expand
+
+        if expand
+          res = db.exec("SELECT * FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")
           res.each do |row|
-            sections << row['section_id']
+            row['meetings'] = ::JSON.parse(row['meetings'])
+            row['instructors'] = find_instructors_for_section db, semester, row['id']
+            sections << row
           end
+        else
+          res = db.exec("SELECT section_id FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")
+          sections = res.values.flatten
         end
 
         return sections
+      end
+
+      # TODO: this only returns blanks
+      def find_instructors_for_section db, semester, section_db_id
+        db.exec("SELECT professors.name FROM professors INNER JOIN section_professors ON professors.id = section_professors.professor_id WHERE section_professors.section=#{section_db_id}").values
       end
 
       # @param string_time string in format like 10:00am, 10:00, 10am or 10

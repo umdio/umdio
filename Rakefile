@@ -21,6 +21,7 @@ namespace :db do
     end
   end
 
+  # TODO: Clean postgres too
   desc "Cleans databases (by deleting all the data)"
   task :clean do
     puts "DANGER: will remove everything in the database, including logs."

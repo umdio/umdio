@@ -1,5 +1,5 @@
 # Module for the courses endpoint is defined. Relies on helpers in courses_helpers.rb
-
+$stdout.sync = true
 module Sinatra
   module UMDIO
     module Routing
@@ -11,9 +11,14 @@ module Sinatra
             semester = params[:semester] || current_semester
             check_semester app, semester, 'courses'
 
+            if params['expand']
+              params['expand'] = params['expand'].to_s == "true"
+            end
+
             @db = app.settings.postgres
           end
 
+          # TODO: CONVERT
           # Returns sections of courses by their id
           app.get '/v0/courses/sections/:section_id' do
             # separate into an array on commas, turn it into uppercase
@@ -36,6 +41,7 @@ module Sinatra
             json res
           end
 
+          # TODO: CONVERT
           # TODO: allow for searching in meetings properties
           app.get '/v0/courses/sections' do
             semester = params[:semester] || current_semester
@@ -82,23 +88,19 @@ module Sinatra
 
           # all of the semesters that we have
           app.get '/v0/courses/semesters' do
-            collection_names = app.settings.courses_db.collection_names()
-            semesters = collection_names.select { |e| e.start_with? "courses" }.map{ |e| e.slice(7,6) }
-            json semesters
+            semesters = @db.exec('SELECT DISTINCT semester FROM courses;').values.flatten
+            json semesters.sort
           end
 
           app.get '/v0/courses/departments' do
-            departments = @course_coll.aggregate([
-              {'$group' => { '_id' => { dept_id: "$dept_id", department: "$department" }}},
-              {'$sort' => {'_id.dept_id' => 1}}
-            ])
-            departments = departments.map{ |e| e }
-            json departments.map { |e| e['_id'] }
+            departments = @db.exec('SELECT DISTINCT dept_id, department FROM courses;').values
+            departments.sort_by! {|dept| dept[0] }
+            json departments.map {|e| {'dept_id': e[0], 'department': e[1]}}
           end
 
           app.get '/v0/courses/list' do
-            semester = params['semester']
-            json ()
+            semester = params['semester'] || current_semester
+            json (find_courses_in_sem @db, semester)
           end
 
           # Returns section info about particular sections of a course, comma separated
@@ -116,7 +118,7 @@ module Sinatra
             end
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
-            sections = find_sections @section_coll, section_ids
+            sections = find_sections @db, (params[:semester] || current_semester), section_ids
 
             if sections.nil? or sections.empty?
               halt 404, { error_code: 404, message: "No sections found." }.to_json
@@ -125,14 +127,11 @@ module Sinatra
             json sections
           end
 
+          # TODO: sort??
           # Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
             course_id = "#{params[:course_id]}".upcase
-
-            courses = find_courses @course_coll, course_id
-            section_ids = flatten_sections courses[0]['sections']
-
-            json find_sections @section_coll, section_ids
+            json find_sections_for_course @db, (params[:semester] || current_semester), course_id, true
           end
 
           # returns courses specified by :course_id
@@ -142,7 +141,7 @@ module Sinatra
             # parse params
             course_ids = "#{params[:course_id]}".upcase.split(',')
 
-            courses = find_courses @db, (params[:semester] || current_semester), course_ids
+            courses = find_courses @db, (params[:semester] || current_semester), course_ids, params
 
             # TODO: get rid of this
             # get rid of [] on single object return
@@ -155,18 +154,23 @@ module Sinatra
 
           # returns a paginated list of courses, with the full course objects
           app.get '/v0/courses' do
-            begin_paginate! @course_coll
+            begin_paginate! @db, 'courses'
 
             # sanitize params
             # TODO: sanitize more parameters to make searching a little more user friendly
             params['dept_id'] = params['dept_id'].upcase if params['dept_id']
 
             # get parse the search and sort
-            sorting = params_sorting_array 'course_id'
-            query   = params_search_query  @special_params
+            sorting = 'course_id ASC'#params_sorting_array 'course_id'
+            query   = 'true' #params_search_query @db, @special_params
+            offset = (@page - 1)*@limit
+            limit = @limit
 
-            courses = @course_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0}}).map{ |e| e }
-            courses = flatten_course_sections_expand @section_coll, courses unless courses.empty?
+            res = @db.exec("SELECT * FROM courses WHERE #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
+            courses = []
+            res.each do |row|
+              courses << (clean_course @db, (params[:semester] || current_semester), row)
+            end
 
             end_paginate! courses
 

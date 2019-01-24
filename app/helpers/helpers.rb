@@ -1,3 +1,4 @@
+$stdout.sync = true
 # general helper methods for controllers
 module Sinatra
 module UMDIO
@@ -31,7 +32,7 @@ module UMDIO
       # prev page
       params['page'] -= 2
       if (params['page']*@limit > @count)
-        params['page'] = (@count.count.to_f / @limit).ceil.to_i
+        params['page'] = (@count.to_f / @limit).ceil.to_i
       end
       @prev_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
     end
@@ -48,26 +49,35 @@ module UMDIO
       link += "<#{@prev_page}>; rel=\"prev\"" unless @page == 1
       headers['X-Prev-Page'] = @prev_page unless @page == 1
       headers['Link'] = link
-      headers['X-Total-Count'] = @count
+      headers['X-Total-Count'] = @count.to_s
     end
 
+    # TODO: convert
     def params_sorting_array default=''
-      sorting = []
       params['sort'] ||= default
+
+      if params['sort'] == ''
+        return "id ASC"
+      end
+
+      sort_query = ""
       params['sort'].split(',').each do |sort|
+        # Figure out what order, and strip it from the field name
         order_str = '+'
         if sort[0] == '+' or sort[0] == '-'
           order_str = sort[0]
           sort = sort[1..sort.length]
         end
-        order = (order_str == '+' ? 1 : -1)
-        sorting << sort
-        sorting << order
-      end unless params['sort'].empty?
 
-      return sorting
+        # Turn that into a postgres ORDER BY clause
+        order = (order_str == '+' ? "ASC" : "DESC")
+        sort_query += "#{sort} #{order},"
+      end
+
+      return sort_query[0..sort.length - 1]
     end
 
+    # TODO: convert
     def params_search_query db, ignore=nil
       # Sinatra adds this param in some cases, and we don't want it
       # TODO: Is there a better way we can delete this?
@@ -100,6 +110,7 @@ module UMDIO
             query << db::escape_string(parts[0]) + "!=" + db::escape_string(params[key])
           end
         elsif not params[key].nil?
+          # Array Search
           if params[key].include? (',')
             query[key] = { "$in" => params[key].split(',') }
           elsif params[key].include? ('|')
