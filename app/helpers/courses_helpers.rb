@@ -43,10 +43,7 @@ module Sinatra
 
         # Decode arrays and json
         res.each do |row|
-          row['instructors'] = find_instructors_for_section db, semester, row['id']
-          row['meetings'] = ::JSON.parse(row['meetings'])
-          row.delete('id')
-          cleaned_rows << row
+          cleaned_rows << (clean_section db, semester, row)
         end
 
         return cleaned_rows
@@ -139,15 +136,30 @@ module Sinatra
         row
       end
 
+      # Takes a section row and formats it into a response
+      def clean_section db, semester, row
+        row['meetings'] = ::JSON.parse(row['meetings'])
+        row['meetings'].each do |meeting|
+          meeting.delete('start_seconds')
+          meeting.delete('end_seconds')
+        end
+
+        row['course'] = row['course_id']
+        row.delete('course_id')
+
+        row['instructors'] = find_instructors_for_section db, semester, row['id']
+        row.delete('id')
+
+        row
+      end
+
       def find_sections_for_course db, semester, course_id, expand
         sections = []
 
-        if expand == true
+        if expand
           res = db.exec("SELECT * FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")
           res.each do |row|
-            row['meetings'] = ::JSON.parse(row['meetings'])
-            row['instructors'] = find_instructors_for_section db, semester, row['id']
-            sections << row
+            sections << (clean_section db, semester, row)
           end
         else
           res = db.exec("SELECT section_id FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")

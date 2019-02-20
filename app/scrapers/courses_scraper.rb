@@ -166,24 +166,10 @@ dep_urls.each do |url|
       course[:department],
       course[:credits],
       course[:description],
+      PG::TextEncoder::Array.new.encode(course[:grading_method]),
+      PG::TextEncoder::Array.new.encode(course[:gen_ed]),
       course[:relationships].to_json
     ])
-
-    id = res.first
-
-    course[:grading_method].each do |method|
-      db.exec_prepared('insert_courses_grading_method', [
-        id,
-        method
-      ])
     end
-
-    course[:grading_method].each do |gen_ed|
-      db.exec_prepared('insert_courses_gen_ed', [
-        id,
-        gen_ed
-      ])
-    end
-
   end
 end

@@ -121,7 +121,8 @@ semesters.each do |semester|
       section[:seats],
       section[:meetings].to_json,
       section[:open_seats],
-      section[:waitlist]
+      section[:waitlist],
+      PG::TextEncoder::Array.new.encode(section[:instructors]),
     ])
 
     row_id = res.first

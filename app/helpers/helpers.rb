@@ -51,7 +51,6 @@ module UMDIO
       headers['X-Total-Count'] = @count.to_s
     end
 
-    # TODO: convert
     def params_sorting_array default=''
       params['sort'] ||= default
 
@@ -73,17 +72,20 @@ module UMDIO
         sort_query += "#{sort} #{order},"
       end
 
-      return sort_query[0..sort.length - 1]
+      return sort_query.chomp(',')
     end
 
-    # TODO: convert
     def params_search_query db, ignore=nil
       # Sinatra adds this param in some cases, and we don't want it
       # TODO: Is there a better way we can delete this?
       params.delete(:captures) if params.key?(:captures)
 
-      query = []
-      params.keys.each do |key| unless ignore.include?(key)
+      # What params need to be represented as arrays
+      arr_params = ['gen_ed', 'grading_method', 'instructors']
+
+      query = ''
+      # TODO: Error on =''
+      params.keys.each do |key| unless ignore.include?(key) or params[key] == ''
         if key.include? ('<') or key.include? ('>')
           # Check which delim
           delim = (key.include? ('<')) ? '<' : '>'
@@ -96,32 +98,38 @@ module UMDIO
           end
 
           # Build sql
-          query << db::escape_string(parts[0]) + delim + db::escape_string(parts[1])
+          query += db::escape_string(parts[0]) + delim +  "'" +db::escape_string(parts[1]) +  "'"
         elsif key.include? ('!')
           # Delete !
           parts = key.split('!')
 
           # Now look at the other side of the !=
-          if params[key].include? (',') or params[key].include? ('|')
-            delim = (params[key].include?(',') ? ',' : '|')
-            query[parts[0]] = { "$nin" => params[key].split(delim) }
+          if params[key].include? (',') or params[key].include? ('|') or arr_params.include? key
+            delim = params[key].include?(',') ? ',' : '|'
+            op = params[key].include?(',') ? '&&' : '@>'
+
+            # TODO: injection?
+            query += "NOT (" + db::escape_string(parts[0]) + op + "ARRAY[#{params[key].split(delim).join(',')}])"
           else
-            query << db::escape_string(parts[0]) + "!=" + db::escape_string(params[key])
+            query += db::escape_string(parts[0]) + "!=" +  "'" + db::escape_string(params[key]) +  "'"
           end
         elsif not params[key].nil?
+          l = params[key].split(',').length
           # Array Search
-          if params[key].include? (',')
-            query[key] = { "$in" => params[key].split(',') }
+          if params[key].include? (',') or (arr_params.include? key and l == 1)
+            query += db::escape_string(key) + "&&" + "ARRAY['#{params[key].split(',').join("','")}']"
           elsif params[key].include? ('|')
-            query[key] = { "$all" => params[key].split('|') }
+            query += db::escape_string(key) + "@>" + "ARRAY['#{params[key].split('|').join("','")}']"
           else
-            query[key] = params[key]
+            query += db::escape_string(key) + "=" + "'" + db::escape_string(params[key]) + "'"
           end
         end
-      end
+        query += " AND "
       end
 
-      return query
+      end
+
+      return query.chomp("AND ")
     end
   end
 end

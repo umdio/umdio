@@ -7,22 +7,12 @@ CREATE TABLE IF NOT EXISTS courses (
     department text NOT NULL,
     credits text NOT NULL,
     description text,
+    grading_method text[],
+    gen_ed text[],
     relationships jsonb,
     UNIQUE(course_id, semester)
 );
 CREATE INDEX on courses(semester);
-
-CREATE TABLE IF NOT EXISTS courses_grading_method (
-    id int REFERENCES courses(id),
-    grading_method text,
-    UNIQUE(id, grading_method)
-);
-
-CREATE TABLE IF NOT EXISTS courses_gen_ed (
-    id int REFERENCES courses(id),
-    gen_ed_code text,
-    UNIQUE(id, gen_ed_code)
-);
 
 CREATE TABLE IF NOT EXISTS sections (
     id SERIAL PRIMARY KEY,
@@ -34,6 +24,7 @@ CREATE TABLE IF NOT EXISTS sections (
     meetings jsonb NOT NULL,
     open_seats text NOT NULL,
     waitlist text,
+    instructors text[],
     UNIQUE(section_id, course_id, semester)
 );
 CREATE INDEX on sections(semester);
@@ -51,10 +42,10 @@ CREATE TABLE IF NOT EXISTS section_professors (
     UNIQUE(professor_id, section)
 );
 
-PREPARE insert_courses (text, int, text, text, text, text, text, jsonb) as
+PREPARE insert_courses (text, int, text, text, text, text, text, text[], text[], jsonb) as
     INSERT INTO courses(
-        id, course_id, semester, name, dept_id, department, credits, description, relationships
-    ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8)
+        id, course_id, semester, name, dept_id, department, credits, description, grading_method, gen_ed, relationships
+    ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     ON CONFLICT (course_id, semester) DO UPDATE SET
         course_id = $1,
         semester = $2,
@@ -63,20 +54,14 @@ PREPARE insert_courses (text, int, text, text, text, text, text, jsonb) as
         department = $5,
         credits = $6,
         description = $7,
-        relationships = $8;
+        grading_method = $8,
+        gen_ed = $9,
+        relationships = $10;
 
-PREPARE insert_courses_grading_method (int, text) as
-    INSERT INTO courses_grading_method(id, grading_method) VALUES($1, $2)
-    ON CONFLICT DO NOTHING;
-
-PREPARE insert_courses_gen_ed (int, text) as
-    INSERT INTO courses_gen_ed(id, gen_ed_code) VALUES($1, $2)
-    ON CONFLICT DO NOTHING;
-
-PREPARE insert_section (text, text, int, text, text, jsonb, text, text) as
+PREPARE insert_section (text, text, int, text, text, jsonb, text, text, text[]) as
     INSERT INTO sections (
-      section_id, course_id, semester, number, seats, meetings, open_seats, waitlist
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      id, section_id, course_id, semester, number, seats, meetings, open_seats, waitlist, instructors
+    ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9)
     ON CONFLICT (section_id, course_id, semester) DO UPDATE SET
         section_id = $1,
         course_id = $2,
@@ -85,7 +70,8 @@ PREPARE insert_section (text, text, int, text, text, jsonb, text, text) as
         seats = $5,
         meetings = $6,
         open_seats = $7,
-        waitlist = $8
+        waitlist = $8,
+        instructors = $9
     RETURNING id;
 
 PREPARE insert_professor (text) as

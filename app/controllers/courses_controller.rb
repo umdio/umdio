@@ -12,13 +12,12 @@ module Sinatra
 
             # TODO: This could be more concise
             if params['expand']
-              params['expand'] = params['expand'].to_s == 'true'
+              params['expand'] = params['expand'].to_s.downcase == 'sections'
             end
 
             @db = app.settings.postgres
           end
 
-          # TODO: CONVERT
           # Returns sections of courses by their id
           app.get '/v0/courses/sections/:section_id' do
             # separate into an array on commas, turn it into uppercase
@@ -44,42 +43,68 @@ module Sinatra
           # TODO: CONVERT
           # TODO: allow for searching in meetings properties
           app.get '/v0/courses/sections' do
-            semester = params[:semester] || current_semester
+            begin_paginate! @db, "sections"
 
-            begin_paginate! @db, "sections#{semester}"
+            query = ''
+
+            # TODO: This has a lot of overlap with params_search_query, but has to be separate specifically for querying the JSONB.
+
+            # Properties that we have to search JSONB to find
+            meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
+            prefixed_meeting_properties = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
+
+            params.keys.each do |key| if (meeting_properties + prefixed_meeting_properties).include? key.chomp('<').chomp('>').chomp('!')
+              if key.include? 'meeting.'
+                new_key = key.split('.')[1]
+                params[new_key] = params[key]
+                params.delete(key)
+                key = new_key
+              end
+
+              delim = ''
+              if key[-1] == '<'
+                delim = '<'
+              elsif key[-1] == '>'
+                delim = '>'
+              elsif key[-1] == '!'
+                delim = '!'
+              end
+
+              n_key = key.chomp('<').chomp('>').chomp('!')
+
+              if n_key == 'start_time'
+                params['start_seconds'] = time_to_int(params['start_time'])
+                params.delete('start_time')
+              end
+
+              if n_key == 'end_time'
+                params['start_seconds'] = time_to_int(params['start_time'])
+                params.delete('start_time')
+              end
+
+              query += " EXISTS(SELECT 1 from jsonb_array_elements(meetings) elem WHERE elem->>'#{n_key}'='#{params[key]}') AND "
+            end
+            end
 
             # get parse the search and sort
             sorting = params_sorting_array 'section_id'
-            query   = params_search_query  @db, @special_params
+            query  += params_search_query @db, (@special_params + meeting_properties)
 
-            halt 404, ::JSON.generate(query)
-
-            # adjust query if meeting property is specified without meetings qualifier
-            meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
-            (query.keys & meeting_properties).each do |prop|
-              query["meetings.#{prop}"] = query[prop]
-              query.delete(prop)
+            if query == ''
+              query = 'TRUE'
             end
 
-            # TODO: possible combine this with above / move into a helper method
-            mappings = {'start_time' => 'start_seconds', 'end_time' => 'end_seconds'}
-            mappings.each do |key, value|
-              if query["meetings.#{key}"]
-                val = query["meetings.#{key}"]
-                if val.is_a? Hash
-                  val.each { |k,v| val[k] = time_to_int(v) }
-                  query["meetings.#{value}"] = val
-                else
-                  query["meetings.#{value}"] = time_to_int(val)
-                end
-                query.delete("meetings.#{key}")
-              end
+            offset = (@page - 1)*@limit
+            limit = @limit
+
+            query.chomp! "AND "
+
+            res = @db.exec("SELECT * FROM sections WHERE #{query} LIMIT #{limit} OFFSET #{offset}")
+            sections = []
+
+            res.each do |row|
+              sections << (clean_section @db, (params[:semester] || current_semester), row)
             end
-
-            # map sorting parameters to their mongo-matching representation
-            sorting.map! { |e| mappings.has_key?(e) ? "meetings.#{mappings[e]}" : e }
-
-            sections = @section_coll.find(query, {:sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => {:_id => 0, 'meetings.start_seconds' => 0, 'meetings.end_seconds' => 0}}).map{ |e| e }
 
             end_paginate! sections
 
@@ -161,10 +186,14 @@ module Sinatra
             params['dept_id'] = params['dept_id'].upcase if params['dept_id']
 
             # get parse the search and sort
-            sorting = 'course_id ASC'#params_sorting_array 'course_id'
-            query   = 'true' #params_search_query @db, @special_params
+            sorting = params_sorting_array
+            query = params_search_query @db, @special_params
             offset = (@page - 1)*@limit
             limit = @limit
+
+            if query == ''
+              query = 'TRUE'
+            end
 
             res = @db.exec("SELECT * FROM courses WHERE #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
             courses = []
