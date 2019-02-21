@@ -47,10 +47,7 @@ task :test_scrape do
   year = Time.now.month <= 10 ? Time.now.year : Time.now.year + 1
   semesters = [] << current_semester
   sh "ruby app/scrapers/courses_scraper.rb #{year}"
-  sh 'ruby app/scrapers/sections_scraper.rb'
-  sh 'ruby app/scrapers/section_course_linker.rb'
-
-  semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+  sh "ruby app/scrapers/sections_scraper.rb #{year}"
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
   sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
   sh 'ruby app/scrapers/buildings.rb'
@@ -72,9 +69,7 @@ namespace :scrape do
     years = ((year - 3)..year).to_a.join ' '
     semesters = current_and_next_semesters
     sh "ruby app/scrapers/courses_scraper.rb #{years}"
-    sh 'ruby app/scrapers/sections_scraper.rb'
-    sh 'ruby app/scrapers/section_course_linker.rb'
-    semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+    sh "ruby app/scrapers/sections_scraper.rb #{years}"
   end
 
   desc "Run course seat updater"
@@ -82,7 +77,7 @@ namespace :scrape do
     year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
     years = ((year - 3)..year).to_a.join ' '
     semesters = current_and_next_semesters
-    semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+    sh "ruby app/scrapers/sections_scraper.rb #{semesters.join(' ')}"
   end
 
   desc "Run building scraper"

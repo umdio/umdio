@@ -33,7 +33,12 @@ unless route_array.nil?
   route_array.each do |route|
     logger.info(prog_name) {"getting #{route[:route_id]}"}
     address = apiRoot + "&command=routeConfig&r=#{route[:route_id]}"
-    route_response = parse(Net::HTTP.get(URI(address)).to_s)["route"]
+    begin
+      route_response = JSON.parse(Net::HTTP.get(URI(address)).to_s)["route"]
+    rescue JSON::ParserError
+      logger.info(prog_name) { "Retrying..."}
+      retry
+    end
     stops = []
     unless route_response.nil?
       route_response["stop"].each do |stop|
