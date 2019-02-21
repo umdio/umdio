@@ -37,8 +37,8 @@ CREATE TABLE IF NOT EXISTS professors (
 
 CREATE TABLE IF NOT EXISTS section_professors (
     id SERIAL PRIMARY KEY,
-    professor_id int REFERENCES professors(id),
-    section int REFERENCES sections(id),
+    professor_id int REFERENCES professors(id) NOT NULL,
+    section int REFERENCES sections(id) NOT NULL,
     UNIQUE(professor_id, section)
 );
 
@@ -75,7 +75,7 @@ PREPARE insert_section (text, text, int, text, text, jsonb, text, text, text[]) 
     RETURNING id;
 
 PREPARE insert_professor (text) as
-    INSERT INTO professors(name) VALUES ($1) ON CONFLICT(name) DO NOTHING RETURNING id;
+    INSERT INTO professors(id, name) VALUES (DEFAULT, $1) ON CONFLICT(name) DO UPDATE SET name = $1  RETURNING id;
 
 PREPARE insert_section_professors(int, int) as
     INSERT INTO section_professors(professor_id, section) VALUES ($1, $2) ON CONFLICT(professor_id, section) DO NOTHING;

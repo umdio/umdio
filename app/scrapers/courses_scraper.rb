@@ -170,6 +170,5 @@ dep_urls.each do |url|
       PG::TextEncoder::Array.new.encode(course[:gen_ed]),
       course[:relationships].to_json
     ])
-    end
   end
 end

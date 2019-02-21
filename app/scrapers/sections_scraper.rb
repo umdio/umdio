@@ -125,11 +125,10 @@ semesters.each do |semester|
       PG::TextEncoder::Array.new.encode(section[:instructors]),
     ])
 
-    row_id = res.first
+    row_id = res.first['id']
     section[:instructors].each do |prof|
       res2 = db.exec_prepared("insert_professor", [prof])
-      prof_id = res2.first
-
+      prof_id = res2.first['id']
       db.exec_prepared("insert_section_professors", [prof_id, row_id])
     end
   end

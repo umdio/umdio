@@ -1,3 +1,4 @@
+$stdout.sync = true
 # Helper methods for courses endpoint
 module Sinatra
   module UMDIO
@@ -123,13 +124,9 @@ module Sinatra
 
       # Takes a course row from the database and formats it into a response
       def clean_course db, semester, row
-        # Grab grading method, core, and gen_ed from respective tables
-        grading_methods = db.exec("SELECT grading_method FROM courses_grading_method WHERE id=#{row['id']};").values
-        gen_ed = db.exec("SELECT gen_ed_code FROM courses_gen_ed WHERE id=#{row['id']};").values
-
         row['sections'] = find_sections_for_course db, semester, row['course_id'], params[:expand]
-        row['grading_method'] = grading_methods
-        row['gen_ed'] = gen_ed
+        row['grading_method'] = PG::TextDecoder::Array.new.decode(row['grading_method'])
+        row['gen_ed'] = PG::TextDecoder::Array.new.decode(row['gen_ed'])
         row['relationships'] = ::JSON.parse(row['relationships'])
         row.delete('id')
 
@@ -147,10 +144,23 @@ module Sinatra
         row['course'] = row['course_id']
         row.delete('course_id')
 
-        row['instructors'] = find_instructors_for_section db, semester, row['id']
+        row['instructors'] = PG::TextDecoder::Array.new.decode(row['instructors'])
         row.delete('id')
 
         row
+      end
+
+      def clean_professor db, semester, row
+        id = row.delete('id')
+        row['semesters'] = [semester]
+        res = @db.exec("SELECT sections.course_id FROM professors JOIN section_professors ON professors.id=section_professors.professor_id join sections on section_professors.section = sections.id WHERE professors.id=#{id} AND sections.semester=#{semester}")
+        row['courses'] = []
+        res.each do |r|
+          row['courses'] << r['course_id']
+        end
+
+        row['courses'] = row['courses'].uniq
+        return row
       end
 
       def find_sections_for_course db, semester, course_id, expand
@@ -167,11 +177,6 @@ module Sinatra
         end
 
         return sections
-      end
-
-      # TODO: this only returns blanks
-      def find_instructors_for_section db, semester, section_db_id
-        db.exec("SELECT professors.name FROM professors INNER JOIN section_professors ON professors.id = section_professors.professor_id WHERE section_professors.section=#{section_db_id}").values
       end
 
       # @param string_time string in format like 10:00am, 10:00, 10am or 10

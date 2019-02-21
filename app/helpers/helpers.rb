@@ -75,11 +75,66 @@ module UMDIO
       return sort_query.chomp(',')
     end
 
+    def parse_param key, value, arr_params=[]
+      # For sections, we want to collapse `meeting.foo` into `foo`
+      if key.include? 'meeting.'
+        key = key.split('.')[1]
+      end
+
+      # Next, we want to find a delimiter
+      delim = ''
+      split = ''
+      if key.include? ('<') or key.include? ('>')
+        delim = (key.include? ('<')) ? '<' : '>'
+
+        # Check for =
+        parts = key.split(delim)
+        if parts.length == 1
+          key = parts[0]
+          delim += '='
+        else
+          key = parts[0]
+          value = parts[1]
+        end
+
+      elsif key.include? ('!')
+        key = key.split('!')[0]
+
+        if value.include? (',') or value.include? ('|') or arr_params.include? key
+          split = value.include?(',') ? ',' : '|'
+          delim = value.include?(',') ? '&&' : '@>'
+        else
+          delim = '!='
+        end
+
+      elsif not value.nil?
+        if arr_params.include? key
+          # Just the plain equals case
+          l = value.split(',').length
+          # Array Search
+          if value.include? (',') or (arr_params.include? key and l == 1)
+            delim = '&&'
+            split = ','
+          elsif value.include? ('|')
+            delim = '@>'
+            split = '|'
+          end
+        else
+          delim = '='
+        end
+      else
+        # Error
+        # TODO: Make more descriptive
+        halt 400, { error_code: 400, message: "Invalid seach query" }.to_json
+      end
+
+      return key, delim, value, split
+    end
+
     def params_search_query db, ignore=nil
       # Sinatra adds this param in some cases, and we don't want it
       # TODO: Is there a better way we can delete this?
       params.delete(:captures) if params.key?(:captures)
-
       # What params need to be represented as arrays
       arr_params = ['gen_ed', 'grading_method', 'instructors']
 

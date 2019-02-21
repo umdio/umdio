@@ -40,52 +40,37 @@ module Sinatra
             json res
           end
 
-          # TODO: CONVERT
-          # TODO: allow for searching in meetings properties
           app.get '/v0/courses/sections' do
             begin_paginate! @db, "sections"
 
             query = ''
 
-            # TODO: This has a lot of overlap with params_search_query, but has to be separate specifically for querying the JSONB.
-
-            # Properties that we have to search JSONB to find
             meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
-            prefixed_meeting_properties = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
 
-            params.keys.each do |key| if (meeting_properties + prefixed_meeting_properties).include? key.chomp('<').chomp('>').chomp('!')
-              if key.include? 'meeting.'
-                new_key = key.split('.')[1]
-                params[new_key] = params[key]
-                params.delete(key)
-                key = new_key
+            params.keys.each do |key|
+              nkey, delim, value, split = parse_param key, params[key]
+
+              next unless (meeting_properties).include? nkey
+
+              params.delete(key)
+
+              if nkey == 'start_time'
+                nkey = 'start_seconds'
+                value = time_to_int(value)
+              elsif nkey == 'end_time'
+                nkey = 'end_seconds'
+                value = time_to_int(value)
               end
 
-              delim = ''
-              if key[-1] == '<'
-                delim = '<'
-              elsif key[-1] == '>'
-                delim = '>'
-              elsif key[-1] == '!'
-                delim = '!'
+              # TODO: More consice
+              if nkey == 'start_time' or nkey == 'end_time'
+                query += " EXISTS(SELECT 1 from jsonb_array_elements(meetings) elem WHERE (elem->>'#{nkey}')::int #{delim} #{value}) AND "
+              else
+                query += " EXISTS(SELECT 1 from jsonb_array_elements(meetings) elem WHERE elem->>'#{nkey}' #{delim} '#{value}') AND "
               end
-
-              n_key = key.chomp('<').chomp('>').chomp('!')
-
-              if n_key == 'start_time'
-                params['start_seconds'] = time_to_int(params['start_time'])
-                params.delete('start_time')
-              end
-
-              if n_key == 'end_time'
-                params['start_seconds'] = time_to_int(params['start_time'])
-                params.delete('start_time')
-              end
-
-              query += " EXISTS(SELECT 1 from jsonb_array_elements(meetings) elem WHERE elem->>'#{n_key}'='#{params[key]}') AND "
-            end
             end
 
+            puts query
             # get parse the search and sort
             sorting = params_sorting_array 'section_id'
             query  += params_search_query @db, (@special_params + meeting_properties)
@@ -156,7 +141,18 @@ module Sinatra
           # Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
             course_id = "#{params[:course_id]}".upcase
-            json find_sections_for_course @db, (params[:semester] || current_semester), course_id, true
+            res = find_sections_for_course @db, (params[:semester] || current_semester), course_id, true
+
+            if res.empty?
+              halt 404, {
+                error_code: 404,
+                message: "Course with course_id #{course_id} not found!",
+                available_courses: "https://api.umd.io/v0/courses",
+                docs: "http://umd.io/courses/"
+              }.to_json
+            end
+
+            json res
           end
 
           # returns courses specified by :course_id
