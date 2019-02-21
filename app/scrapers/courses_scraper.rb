@@ -8,14 +8,8 @@ require 'pg'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
-db = PG.connect(
-      dbname: 'umdio',
-      host: 'postgres',
-      port: '5432',
-      user: 'postgres'
-    )
-prog_name = "courses_scraper"
 
+prog_name = "courses_scraper"
 logger = ScraperCommon::logger
 
 db = ScraperCommon::postgres
@@ -64,6 +58,10 @@ dep_urls.each do |url|
 
   page.search('div.course').each do |course|
     course_id = course.search('div.course-id').text
+
+    # Rejects course ids that are longer than expected
+    next if course_id.length > 8
+
     course_title = course.search('span.course-title').text
     credits = course.search('span.course-min-credits').text
 
@@ -168,6 +166,7 @@ dep_urls.each do |url|
       course[:description],
       PG::TextEncoder::Array.new.encode(course[:grading_method]),
       PG::TextEncoder::Array.new.encode(course[:gen_ed]),
+      PG::TextEncoder::Array.new.encode(course[:core]),
       course[:relationships].to_json
     ])
   end

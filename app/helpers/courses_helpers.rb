@@ -1,4 +1,3 @@
-$stdout.sync = true
 # Helper methods for courses endpoint
 module Sinatra
   module UMDIO
@@ -127,6 +126,7 @@ module Sinatra
         row['sections'] = find_sections_for_course db, semester, row['course_id'], params[:expand]
         row['grading_method'] = PG::TextDecoder::Array.new.decode(row['grading_method'])
         row['gen_ed'] = PG::TextDecoder::Array.new.decode(row['gen_ed'])
+        row['core'] = PG::TextDecoder::Array.new.decode(row['core'])
         row['relationships'] = ::JSON.parse(row['relationships'])
         row.delete('id')
 

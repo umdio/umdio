@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS courses (
     description text,
     grading_method text[],
     gen_ed text[],
+    core text[],
     relationships jsonb,
     UNIQUE(course_id, semester)
 );
@@ -42,10 +43,10 @@ CREATE TABLE IF NOT EXISTS section_professors (
     UNIQUE(professor_id, section)
 );
 
-PREPARE insert_courses (text, int, text, text, text, text, text, text[], text[], jsonb) as
+PREPARE insert_courses (text, int, text, text, text, text, text, text[], text[], text[], jsonb) as
     INSERT INTO courses(
-        id, course_id, semester, name, dept_id, department, credits, description, grading_method, gen_ed, relationships
-    ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        id, course_id, semester, name, dept_id, department, credits, description, grading_method, gen_ed, core, relationships
+    ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     ON CONFLICT (course_id, semester) DO UPDATE SET
         course_id = $1,
         semester = $2,
@@ -56,7 +57,8 @@ PREPARE insert_courses (text, int, text, text, text, text, text, text[], text[],
         description = $7,
         grading_method = $8,
         gen_ed = $9,
-        relationships = $10;
+        core = $10,
+        relationships = $11;
 
 PREPARE insert_section (text, text, int, text, text, jsonb, text, text, text[]) as
     INSERT INTO sections (

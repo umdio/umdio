@@ -70,7 +70,6 @@ module Sinatra
               end
             end
 
-            puts query
             # get parse the search and sort
             sorting = params_sorting_array 'section_id'
             query  += params_search_query @db, (@special_params + meeting_properties)

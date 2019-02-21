@@ -33,7 +33,6 @@ class UMDIO < Sinatra::Base
     puts "Connecting to postgres on 5432"
 
     # we might need other databases for other endpoints, but for now this is fine, with multiple collections
-    set :courses_db, MongoClient.new(host, port, pool_size: 20, pool_timeout: 5).db('umdclass')
     set :buses_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdbus')
     set :map_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmap')
     set :majors_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmajors')
