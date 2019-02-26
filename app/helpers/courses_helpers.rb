@@ -152,14 +152,9 @@ module Sinatra
 
       def clean_professor db, semester, row
         id = row.delete('id')
-        row['semesters'] = [semester]
-        res = @db.exec("SELECT sections.course_id FROM professors JOIN section_professors ON professors.id=section_professors.professor_id join sections on section_professors.section = sections.id WHERE professors.id=#{id} AND sections.semester=#{semester}")
-        row['courses'] = []
-        res.each do |r|
-          row['courses'] << r['course_id']
-        end
-
-        row['courses'] = row['courses'].uniq
+        row['courses'] = PG::TextDecoder::Array.new.decode(row['courses'])
+        row['departments'] = PG::TextDecoder::Array.new.decode(row['departments'])
+        row['semester'] = [row['semester']]
         return row
       end
 

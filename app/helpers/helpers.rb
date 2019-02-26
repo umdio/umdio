@@ -136,7 +136,7 @@ module UMDIO
       # TODO: Is there a better way we can delete this?
       params.delete(:captures) if params.key?(:captures)
       # What params need to be represented as arrays
-      arr_params = ['gen_ed', 'grading_method', 'instructors']
+      arr_params = ['gen_ed', 'grading_method', 'instructors', 'departments']
 
       query = ''
       # TODO: Error on =''

@@ -31,10 +31,9 @@ module Sinatra
             limit = @limit
 
             query.chomp! "AND "
-            query += " AND EXISTS(SELECT 1 FROM professors JOIN section_professors ON professors.id=section_professors.professor_id JOIN sections ON section_professors.section = sections.id WHERE sections.semester=#{current_semester} AND professors.id = p.id)"
 
             profs = []
-            res = @db.exec("SELECT * FROM professors as p WHERE #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
+            res = @db.exec("SELECT * FROM professor_view as p WHERE semester=#{params[:semester] || current_semester} AND #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
 
             res.each do |row|
               profs << clean_professor(@db, (params[:semester] || current_semester), row)
