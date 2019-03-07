@@ -193,7 +193,7 @@ img {
 
 .post {
   padding: 1rem 1rem;
-  padding-top: 3rem;
+  padding-top: 3rem; //Padding prevents clipping on mobile. Maybe there's a more elegant solution?
   margin: 1rem 0rem;
   display: flex;
   flex-direction: column;
@@ -265,7 +265,6 @@ pre, code {
 
 
   .menu {
-    margin: 0;
     margin-left: auto;
     .ref-title {
       color: $dark-gray;
@@ -309,47 +308,46 @@ pre, code {
 
   .post {
     flex-direction: row;
+    flex: 0 0 auto;
     padding: 0;
     margin: 0;
     border: none;
     .post-description {
-      flex: 1 0 50%;
+      flex: 0 1 50%;
       padding: 30px;
     }
     .post-example {
-      flex-basis: 50%;
+      flex: 0 1 50%;
       margin-right: 2vw;
       margin: 0;
       border-radius: 0;
     }
   }
   footer {
-    display: flex;
-    width: 100%;
+    padding: 20px 40px;
+    flex-shrink: 0;
+    flex: 0 0 auto;
     background-color: $light-gray;
-    .footer-text {
-      padding: 2rem 4rem;
-    }
   }
 }
 
 @media(min-width: 1800px) {
 
   .sidebar {
-    flex: 1 0 30%;
+    flex: 0 1 30%;
   }
 
   .docs {
-    flex: 1 0 70%;
+    flex: 0 1 70%;
     padding: 0;
   }
 
   .post {
     .post-description {
-      flex-basis: 40%;
+      flex: 0 1 40%;
     }
     .post-example {
-      flex-basis: 60%;
+      flex: 0 1 60%;
     }
   }
 
