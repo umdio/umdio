@@ -10,27 +10,41 @@ module Sinatra
           app.before '/v0/professors*' do
             @special_params = ['sort', 'semester', 'per_page', 'page']
 
-            semester = params[:semester] || current_semester
-            check_semester app, semester, 'profs'
+            params[:semester] ||= current_semester
+            check_semester app, params[:semester], 'courses'
 
-            @prof_coll = app.settings.courses_db.collection("profs#{semester}")
+            @db = app.settings.postgres
           end
 
           # Route for professors, use 'name' or 'course' to filter
           app.get '/v0/professors' do
-            begin_paginate! @prof_coll 
-            
-            query = params_search_query @special_params
+            begin_paginate! @db, "professors"
+
+            query = params_search_query @db, @special_params
             sorting = params_sorting_array "name"
-            
-            profs = @prof_coll.find(query, { :sort => sorting, :limit => @limit, :skip => (@page - 1)*@limit, :fields => { :_id => 0 } }).map { |e| e }
-            
+
+            if query == ''
+              query = 'TRUE'
+            end
+
+            offset = (@page - 1)*@limit
+            limit = @limit
+
+            query.chomp! "AND "
+
+            profs = []
+            res = @db.exec("SELECT * FROM professor_view as p WHERE semester=#{params[:semester] || current_semester} AND #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
+
+            res.each do |row|
+              profs << clean_professor(@db, (params[:semester] || current_semester), row)
+            end
+
             end_paginate! profs
 
             #Throw a 404 if prof is empty. (Doesn't exist or invalid)
             if profs == []
               halt 404, {
-                error_code: 404, 
+                error_code: 404,
                 message: "There were no professors that matched your search.",
                 docs: "https://umd.io/professors"
               }.to_json

@@ -4,26 +4,19 @@
 require 'open-uri'
 require 'nokogiri'
 require 'mongo'
+require 'pg'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
 prog_name = "courses_scraper"
-
 logger = ScraperCommon::logger
-db = ScraperCommon::database 'umdclass'
+
+db = ScraperCommon::postgres
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
-years = ARGV
-semesters = years.map do |e|
-  if e.length == 6
-    e
-  else
-    [e + '01', e + '05', e + '08', e + '12']
-  end
-end
-semesters = semesters.flatten
+semesters = ScraperCommon::get_semesters(ARGV)
 
 logger.info(prog_name) {semesters}
 
@@ -49,23 +42,26 @@ def utf_safe text
   text
 end
 
+queries = []
+
 # add the courses from each department to the database
 dep_urls.each do |url|
   dept_id = url.split('/soc/')[1][7,10]
   semester = url.split('/soc/')[1][0,6]
   courses = []
-  coll = db.collection('courses' + semester)
-  bulk = coll.initialize_unordered_bulk_op
+  table_name = "courses"
 
   logger.info(prog_name) {"Getting courses for #{dept_id} (#{semester})"}
 
   page = Nokogiri::HTML(open(url), nil, "UTF-8")
-
   department = page.search('span.course-prefix-name').text.strip
-
 
   page.search('div.course').each do |course|
     course_id = course.search('div.course-id').text
+
+    # Rejects course ids that are longer than expected
+    next if course_id.length > 8
+
     course_title = course.search('span.course-title').text
     credits = course.search('span.course-min-credits').text
 
@@ -97,7 +93,6 @@ dep_urls.each do |url|
     match = /Prerequisite: ([^.]+\.)/.match(text)
     text = match ? text.gsub(match[0], '') : text
     prereq = match ? match[1] : nil
-
 
     match = /Corequisite: ([^.]+\.)/.match(text)
     text = match ? text.gsub(match[0], '') : text
@@ -161,8 +156,18 @@ dep_urls.each do |url|
   end
 
   courses.each do |course|
-    bulk.find({course_id: course[:course_id]}).upsert.update({ "$set" => course })
+    res = db.exec_prepared("insert_courses", [
+      course[:course_id],
+      course[:semester],
+      course[:name],
+      course[:dept_id],
+      course[:department],
+      course[:credits],
+      course[:description],
+      PG::TextEncoder::Array.new.encode(course[:grading_method]),
+      PG::TextEncoder::Array.new.encode(course[:gen_ed]),
+      PG::TextEncoder::Array.new.encode(course[:core]),
+      course[:relationships].to_json
+    ])
   end
-
-  bulk.execute
 end

@@ -27,3 +27,5 @@ end
 group :scrape do
   gem 'nokogiri'
 end
+
+gem "pg", "~> 1.1"

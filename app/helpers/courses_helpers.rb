@@ -4,35 +4,31 @@ module Sinatra
     module Helpers
 
       # generalize logic for checking if semester param valid
-      def check_semester app, semester, coll_prefix
+      def check_semester app, semester, table
         # check for semester formatting
         if not (semester.length == 6 and semester.is_number?)
           halt 400, { error_code: 400, message: "Invalid semester parameter! semester must be 6 digits" }.to_json
         end
 
-        # check if we have data for the requested semester
-        collection_names = app.settings.courses_db.collection_names()
-        if not collection_names.index("#{coll_prefix}#{semester}")
-          semesters = collection_names.select { |e| e.start_with? coll_prefix }.map{ |e| e.slice(coll_prefix.length,6) }
-          msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo. Or try one of the available semester below:"
-          halt 404, {error_code: 404, message: msg, semesters: semesters}.to_json
+        # check if table exists
+        begin
+          app.settings.postgres.exec("SELECT * from #{table} WHERE semester=#{semester} LIMIT 1")
+        rescue PG::UndefinedTable
+          msg = "We don't have data for this semester! If you leave off the semester parameter, we'll give you the courses currently on Testudo"
+          halt 404, {error_code: 404, message: msg}.to_json
         end
+
+        true
       end
 
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
-      def find_sections section_coll, section_ids
-        query = section_ids[0]
-        query = { '$in' => section_ids } if section_ids.length > 1
+      def find_sections db, semester, section_ids
+        # Turn section_ids into string
+        sections = (section_ids.map {|e| "'#{e}'"}).join ','
 
-        res = section_coll.find(
-          { section_id: query },
-          { fields: {_id: 0, 'meetings.start_seconds' => 0, 'meetings.end_seconds' => 0} }
-        ).map { |e| e }
-
-        # is returning the single object without [] weird? should we return the array without []?
-        if section_ids.length == 1
-          return res[0]
-        end
+        # This is proably ok, because we know that semester and section_ids both match expected formats
+        # TODO: Take another look here, for security purposes
+        res = db.exec("SELECT * FROM sections WHERE semester=#{semester} AND section_id in (#{sections})")
 
         if !res
           halt 404, {
@@ -43,40 +39,14 @@ module Sinatra
           }.to_json
         end
 
-        return res
-      end
+        cleaned_rows = []
 
-      # returns an array of the section ids of an array of sections
-      def flatten_sections sections_array
-        if sections_array.nil?
-          []
-        else
-          sections_array.map { |e| e['section_id'] }
-        end
-      end
-
-      # flattens course sections and expands them if params[:expand] is set
-      def flatten_course_sections_expand section_coll, courses
-        # flatten sections
-        section_ids = []
-        courses.each do |course|
-          course['sections'] = flatten_sections course['sections']
-          section_ids.concat course['sections']
+        # Decode arrays and json
+        res.each do |row|
+          cleaned_rows << (clean_section db, semester, row)
         end
 
-        # expand sections if ?expand=sections
-        if params[:expand] == 'sections'
-          sections = find_sections section_coll, section_ids
-          sections = [sections] if not sections.kind_of?(Array) # hacky, maybe modify find_sections?
-
-          # map sections to course hash & replace section data
-          if not sections.empty?
-            course_sections = sections.group_by { |e| e['course'] }
-            courses.each { |course| course['sections'] = course_sections[course['course_id']] }
-          end
-        end
-
-        return courses
+        return cleaned_rows
       end
 
       def validate_section_ids section_ids, do_halt=true
@@ -108,30 +78,34 @@ module Sinatra
         return true
       end
 
+      def find_courses_in_sem db, semester
+        res = db.exec("SELECT course_id, name, dept_id FROM courses WHERE semester=#{semester} ORDER BY course_id ASC;")
+        courses = []
+
+        res.each do |row|
+          courses << row
+        end
+
+        courses
+      end
+
       # gets a single course or an array or courses and halts if none are found
-      # @param collection : MongoDB Collection
-      # @param course_ids : String or Array of course ids
       # @return: Array of courses
-      def find_courses collection, course_ids
+      def find_courses db, semester, course_ids, params
         course_ids = [course_ids] if course_ids.is_a?(String)
 
         validate_course_ids course_ids
 
-        # query db
-        if course_ids.length > 1
-          courses = collection.find(
-            { course_id: { '$in' => course_ids } },
-            { fields: { _id:0, 'sections._id' => 0 } }
-          )
-        else
-          courses = collection.find(
-            { course_id: course_ids[0] },
-            { fields: { _id:0, 'sections._id' => 0 } }
-          )
-        end
+        # Turn course_ids into string
+        courses_ids_string = (course_ids.map {|e| "'#{e}'"}).join ','
 
-        # to_a, map is more memory efficient
-        courses = courses.map { |e| e }
+        # This is proably ok, because we know that semester and sectcourse_idsion_ids both match expected formats
+        # TODO: Take another look here, for security purposes
+        res = db.exec("SELECT * FROM courses WHERE semester=#{semester} AND course_id in (#{courses_ids_string})")
+        courses = []
+        res.each do |row|
+          courses << (clean_course db, semester, row)
+        end
 
         # check if found
         if courses.empty?
@@ -145,6 +119,59 @@ module Sinatra
         end
 
         courses
+      end
+
+      # Takes a course row from the database and formats it into a response
+      def clean_course db, semester, row
+        row['sections'] = find_sections_for_course db, semester, row['course_id'], params[:expand]
+        row['grading_method'] = PG::TextDecoder::Array.new.decode(row['grading_method'])
+        row['gen_ed'] = PG::TextDecoder::Array.new.decode(row['gen_ed'])
+        row['core'] = PG::TextDecoder::Array.new.decode(row['core'])
+        row['relationships'] = ::JSON.parse(row['relationships'])
+        row.delete('id')
+
+        row
+      end
+
+      # Takes a section row and formats it into a response
+      def clean_section db, semester, row
+        row['meetings'] = ::JSON.parse(row['meetings'])
+        row['meetings'].each do |meeting|
+          meeting.delete('start_seconds')
+          meeting.delete('end_seconds')
+        end
+
+        row['course'] = row['course_id']
+        row.delete('course_id')
+
+        row['instructors'] = PG::TextDecoder::Array.new.decode(row['instructors'])
+        row.delete('id')
+
+        row
+      end
+
+      def clean_professor db, semester, row
+        id = row.delete('id')
+        row['courses'] = PG::TextDecoder::Array.new.decode(row['courses'])
+        row['departments'] = PG::TextDecoder::Array.new.decode(row['departments'])
+        row['semester'] = [row['semester']]
+        return row
+      end
+
+      def find_sections_for_course db, semester, course_id, expand
+        sections = []
+
+        if expand
+          res = db.exec("SELECT * FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")
+          res.each do |row|
+            sections << (clean_section db, semester, row)
+          end
+        else
+          res = db.exec("SELECT section_id FROM sections WHERE semester=#{semester} AND course_id='#{course_id}'")
+          sections = res.values.flatten
+        end
+
+        return sections
       end
 
       # @param string_time string in format like 10:00am, 10:00, 10am or 10

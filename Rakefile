@@ -21,6 +21,7 @@ namespace :db do
     end
   end
 
+  # TODO: Clean postgres too
   desc "Cleans databases (by deleting all the data)"
   task :clean do
     puts "DANGER: will remove everything in the database, including logs."
@@ -46,10 +47,7 @@ task :test_scrape do
   year = Time.now.month <= 10 ? Time.now.year : Time.now.year + 1
   semesters = [] << current_semester
   sh "ruby app/scrapers/courses_scraper.rb #{year}"
-  sh 'ruby app/scrapers/sections_scraper.rb'
-  sh 'ruby app/scrapers/section_course_linker.rb'
-
-  semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+  sh "ruby app/scrapers/sections_scraper.rb #{year}"
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
   sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
   sh 'ruby app/scrapers/buildings.rb'
@@ -71,9 +69,7 @@ namespace :scrape do
     years = ((year - 3)..year).to_a.join ' '
     semesters = current_and_next_semesters
     sh "ruby app/scrapers/courses_scraper.rb #{years}"
-    sh 'ruby app/scrapers/sections_scraper.rb'
-    sh 'ruby app/scrapers/section_course_linker.rb'
-    semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+    sh "ruby app/scrapers/sections_scraper.rb #{years}"
   end
 
   desc "Run course seat updater"
@@ -81,7 +77,7 @@ namespace :scrape do
     year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
     years = ((year - 3)..year).to_a.join ' '
     semesters = current_and_next_semesters
-    semesters.each {|semester| sh "ruby app/scrapers/update_open_seats.rb #{semester}"}
+    sh "ruby app/scrapers/sections_scraper.rb #{semesters.join(' ')}"
   end
 
   desc "Run building scraper"
@@ -107,7 +103,7 @@ task :server => :up
 
 desc "Start the web server for prod"
 task :prod do
-  system "rakeup -p 3000 -o 0.0.0.0"
+  system "rackup -p 3000 -o 0.0.0.0"
 end
 
 desc "Sinatra console"

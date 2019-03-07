@@ -10,10 +10,19 @@ services:
       - ./data/db:/data/db
     ports:
       - 27017:27017
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=umdio
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    ports:
+      - 5433:5433
   umdio:
     build: .
     links:
       - mongodb
+      - postgres
     environment:
       - MONGO_RUBY_DRIVER_HOST=mongodb
       - MONGO_RUBY_DRIVER_PORT=27017
