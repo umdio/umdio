@@ -103,7 +103,7 @@ task :server => :up
 
 desc "Start the web server for prod"
 task :prod do
-  system "rakeup -p 3000 -o 0.0.0.0"
+  system "rackup -p 3000 -o 0.0.0.0"
 end
 
 desc "Sinatra console"
