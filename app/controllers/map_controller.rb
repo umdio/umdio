@@ -17,7 +17,7 @@ module Sinatra
             resp = {
               message: "This is the map endpoint.",
               status: "in development",
-              docs: "http://umd.io/map",
+              docs: "https://umd.io/map",
             }
             json resp
           end
@@ -44,10 +44,10 @@ module Sinatra
             # throw 404 if empty
             if buildings == []
               halt 404, {
-                error_code: 404, 
+                error_code: 404,
                 message: "Building number #{params[:building_id]} isn't in our database, and probably doesn't exist.",
                 available_buildings: "https://api.umd.io/map/buildings",
-                docs: "http://umd.io/map"
+                docs: "https://umd.io/map"
               }.to_json
             end
 
@@ -55,7 +55,7 @@ module Sinatra
           end
 
         end
-   
+
       end
     end
   end

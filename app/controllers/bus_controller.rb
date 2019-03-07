@@ -23,7 +23,7 @@ module Sinatra
               resp = {
                 message: "This is the bus endpoint.",
                 status: "working (we think!)",
-                docs: "http://umd.io/bus/",
+                docs: "https://umd.io/bus/",
               }
               json resp
            end

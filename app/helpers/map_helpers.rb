@@ -13,8 +13,8 @@ module Sinatra
       def bad_url_error message
         message ||= "Check your url! It doesn't seem to correspond to anything on the umd.io api. If you think it should, create an issue on our github page."
         {error_code: 400,
-         message: message, 
-         docs: "http://umd.io/maps/"}.to_json
+         message: message,
+         docs: "https://umd.io/maps/"}.to_json
       end
 
     end

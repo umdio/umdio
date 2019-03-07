@@ -64,6 +64,5 @@ Knowledge is power.
 - [MongoDB](http://www.mongodb.org/)
 - [RSpec](http://rspec.info/)
 - [Nginx](http://nginx.org/en/docs/)
-- [Passenger](https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html)
 - [Jekyll](http://jekyllrb.com/)
 - [Docker](https://www.docker.com/)
