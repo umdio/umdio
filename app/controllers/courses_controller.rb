@@ -147,7 +147,7 @@ module Sinatra
                 error_code: 404,
                 message: "Course with course_id #{course_id} not found!",
                 available_courses: "https://api.umd.io/v0/courses",
-                docs: "http://umd.io/courses/"
+                docs: "https://umd.io/courses/"
               }.to_json
             end
 

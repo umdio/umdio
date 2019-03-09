@@ -10,7 +10,7 @@ module Sinatra
             resp = {
               message: "This is the umd.io JSON API.",
               status: "working, most of the time",
-              docs: "http://umd.io/",
+              docs: "https://umd.io/",
               current_version: "v0",
               versions: [
                 {
@@ -31,17 +31,17 @@ module Sinatra
                 {
                   name: 'Courses',
                   url: 'https://api.umd.io/v0/courses',
-                  docs: 'http://umd.io/courses/'
+                  docs: 'https://umd.io/courses/'
                 },
                 {
                   name: 'Bus',
                   url: 'https://api.umd.io/v0/bus',
-                  docs: 'http://umd.io/bus/'
+                  docs: 'https://umd.io/bus/'
                 },
                 {
                   name: 'Map',
                   url: 'https://api.umd.io/v0/map',
-                  docs: 'http://umd.io/map/'
+                  docs: 'https://umd.io/map/'
                 },
               ]
             }
@@ -52,7 +52,7 @@ module Sinatra
             resp = {
               error_code: 404,
               message: "We couldn't find what you're looking for. Please see the docs for more information.",
-              docs: "http://umd.io/"
+              docs: "https://umd.io/"
             }
             status 404
             json resp

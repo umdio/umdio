@@ -20,8 +20,6 @@ Edit on your machine in your favorite text editor, and changes will automagicall
 
 Write tests that fail, write code that makes the tests pass. Run tests with `docker exec -it umdio_umdio_1 bundle exec rake` on the VM. If you are running scrapers or managing the database, remember that mongo is running on the VM, so run your scrapers there too.
 
-If you want to see how the server will run with nginx, check `localhost:4080`. From the VM shell, `nginx -s reload` to update. Cool to check this once in a while, like before a commit. (Tough to view the api from your machine's browser, unless you update your hosts file with a line like `api.localhost 127.0.0.1`. This shouldn't really matter, but if you want, it's there.)
-
 ## Documentation
 We are only as good as our docs.
 
@@ -64,6 +62,5 @@ Knowledge is power.
 - [MongoDB](http://www.mongodb.org/)
 - [RSpec](http://rspec.info/)
 - [Nginx](http://nginx.org/en/docs/)
-- [Passenger](https://www.phusionpassenger.com/documentation/Users%20guide%20Nginx.html)
 - [Jekyll](http://jekyllrb.com/)
 - [Docker](https://www.docker.com/)

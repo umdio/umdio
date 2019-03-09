@@ -35,7 +35,7 @@ module Sinatra
             error_code: 404,
             message: "Section with section_id #{section_ids[0]} not found.",
             available_sections: "https://api.umd.io/v0/courses/sections",
-            docs: "http://umd.io/courses"
+            docs: "https://umd.io/courses"
           }.to_json
         end
 
@@ -54,7 +54,7 @@ module Sinatra
         section_ids.each do |id|
           if not is_full_section_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid section_id #{id}.", docs: "http://umd.io/courses/" }.to_json
+            error_msg = { error_code: 400, message: "Invalid section_id #{id}.", docs: "https://umd.io/courses/" }.to_json
             halt 400, error_msg
           end
         end
@@ -70,7 +70,7 @@ module Sinatra
         course_ids.each do |id|
           if not is_course_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid course_id #{id}.", docs: "http://umd.io/courses/" }.to_json
+            error_msg = { error_code: 400, message: "Invalid course_id #{id}.", docs: "https://umd.io/courses/" }.to_json
             halt 400, error_msg
           end
         end
@@ -114,7 +114,7 @@ module Sinatra
             error_code: 404,
             message: "Course#{s} with course_id#{s} #{course_ids.join(',')} not found!",
             available_courses: "https://api.umd.io/v0/courses",
-            docs: "http://umd.io/courses/"
+            docs: "https://umd.io/courses/"
           }.to_json
         end
 
