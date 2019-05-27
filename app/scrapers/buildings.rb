@@ -29,7 +29,7 @@ array.each do |e|
   unless status.kind_of? Net::HTTPNotFound
     e[:image_url] = image_url
   end
-
+  e[:lon] = e.delete(:lng)
   e[:building_id] = e[:number].upcase
   e.delete :number
   buildings_coll.update({building_id: e[:building_id]}, {"$set" => e}, {upsert: true})
