@@ -7,6 +7,7 @@ module Sinatra
           app.before '/v0/courses*' do
             @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
 
+            # TODO: It's unclear if this is actually doing anything.
             params[:semester] ||= current_semester
             check_semester app, params[:semester], 'courses'
 
@@ -179,6 +180,7 @@ module Sinatra
             # sanitize params
             # TODO: sanitize more parameters to make searching a little more user friendly
             params['dept_id'] = params['dept_id'].upcase if params['dept_id']
+            params[:semester] ||= current_semester
 
             # get parse the search and sort
             sorting = params_sorting_array
@@ -190,10 +192,10 @@ module Sinatra
               query = 'TRUE'
             end
 
-            res = @db.exec("SELECT * FROM courses WHERE #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
+            res = @db.exec("SELECT * FROM courses WHERE semester=#{params[:semester]} AND #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
             courses = []
             res.each do |row|
-              courses << (clean_course @db, (params[:semester] || current_semester), row)
+              courses << (clean_course @db, params[:semester], row)
             end
 
             end_paginate! courses
