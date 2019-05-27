@@ -89,6 +89,12 @@ namespace :scrape do
   task :majors do
     sh 'ruby app/scrapers/majors_scraper.rb'
   end
+
+  desc "Scrapes only the current semester courses/sections"
+  task :current do
+    sh "ruby app/scrapers/courses_scraper.rb #{current_semester}"
+    sh "ruby app/scrapers/sections_scraper.rb #{current_semester}"
+  end
 end
 
 ###### Server
