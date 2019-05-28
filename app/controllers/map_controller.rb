@@ -2,7 +2,7 @@ module Sinatra
   module UMDIO
     module Routing
       module Map
-
+        # Sinatra handling
         def self.registered(app)
           app.register Sinatra::Namespace
 
@@ -13,10 +13,31 @@ module Sinatra
             get do
               resp = {
                 message: "This is the map endpoint.",
-                status: "Version 1!",
+                version: "1.0.0",
                 docs: "https://umd.io/map",
+                endpoints: ["/buildings", "/buildings/{:building_id}"]
               }
               json resp
+            end
+
+            # get list of all buildings with names and numbers
+            get '/buildings' do
+              buildings = get_buildings(buildings_collection)
+              buildings.map{|e|
+                e['lon'] = e.delete('lng')
+              }
+
+              json buildings
+            end
+
+            # get buildings by building_id or code
+            get '/buildings/:building_id' do
+              buildings = get_buildings_by_id(buildings_collection, params[:building_id])
+              buildings.map{|e|
+                e['lon'] = e.delete('lng')
+              }
+
+              json buildings
             end
           end
 
@@ -32,34 +53,12 @@ module Sinatra
 
             # get list of all buildings with names and numbers
             get '/buildings' do
-              json buildings_collection.find({},{fields: {:_id => 0}}).map { |e| e }
+              json get_buildings(buildings_collection)
             end
 
             # get buildings by building_id or code
             get 'buildings/:building_id' do
-              building_ids = params[:building_id].upcase.split(",")
-              building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }
-
-              # find building ids or building codes
-              expr = {
-                '$or' => [
-                  { building_id: { '$in' => building_ids} },
-                  { code: { '$in' => building_ids} },
-                ]
-              }
-              buildings = buildings_collection.find(expr, { fields: {:_id => 0} }).to_a
-
-              # throw 404 if empty
-              if buildings == []
-                halt 404, {
-                  error_code: 404,
-                  message: "Building number #{params[:building_id]} isn't in our database, and probably doesn't exist.",
-                  available_buildings: "https://api.umd.io/map/buildings",
-                  docs: "https://umd.io/map"
-                }.to_json
-              end
-
-              json buildings
+              json get_buildings_by_id(buildings_collection, params[:building_id])
             end
           end
         end
