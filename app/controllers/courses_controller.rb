@@ -5,7 +5,7 @@ module Sinatra
       module Courses
         def self.registered(app)
           app.before '/v0/courses*' do
-            @special_params = ['sort', 'semester', 'expand', 'per_page', 'page']
+            @special_params = ['sort', 'semester', 'expand', 'per_page', 'page', :semester]
 
             # TODO: It's unclear if this is actually doing anything.
             params[:semester] ||= current_semester
@@ -109,7 +109,7 @@ module Sinatra
           end
 
           app.get '/v0/courses/list' do
-            semester = params['semester'] || current_semester
+            semester = params[:semester] || current_semester
             json (find_courses_in_sem @db, semester)
           end
 
@@ -183,7 +183,7 @@ module Sinatra
             params[:semester] ||= current_semester
 
             # get parse the search and sort
-            sorting = params_sorting_array
+            sorting = params_sorting_array 'course_id'
             query = params_search_query @db, @special_params
             offset = (@page - 1)*@limit
             limit = @limit
