@@ -24,7 +24,7 @@ module Sinatra
             get '/buildings' do
               buildings = get_buildings(buildings_collection)
               buildings.map{|e|
-                e['lon'] = e.delete('lng')
+                e['long'] = e.delete('lng')
               }
 
               json buildings
