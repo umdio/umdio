@@ -1,3 +1,5 @@
+require_relative '../models/building.rb'
+
 module Sinatra
   module UMDIO
     module Routing
@@ -6,7 +8,7 @@ module Sinatra
         def self.registered(app)
           app.register Sinatra::Namespace
 
-          buildings_collection = app.settings.map_db.collection('buildings')
+          buildings_t = buildings_table(app.settings.DB)
           bad_id_message = "Check the building id in the url."
 
           app.namespace '/v1/map' do
@@ -22,22 +24,12 @@ module Sinatra
 
             # get list of all buildings with names and numbers
             get '/buildings' do
-              buildings = get_buildings(buildings_collection)
-              buildings.map{|e|
-                e['long'] = e.delete('lng')
-              }
-
-              json buildings
+              json get_buildings(buildings_t)
             end
 
             # get buildings by building_id or code
             get '/buildings/:building_id' do
-              buildings = get_buildings_by_id(buildings_collection, params[:building_id])
-              buildings.map{|e|
-                e['lon'] = e.delete('lng')
-              }
-
-              json buildings
+              json get_buildings_by_id(buildings_t, params[:building_id])
             end
           end
 
@@ -53,12 +45,24 @@ module Sinatra
 
             # get list of all buildings with names and numbers
             get '/buildings' do
-              json get_buildings(buildings_collection)
+              buildings = get_buildings(buildings_t)
+              buildings.map{|e|
+                e[:lng] = e.delete(:long)
+                e[:lng] = e[:lng].to_s
+                e[:lat] = e[:lat].to_s
+              }
+              json buildings
             end
 
             # get buildings by building_id or code
             get 'buildings/:building_id' do
-              json get_buildings_by_id(buildings_collection, params[:building_id])
+              buildings = get_buildings_by_id(buildings_t, params[:building_id])
+              buildings.map{|e|
+                e[:lng] = e.delete(:long)
+                e[:lng] = e[:lng].to_s
+                e[:lat] = e[:lat].to_s
+              }
+              json buildings
             end
           end
         end

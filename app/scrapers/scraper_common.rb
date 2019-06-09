@@ -1,6 +1,10 @@
 require 'logger'
+require 'sequel'
 
 module ScraperCommon
+    # TODO: Load config from memory
+    DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
+
     def logger
         @logger = Logger.new(STDOUT)
         @logger.level = Logger::INFO
@@ -11,6 +15,7 @@ module ScraperCommon
         @logger
     end
 
+    #TODO: Deprecated. Use sequel instead
     def database(table)
         host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
         port = ENV['MONGO_RUBY_DRIVER_PORT'] || Mongo::DEFAULT_PORT
@@ -19,6 +24,7 @@ module ScraperCommon
         db = Mongo::MongoClient.new(host, port, pool_size: 2, pool_timeout: 2).db(table)
     end
 
+    #TODO: Deprecated. Use sequel instead
     def postgres
         db = PG.connect(
             dbname: 'umdio',
