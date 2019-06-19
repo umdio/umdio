@@ -1,0 +1,117 @@
+openapi: 3.0.1
+info:
+  title: umd.io
+  description: >-
+    Welcome to umd.io, the open-source API for University of Maryland data. If
+    you are building a University data-focused app, hack, or project, you’re in
+    the right place. This site will walk you through basic API use and document
+    all supported API calls.
+
+
+    Read more about the motivation and vision for the project in the blog post.
+
+
+    umd.io is a GETful API. It follows RESTful conventions, but for now, you can
+    only get data – you can’t create, update, or destroy.
+
+
+    The API is in version 0. We are adding, changing, and breaking things all
+    the time. Contact the team or (preferably) create an issue on github if
+    something isn’t working the way you think it should.
+
+
+    We are actively looking for contributors! Tweet, email, or otherwise get in
+    touch with us.
+  contact:
+    email: hi@umd.io
+  license:
+    name: MIT
+    url: 'https://github.com/umdio/umdio/LICENSE'
+  version: 1.0.0
+externalDocs:
+  description: Github
+  url: 'https://github.com/umdio/umdio'
+servers:
+  - url: 'https://api.umd.io/v1'
+tags:
+- name: map
+  description: Building data
+paths:
+  /map:
+    get:
+      tags:
+        - map
+      summary: List buildings
+      description: Get a list of the available buildings.
+      operationId: findBuildings
+      responses:
+        '200':
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Building'
+  /map/{building_id}:
+    get:
+      tags:
+        - map
+      summary: Get buildings
+      description: >-
+        Get location data about one or more buildings. Comma separated building
+        numbers are the parameters.
+      operationId: findBuildingById
+      parameters:
+        - in: path
+          name: building_id
+          required: true
+          schema:
+            oneOf:
+              - type: string
+              - type: array
+                items:
+                  type: string
+            example: 226
+          description: Numeric building ID
+          explode: true
+      responses:
+        '200':
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/Building'
+                  - type: array
+                    items:
+                      $ref: '#/components/schemas/Building'
+        '404':
+          description: Invalid building code
+          content: {}
+components:
+  schemas:
+    Building:
+      type: object
+      description: Represents a building on campus.
+      properties:
+        name:
+          type: string
+          description: Name of the building
+          example: Edward St. John Learning and Teaching Center
+        code:
+          type: string
+          description: Shortened building code. Not all buildings have these.
+          example: ESJ
+        number:
+          type: integer
+          description: Unique building number
+          example: 226
+        long:
+          type: number
+          description: Longitude
+          example: '-76.941914'
+        lat:
+          type: number
+          description: Latitude
+          example: '38.986699'
