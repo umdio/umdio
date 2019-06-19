@@ -55,7 +55,7 @@ module Sinatra
             end
 
             # get buildings by building_id or code
-            get 'buildings/:building_id' do
+            get '/buildings/:building_id' do
               buildings = get_buildings_by_id(buildings_t, params[:building_id])
               buildings.map{|e|
                 e[:lng] = e.delete(:long)

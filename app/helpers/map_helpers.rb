@@ -16,7 +16,7 @@ module Sinatra
         building_ids = id.upcase.split(",")
         building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }
 
-        buildings = db.where(id: building_ids).or(code: building_ids)
+        buildings = db.where(id: building_ids).or(code: building_ids).to_a
 
         # throw 404 if empty
         if buildings == []
