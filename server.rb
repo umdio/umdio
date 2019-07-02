@@ -8,9 +8,14 @@ require 'sinatra/base'
 require 'sinatra/reloader'
 require 'sinatra/param'
 require 'sinatra/namespace'
-require 'mongo'
 require 'json'
+# TODO: Deprecated
+require 'mongo'
+
+# TODO: Deprecated?
 require 'pg'
+
+require 'sequel'
 
 include Mongo
 
@@ -18,12 +23,17 @@ class UMDIO < Sinatra::Base
   # Explicitly set this as the root file
   set :root, File.dirname(__FILE__)
 
+  # TODO: Load config from memory
+  DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
+
   configure do
+    # TODO: Deprecated. Use sequel instead.
     # set up mongo database - code from ruby mongo driver tutorial
     host = ENV['MONGO_RUBY_DRIVER_HOST'] || 'localhost'
     port = ENV['MONGO_RUBY_DRIVER_PORT'] || MongoClient::DEFAULT_PORT
     puts "Connecting to mongo on #{host}:#{port}"
 
+    # TODO: Deprecated. Use sequel instead.
     db = PG.connect(
       dbname: 'umdio',
       host: 'postgres',
@@ -38,9 +48,9 @@ class UMDIO < Sinatra::Base
 
     # we might need other databases for other endpoints, but for now this is fine, with multiple collections
     set :buses_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdbus')
-    set :map_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmap')
     set :majors_db, MongoClient.new(host,port, pool_size: 20, pool_timeout: 5).db('umdmajors')
     set :postgres, db
+    set :DB, DB
   end
 
   # before application/request starts

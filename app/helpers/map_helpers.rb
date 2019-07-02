@@ -4,22 +4,19 @@ module Sinatra
   module UMDIO
     module Helpers
       def get_buildings db
-        db.find({},{fields: {:_id => 0}}).map { |e| e }
+        buildings = db.all
+        buildings.each do |e|
+          e.delete(:pid)
+        end
+
+        buildings
       end
 
       def get_buildings_by_id db, id
         building_ids = id.upcase.split(",")
         building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }
 
-        # find building ids or building codes
-        expr = {
-          '$or' => [
-            { building_id: { '$in' => building_ids} },
-            { code: { '$in' => building_ids} },
-          ]
-        }
-
-        buildings = db.find(expr, { fields: {:_id => 0} }).to_a
+        buildings = db.where(id: building_ids).or(code: building_ids).to_a
 
         # throw 404 if empty
         if buildings == []
@@ -29,6 +26,10 @@ module Sinatra
             available_buildings: "https://api.umd.io/map/buildings",
             docs: "https://umd.io/map"
           }.to_json
+        end
+
+        buildings.each do |e|
+          e.delete(:pid)
         end
 
         buildings
