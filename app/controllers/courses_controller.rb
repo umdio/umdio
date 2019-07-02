@@ -84,11 +84,12 @@ module Sinatra
 
             query.chomp! "AND "
 
-            res = @db.exec("SELECT * FROM sections WHERE #{query} LIMIT #{limit} OFFSET #{offset}")
+            semester = params[:semester] || current_semester
+            res = @db.exec("SELECT * FROM sections WHERE semester=#{semester} AND #{query} LIMIT #{limit} OFFSET #{offset}")
             sections = []
 
             res.each do |row|
-              sections << (clean_section @db, (params[:semester] || current_semester), row)
+              sections << (clean_section @db, semester, row)
             end
 
             end_paginate! sections
