@@ -48,6 +48,12 @@ module Sinatra
             json resp
           end
 
+          app.get '/v1/spec.yaml' do
+            response.headers['Access-Control-Allow-Origin'] = '*'
+            response.headers['Access-Control-Allow-Methods'] = 'GET, HEAD'
+            File.read('openapi.yaml')
+          end
+
           app.get '/*' do
             resp = {
               error_code: 404,

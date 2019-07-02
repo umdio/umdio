@@ -18,6 +18,12 @@ services:
       - ./data/postgres:/var/lib/postgresql/data
     ports:
       - 5433:5433
+  redoc:
+    image: redocly/redoc
+    environment:
+      - SPEC_URL=http://localhost:3000/v1/spec.yaml
+    ports:
+      - 8080:80
   umdio:
     build: .
     links:
