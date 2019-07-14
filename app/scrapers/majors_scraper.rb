@@ -3,15 +3,13 @@ require 'nokogiri'
 require 'mongo'
 
 require_relative 'scraper_common.rb'
+require_relative '../models/majors.rb'
 include ScraperCommon
 
 prog_name = "majors_scraper"
 
 logger = ScraperCommon::logger
-db = ScraperCommon::database 'umdmajors'
-majors_coll = db.collection('majors')
-
-majors_coll.remove()
+majors_db = majors_table(DB)
 
 url = "https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically"
 page = Nokogiri::HTML(open(url))
@@ -37,6 +35,6 @@ majors.each do |major|
   logger.info(prog_name) { "inserting #{major[:name]}"}
 
   major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
-  majors_coll.update({ major_id: major[:major_id] }, { "$set" => major }, { upsert: true })
+  majors_db.insert(:major_id => major[:major_id], :name => major[:name], :college => major[:college], :url => major[:url])
 end
 logger.info(prog_name) {"Inserted #{majors.length} majors"}
