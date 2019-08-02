@@ -109,7 +109,7 @@ task :server => :up
 
 desc "Start the web server for prod"
 task :prod do
-  system "rackup -p 3000 -o 0.0.0.0"
+  system "puma -p 3000"
 end
 
 desc "Sinatra console"

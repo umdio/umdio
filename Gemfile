@@ -31,3 +31,5 @@ end
 gem "pg", "~> 1.1"
 
 gem "sequel", "~> 5.21"
+
+gem "puma", "~> 4.0"
