@@ -4,7 +4,6 @@
 
 require 'open-uri'
 require 'net/http'
-require 'mongo'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
