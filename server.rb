@@ -24,7 +24,7 @@ class UMDIO < Sinatra::Base
   set :root, File.dirname(__FILE__)
 
   # TODO: Load config from memory
-  DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
+  $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
 
   configure do
     # TODO: Deprecated. Use sequel instead.
@@ -68,6 +68,7 @@ class UMDIO < Sinatra::Base
   # load in app helpers & controllers
   Dir["./app/helpers/*.rb"].each { |file| require file }
   Dir["./app/controllers/*.rb"].each { |file| require file }
+  Dir["./app/models/*.rb"].each { |file| require file }
   require './root.rb'
 
   # register the helpers
