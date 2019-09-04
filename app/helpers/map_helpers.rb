@@ -3,20 +3,11 @@
 module Sinatra
   module UMDIO
     module Helpers
-      def get_buildings db
-        buildings = db.all
-        buildings.each do |e|
-          e.delete(:pid)
-        end
-
-        buildings
-      end
-
-      def get_buildings_by_id db, id
+      def get_buildings_by_id id
         building_ids = id.upcase.split(",")
         building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }
 
-        buildings = db.where(id: building_ids).or(code: building_ids).to_a
+        buildings = Building.where(id: building_ids).or(code: building_ids).to_a
 
         # throw 404 if empty
         if buildings == []
@@ -26,10 +17,6 @@ module Sinatra
             available_buildings: "https://api.umd.io/map/buildings",
             docs: "https://umd.io/map"
           }.to_json
-        end
-
-        buildings.each do |e|
-          e.delete(:pid)
         end
 
         buildings

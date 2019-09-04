@@ -8,7 +8,6 @@ module Sinatra
         def self.registered(app)
           app.register Sinatra::Namespace
 
-          buildings_t = buildings_table(app.settings.DB)
           bad_id_message = "Check the building id in the url."
 
           app.namespace '/v1/map' do
@@ -24,12 +23,12 @@ module Sinatra
 
             # get list of all buildings with names and numbers
             get '/buildings' do
-              json get_buildings(buildings_t)
+              json Building.all.map {|b| b.to_v1}
             end
 
             # get buildings by building_id or code
             get '/buildings/:building_id' do
-              json get_buildings_by_id(buildings_t, params[:building_id])
+              json get_buildings_by_id(params[:building_id]).map {|b| b.to_v1}
             end
           end
 
@@ -45,24 +44,13 @@ module Sinatra
 
             # get list of all buildings with names and numbers
             get '/buildings' do
-              buildings = get_buildings(buildings_t)
-              buildings.map{|e|
-                e[:lng] = e.delete(:long)
-                e[:lng] = e[:lng].to_s
-                e[:lat] = e[:lat].to_s
-              }
-              json buildings
+              json Building.all.map {|b| b.to_v0}
             end
 
             # get buildings by building_id or code
             get '/buildings/:building_id' do
-              buildings = get_buildings_by_id(buildings_t, params[:building_id])
-              buildings.map{|e|
-                e[:lng] = e.delete(:long)
-                e[:lng] = e[:lng].to_s
-                e[:lat] = e[:lat].to_s
-              }
-              json buildings
+              buildings = get_buildings_by_id(params[:building_id])
+              json buildings.map{|b| b.to_v0 }
             end
           end
         end

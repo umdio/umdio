@@ -3,7 +3,7 @@ require 'sequel'
 
 module ScraperCommon
     # TODO: Load config from memory
-    DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
+    $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
 
     def logger
         @logger = Logger.new(STDOUT)
