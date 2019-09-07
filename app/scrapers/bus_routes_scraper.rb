@@ -1,7 +1,6 @@
 # script for getting route info from nextbus api, dumping into Mongo database.
 # run  every ~month
 
-require 'mongo'
 require 'net/http'
 require 'json'
 require 'set'

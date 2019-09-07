@@ -1,7 +1,8 @@
-$DB.drop_table? :routes
+# TODO: None of this is actually "relational". Really, all we've done here is define a schema.
+
 $DB.create_table? :routes do
     primary_key :pid
-    String :route_id
+    String :route_id, {unique: true}
     String :title
     Float :lat_max
     Float :lat_min
@@ -12,16 +13,38 @@ $DB.create_table? :routes do
     column :paths, :jsonb
 end
 
-$DB.drop_table? :stops
 $DB.create_table? :stops do
     primary_key :pid
-    String :stop_id
+    String :stop_id, {unique: true}
     String :title
     Float :long
     Float :lat
 end
 
+$DB.create_table? :schedules do
+    String :route
+    String :days
+    String :direction
+    String :schedule_class
+    column :stops, :jsonb
+    column :trips, :jsonb
+end
+
 class Route < Sequel::Model
+    def to_v0
+        {
+            route_id: route_id,
+            title: title,
+            lat_max: lat_max.to_s,
+            lat_min: lat_min.to_s,
+            lon_max: long_max.to_s,
+            lon_min: long_min.to_s,
+            stops: stops,
+            directions: directions,
+            paths: paths
+        }
+    end
+
     def to_v0_info
         {
             route_id: route_id,
@@ -31,5 +54,31 @@ class Route < Sequel::Model
 end
 
 class Stop < Sequel::Model
+    def to_v0_info
+        {
+            stop_id: stop_id,
+            title: titile
+        }
+    end
 
+    def to_v0
+        {
+            stop_id: stop_id,
+            title: title,
+            lat: lat.to_s,
+            lon: long.to_s
+        }
+    end
+end
+
+class Schedule < Sequel::Model
+    def to_v0
+        {
+            route: route,
+            days: days,
+            direction: direction,
+            stops: stops,
+            trips: trips
+        }
+    end
 end

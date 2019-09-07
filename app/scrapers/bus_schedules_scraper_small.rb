@@ -2,23 +2,19 @@
 # gets schedule information for bus routes
 # run every ~month
 
-require 'mongo'
 require 'net/http'
 require 'json'
 include JSON
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+require_relative '../models/bus.rb'
+
 prog_name = "bus_schedules_scraper"
 
 logger = ScraperCommon::logger
-db = ScraperCommon::database 'umdbus'
 
-# set up routes and schedules collections
-routes_coll = db.collection('routes')
-schedule_coll = db.collection('schedules')
-
-routes = routes_coll.find({},{fields:{_id:0,route_id:1}}).map{|e| e['route_id']}.flatten
+routes = Route.all.map {|r| r.route_id}
 address = "http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule"
 routes.each do |route|
   begin
@@ -60,13 +56,13 @@ routes.each do |route|
       trips << stop_times
     end
     logger.info(prog_name) {"updating the #{days} schedule for route #{route} in the #{direction} direction"}
-      schedule_coll.update({route: route, days: days, direction: direction}, {'$set' => {
-        route: route,
-        days: days,
-        direction: direction,
-        schedule_class: schedule_class,
-        stops: stops,
-        trips: trips
-      }}, {upsert: true})
+    Schedule.insert(
+      :route => route,
+      :days => days,
+      :direction => direction,
+      :schedule_class => schedule_class,
+      :stops => Sequel.pg_jsonb_wrap(stops),
+      :trips => Sequel.pg_jsonb_wrap(trips)
+    )
   end
 end
