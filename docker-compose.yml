@@ -1,15 +1,5 @@
 version: '2.0'
 services:
-  mongodb:
-    image: mongo:3.2.17
-    command: mongod --port 27017
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    volumes:
-      - ./data/db:/data/db
-    ports:
-      - 27017:27017
   postgres:
     image: postgres
     environment:
@@ -27,11 +17,7 @@ services:
   umdio:
     build: .
     links:
-      - mongodb
       - postgres
-    environment:
-      - MONGO_RUBY_DRIVER_HOST=mongodb
-      - MONGO_RUBY_DRIVER_PORT=27017
     volumes:
       - ./:/umdio
     ports:

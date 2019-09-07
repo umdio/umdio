@@ -2,17 +2,14 @@ module Sinatra
   module UMDIO
     module Helpers
 
-      def is_route_id?(coll, route)
-        routes = coll.find({},{fields: {:_id => 0, :route_id => 1, :title => 1}}).to_a
-        route_ids = []
-        routes.each {|route|
-          route_ids.push(route['route_id'])
-        }
-        route_ids.include?(route)
+      def is_route_id? route_id
+        route_ids = Route.all.map {|r| r.route_id}
+        route_ids.include? route_id
       end
 
-      def is_stop_id? string
-        true # should actually so some validation
+      def is_stop_id? stop_id
+        stop_ids = Stop.all.map{|s| s.stop_id}
+        stop_ids.include? stop_id
       end
 
       def bad_url_error message

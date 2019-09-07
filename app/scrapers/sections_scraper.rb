@@ -2,7 +2,6 @@
 
 require 'open-uri'
 require 'nokogiri'
-require 'mongo'
 require 'pg'
 
 require_relative '../helpers/courses_helpers.rb'

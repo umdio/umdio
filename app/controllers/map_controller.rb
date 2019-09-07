@@ -1,5 +1,3 @@
-require_relative '../models/building.rb'
-
 module Sinatra
   module UMDIO
     module Routing

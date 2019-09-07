@@ -1,7 +1,6 @@
 # script for getting route info from nextbus api, dumping into Mongo database.
 # run  every ~month
 
-require 'mongo'
 require 'net/http'
 require 'json'
 require 'set'
@@ -10,19 +9,11 @@ include JSON
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+require_relative '../models/bus.rb'
+
 prog_name = "bus_routes_scraper"
 
 logger = ScraperCommon::logger
-db = ScraperCommon::database 'umdbus'
-
-# set up and clean the database collections
-routes_coll = db.collection('routes')
-stops_coll = db.collection('stops')
-
-if ARGV[0] == "rebuild"
-  routes_coll.remove()
-  stops_coll.remove()
-end
 
 apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
 address = apiRoot + '&command=routeList&t=0'
@@ -43,19 +34,7 @@ unless route_array.nil?
     unless route_response.nil?
       route_response["stop"].each do |stop|
         logger.info(prog_name) {"inserting #{stop["title"]}"}
-        stops_coll.update({stop_id: stop["stop_id"]},{
-          "$set" =>
-            {
-              stop_id: stop["tag"],
-              title: stop["title"],
-              lon: stop["lon"],
-              lat: stop["lat"]
-            },
-          "$addToSet" =>
-            {
-              routes: route[:route_id]
-            }
-        }, {upsert: true}) # update or insert stops to mongo
+        $DB[:stops].insert_ignore.insert(:stop_id => stop["tag"], :title => stop["title"], :long => stop["lon"], :lat => stop["lat"])
         stops << stop["tag"]
       end
 
@@ -69,18 +48,17 @@ unless route_array.nil?
         }
       end
 
-      routes_coll.update({route_id: route["route_id"]}, # match the route, if it exists
-      { "$set" => {
-        route_id: route[:route_id],
-        title: route[:title],
-        stops: stops,
-        directions: directions,
-        paths:  paths,
-        lat_max: route_response["latMax"],
-        lat_min: route_response["latMin"],
-        lon_max: route_response["lonMax"],
-        lon_min: route_response["lonMin"],
-      }}, {upsert: true}) # update or insert route
+      $DB[:routes].insert_ignore.insert(
+        :route_id => route[:route_id],
+        :title => route[:title],
+        :lat_max => route_response["latMax"],
+        :lat_min => route_response["latMin"],
+        :long_max => route_response["lonMax"],
+        :long_min => route_response["lonMin"],
+        :stops => Sequel.pg_jsonb_wrap(stops),
+        :directions => Sequel.pg_jsonb_wrap(directions),
+        :paths => Sequel.pg_jsonb_wrap(paths)
+      )
     end
   end
 end

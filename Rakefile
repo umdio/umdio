@@ -2,41 +2,6 @@ require 'rspec/core/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
-###### Database
-namespace :db do
-  desc "Build Database"
-  task :up => ['db:down'] do
-    sh 'mkdir -p ./data/mongo'
-    sh 'mongod --dbpath ./data/db --fork --logpath ./data/mongo/mongodb.log'
-  end
-
-  desc "Shutdown mongo database server"
-  task :down do
-    mongo_pid = `pgrep mongod`
-    if (!mongo_pid.empty?) then
-      puts "DANGER: killing mongod instances: #{mongo_pid}."
-      mongo_pid.split("\n").each{|pid| `sudo kill 15 #{pid.to_i}`}
-    else
-      puts 'No mongod processes found -- free to go ahead'
-    end
-  end
-
-  # TODO: Clean postgres too
-  desc "Cleans databases (by deleting all the data)"
-  task :clean do
-    puts "DANGER: will remove everything in the database, including logs."
-    puts "Continue? [y/N]"
-    prompt = STDIN.gets.chomp
-    if prompt == 'y'
-      `rm -r ./data/db`
-      `mkdir ./data/db`
-      puts "Database successfully deleted."
-    else
-      puts "Deletion aborted"
-    end
-  end
-end
-
 ###### Scraping
 desc "Scrape to fill databases (takes ~20 minutes)"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
