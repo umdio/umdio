@@ -52,7 +52,7 @@ module Sinatra
             # address = apiRoot + "&command=schedule"
             # Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
             #json schedules_collection.find({route: route_id},{fields:{_id:0,schedule_class:0}}).to_a
-            json Schedule.where(route_id: route_id).map{|r| r.to_v0}
+            json Schedule.where(route: route_id).map{|r| r.to_v0}
           end
 
           # next arriving buses for a particular stop on the route (in nextbus, the predictions)

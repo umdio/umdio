@@ -40,7 +40,6 @@ class UMDIO < Sinatra::Base
 
     # TODO: Elimiate these top two, and only go through Sequel
     set :postgres, db
-    set :DB, DB
   end
 
   # before application/request starts
