@@ -1,5 +1,3 @@
-require_relative '../models/majors.rb'
-
 module Sinatra
   module UMDIO
     module Routing
