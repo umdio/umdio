@@ -25,6 +25,7 @@ class UMDIO < Sinatra::Base
 
   # TODO: Load config from memory
   $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
+  $DB.extension :pg_array, :pg_json
 
   configure do
     # TODO: Deprecated. Use sequel instead.

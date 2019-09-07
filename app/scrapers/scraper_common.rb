@@ -4,6 +4,7 @@ require 'sequel'
 module ScraperCommon
     # TODO: Load config from memory
     $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
+    $DB.extension :pg_array, :pg_json
 
     def logger
         @logger = Logger.new(STDOUT)
