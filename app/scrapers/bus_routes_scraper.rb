@@ -34,7 +34,7 @@ unless route_array.nil?
     unless route_response.nil?
       route_response["stop"].each do |stop|
         logger.info(prog_name) {"inserting #{stop["title"]}"}
-        $DB[:routes].insert_ignore.insert(:stop_id => stop["tag"], :title => stop["title"], :long => stop["lon"], :lat => stop["lat"])
+        $DB[:stops].insert_ignore.insert(:stop_id => stop["tag"], :title => stop["title"], :long => stop["lon"], :lat => stop["lat"])
         stops << stop["tag"]
       end
 
