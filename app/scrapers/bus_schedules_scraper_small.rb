@@ -56,7 +56,7 @@ routes.each do |route|
       trips << stop_times
     end
     logger.info(prog_name) {"updating the #{days} schedule for route #{route} in the #{direction} direction"}
-    Schedule.insert(
+    $DB[:schedules].insert_ignore.insert(
       :route => route,
       :days => days,
       :direction => direction,

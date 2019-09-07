@@ -48,7 +48,7 @@ unless route_array.nil?
         }
       end
 
-      Route.insert(
+      $DB[:routes].insert_ignore.insert(
         :route_id => route[:route_id],
         :title => route[:title],
         :lat_max => route_response["latMax"],

@@ -18,6 +18,6 @@ url="https://gist.githubusercontent.com/McIntireEvan/34f7875ad0e302cbba8615f6046
 
 array = eval open(url).read
 array.each do |e|
-  Building.insert(:name => e[:name], :code => e[:code], :id => e[:number].upcase, :long => e[:lng], :lat => e[:lat])
+  $DB[:buildings].insert_ignore.insert(:name => e[:name], :code => e[:code], :id => e[:number].upcase, :long => e[:lng], :lat => e[:lat])
   logger.info(prog_name) {"inserted #{e[:name]}"}
 end

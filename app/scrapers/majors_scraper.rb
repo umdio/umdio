@@ -34,6 +34,6 @@ majors.each do |major|
   logger.info(prog_name) { "inserting #{major[:name]}"}
 
   major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
-  Major.insert(:major_id => major[:major_id], :name => major[:name], :college => major[:college], :url => major[:url])
+  $DB[:majors].insert_ignore.insert(:major_id => major[:major_id], :name => major[:name], :college => major[:college], :url => major[:url])
 end
 logger.info(prog_name) {"Inserted #{majors.length} majors"}
