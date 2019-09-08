@@ -34,9 +34,9 @@ class UMDIO < Sinatra::Base
     puts "Connecting to postgres on 5432"
 
     # TODO: Replace this with Sequel
-    puts "Creating views"
-    sql = File.open(File.join(File.dirname(__FILE__), '/startup.sql'), 'rb') { |file| file.read }
-    db.exec(sql)
+    #puts "Creating views"
+    #sql = File.open(File.join(File.dirname(__FILE__), '/startup.sql'), 'rb') { |file| file.read }
+    #db.exec(sql)
 
     # TODO: Elimiate these top two, and only go through Sequel
     set :postgres, db
