@@ -21,7 +21,8 @@ class UMDIO < Sinatra::Base
 
   # TODO: Load config from memory
   $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
-  $DB.extension :pg_array, :pg_json
+  $DB.extension :pg_array, :pg_json, :pagination
+  Sequel.extension :pg_json_ops
 
   configure do
     # TODO: Deprecated. Use sequel instead.
@@ -32,11 +33,6 @@ class UMDIO < Sinatra::Base
       user: 'postgres'
     )
     puts "Connecting to postgres on 5432"
-
-    # TODO: Replace this with Sequel
-    #puts "Creating views"
-    #sql = File.open(File.join(File.dirname(__FILE__), '/startup.sql'), 'rb') { |file| file.read }
-    #db.exec(sql)
 
     # TODO: Elimiate these top two, and only go through Sequel
     set :postgres, db
