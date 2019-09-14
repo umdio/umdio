@@ -6,7 +6,9 @@ module Sinatra
         def self.registered(app)
           app.before '/v0/courses*' do
             @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
-            @section_params = []
+            @section_params = ['section_id', 'course_id', 'seats', 'semester']
+            @section_array_params = ['instructors']
+            @section_json_array_params = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
 
             if !request.params['semester'] or (request.params['semester'] == '')
               request.update_param('semester', current_semester)
@@ -44,7 +46,18 @@ module Sinatra
           app.get '/v0/courses/sections' do
             begin_paginate! $DB[:sections]
 
-            meeting_properties = ['days', 'start_time', 'end_time', 'building', 'room', 'classtype']
+            sorting = parse_sorting_params 'section_id'
+            std_params = parse_query_v0 @section_params, @section_array_params, ['meetings.days']
+            res =
+              Section
+                .where{Sequel.&(*std_params)}
+                .order(*sorting)
+                .limit(@limit)
+                .offset((@page - 1)*@limit)
+                .map{|c| c.to_v0}
+
+            return json [res]
+            meeting_properties = []
 
             request.params.keys.each do |key|
               nkey, delim, value, split = parse_param key, request.params[key]
@@ -134,7 +147,7 @@ module Sinatra
           # TODO: sort??
           # Returns section objects of a given course
           app.get '/v0/courses/:course_id/sections' do
-            course_id = request.params[:course_id].upcase
+            course_id = params[:course_id].upcase
             res = find_sections_for_course request.params['semester'], course_id, true
 
             if res.empty?

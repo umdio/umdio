@@ -82,9 +82,6 @@ module UMDIO
       request.params.keys.each do |key|
         value = request.params[key]
         key = key.to_s
-        if key.include? "meeting."
-          key = (key.split '.')[1]
-        end
 
         if key.include? ('<') or key.include? ('>')
           delim = (key.include? ('<')) ? '<' : '>'
@@ -113,11 +110,11 @@ module UMDIO
     end
 
     # Uses a whitelist of request.params to parse
-    def parse_query_v0 valid_params, valid_array_params=[]
+    def parse_query_v0 valid_params, valid_array_params=[], valid_json_array_params=[]
       conds = []
 
       std_params = standardize_params
-      std_params.keys.each do |key| if (valid_params.include? key) or (valid_array_params.include? key)
+      std_params.keys.each do |key| if (valid_params.include? key) or (valid_array_params.include? key) or (valid_json_array_params.include? key)
         value = std_params[key][0]
         delim = std_params[key][1]
 
@@ -129,6 +126,11 @@ module UMDIO
           else
             conds << j.contain_all(value.split('|'))
           end
+        elsif valid_json_array_params.include? key
+          key_parts = key.split('.')
+          nkey = key_parts[1]
+
+          conds << {section_key: $DB[key_parts[0].to_sym].where(Sequel.lit("#{key} #{delim} ?", value)).map{|m| m[:section_key]}}
         else
           if delim.include? '!'
             conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))

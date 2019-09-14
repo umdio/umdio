@@ -3,7 +3,6 @@
 
 require 'open-uri'
 require 'nokogiri'
-require 'pg'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon

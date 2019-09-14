@@ -110,17 +110,30 @@ semesters.each do |semester|
 
   # Now, insert all our stuff to the db
   sections.each do |section|
-    $DB[:sections].insert_ignore.insert(
+    section_key = $DB[:sections].insert_ignore.insert(
       :section_id => section[:section_id],
       :course_id => section[:course_id],
       :semester => section[:semester],
       :number => section[:number],
       :seats => section[:seats],
-      :meetings => section[:meetings].to_json,
       :open_seats => section[:open_seats],
       :waitlist => section[:waitlist],
       :instructors => Sequel.pg_jsonb_wrap(section[:instructors])
     )
+
+    section[:meetings].each do |meeting|
+      $DB[:meetings].insert_ignore.insert(
+        :section_key => section_key,
+        :days => meeting[:days],
+        :room => meeting[:room],
+        :building => meeting[:building],
+        :classtype => meeting[:classtype],
+        :start_time => meeting[:start_time],
+        :end_time => meeting[:end_time],
+        :start_seconds => meeting[:start_seconds],
+        :end_seconds => meeting[:end_seconds]
+      )
+    end
 
   section[:instructors].each do |prof|
     profs = Professor.where(name: prof).map{|p| p.to_v0}

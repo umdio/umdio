@@ -14,9 +14,8 @@ $DB.create_table? :courses do
     unique [:course_id, :semester]
 end
 
-
 $DB.create_table? :sections do
-    primary_key :pid
+    primary_key :section_key
     String :section_id
     String :course_id
     Integer :semester
@@ -27,6 +26,19 @@ $DB.create_table? :sections do
     String :waitlist
     column :instructors, :jsonb
     unique [:section_id, :course_id, :semester]
+end
+
+$DB.create_table? :meetings do
+    primary_key :meeting_key
+    foreign_key :section_key
+    String :days
+    String :room
+    String :building
+    String :classtype
+    String :start_time
+    String :end_time
+    Integer :start_seconds
+    Integer :end_seconds
 end
 
 $DB.create_table? :professors do
@@ -63,7 +75,22 @@ class Course < Sequel::Model
     end
 end
 
+class Meeting < Sequel::Model
+    def to_v0
+        {
+            days: days,
+            room: room,
+            building: building,
+            classtype: classtype,
+            start_time: start_time,
+            end_time: end_time
+        }
+    end
+end
+
 class Section < Sequel::Model
+    one_to_many :meetings, key: :section_key
+
     def to_v0
         {
             course_id: course_id,
@@ -71,7 +98,7 @@ class Section < Sequel::Model
             semester: semester.to_s,
             number: number,
             seats: seats,
-            meetings: meetings,
+            meetings: meetings.map {|m| m.to_v0},
             open_seats: open_seats,
             waitlist: waitlist,
             instructors: instructors

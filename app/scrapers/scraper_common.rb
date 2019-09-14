@@ -16,22 +16,6 @@ module ScraperCommon
         @logger
     end
 
-    #TODO: Deprecated. Use sequel instead
-    def postgres
-        db = PG.connect(
-            dbname: 'umdio',
-            host: 'postgres',
-            port: '5432',
-            user: 'postgres'
-        )
-
-        # Setup generic tables
-        sql = File.open(File.join(File.dirname(__FILE__), '/sql/courses.sql'), 'rb') { |file| file.read }
-        db.exec(sql)
-
-        return db
-    end
-
     # Takes in a list of years and semesters. It maps years to 4 semesters, and semesters to themselves
     # 2018 -> 201801, 201805, 201808, 201812
     # 201901 -> 201901
