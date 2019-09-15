@@ -18,9 +18,7 @@ module Sinatra
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections semester, section_ids
         # Turn section_ids into string
-        sections = (section_ids.map {|e| "'#{e}'"}).join ','
-
-        res = Section.where(semester: semester, section_id: section_ids).map
+        res = Section.where(semester: semester, section_id: section_ids).map{|s| s.to_v0}
 
         if !res
           halt 404, {
@@ -31,7 +29,7 @@ module Sinatra
           }.to_json
         end
 
-        return cleaned_rows
+        return res
       end
 
       def validate_section_ids section_ids, do_halt=true
@@ -64,7 +62,7 @@ module Sinatra
       end
 
       def find_courses_in_sem semester
-        Course.where(semster: semester).order(Sequel.asc(:course_id)).map{|c| c.to_v0_info}
+        Course.where(semester: 201908).order(Sequel.asc(:course_id)).map{|c| c.to_v0_info}
       end
 
       # gets a single course or an array or courses and halts if none are found
@@ -86,7 +84,7 @@ module Sinatra
           }.to_json
         end
 
-        courses.each{|c| c['sections'] = find_sections_for_course semester, c[:course_id], params[:expand]}
+        courses.each{|c| c['sections'] = find_sections_for_course semester, c[:course_id], params['expand']}
         courses
       end
 

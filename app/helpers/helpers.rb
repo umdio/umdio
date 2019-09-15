@@ -103,6 +103,10 @@ module UMDIO
         else
           halt 400, { error_code: 400, message: "Malformed parameters" }.to_json
         end
+
+        if value.is_a? String
+          value = value.squeeze(' ')
+        end
         std_params[key] = [value, delim]
       end
 

@@ -53,7 +53,7 @@ class Course < Sequel::Model
     def to_v0
         {
             course_id: course_id,
-            semester: semester,
+            semester: semester.to_s,
             name: name,
             dept_id: dept_id,
             department: department,
@@ -66,7 +66,7 @@ class Course < Sequel::Model
         }
     end
 
-    def t0_v0_info
+    def to_v0_info
         {
             course_id: course_id,
             dept_id: dept_id,

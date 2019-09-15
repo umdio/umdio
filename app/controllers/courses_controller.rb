@@ -17,14 +17,14 @@ module Sinatra
 
             # TODO: This could be more concise
             if request.params['expand']
-              request.params('expand', request.params['expand'].to_s.downcase == 'sections')
+              request.update_param('expand', request.params['expand'].to_s.downcase == 'sections')
             end
           end
 
           # Returns sections of courses by their id
           app.get '/v0/courses/sections/:section_id' do
             # separate into an array on commas, turn it into uppercase
-            section_ids = "#{request.params[:section_id]}".upcase.split(",")
+            section_ids = "#{params[:section_id]}".upcase.split(",")
 
             section_ids.each do |section_id|
               if not is_full_section_id? section_id
@@ -117,16 +117,16 @@ module Sinatra
           end
 
           app.get '/v0/courses/list' do
-            json (find_courses_in_sem semester)
+            json (find_courses_in_sem request.params[:semester])
           end
 
           # Returns section info about particular sections of a course, comma separated
           app.get '/v0/courses/:course_id/sections/:section_id' do
-            course_id = "#{request.params[:course_id]}".upcase
+            course_id = "#{params[:course_id]}".upcase
 
             validate_course_ids course_id
 
-            section_numbers = "#{request.params[:section_id]}".upcase.split(',')
+            section_numbers = "#{params[:section_id]}".upcase.split(',')
             # TODO: validate_section_ids
             section_numbers.each do |number|
               if not is_section_number? number
@@ -167,7 +167,7 @@ module Sinatra
           # MAYBE     if only a department is specified, acts as a shortcut to search with ?dept=<param>
           app.get '/v0/courses/:course_id' do
             # parse request.params
-            course_ids = "#{request.params[:course_id]}".upcase.split(',')
+            course_ids = "#{params[:course_id]}".upcase.split(',')
 
             courses = find_courses request.params['semester'], course_ids, request.params
 
@@ -200,6 +200,10 @@ module Sinatra
                 .map{|c| c.to_v0}
 
             end_paginate! res
+
+            res.each {|c|
+              c[:sections] = find_sections_for_course request.params['semester'], c[:course_id], request.params['expand']
+            }
 
             return json res
           end
