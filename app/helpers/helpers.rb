@@ -2,38 +2,37 @@
 module Sinatra
 module UMDIO
   module Helpers
-    # adds instance variables to start the pagitaion based on params['page'] and params['per_page']
+    # adds instance variables to start the pagitaion based on request.params['page'] and request.params['per_page']
     # the following instance variables are reserved: collection, limit, page, next_page, and prev_page
-    def begin_paginate! db, table, default_per_page=30, max_per_page=100
-      @db = db
-      @table = table
-      # clamp page and per_page params
-      params['page'] = (params['page'] || 1).to_i
-      params['page'] = 1 if params['page'] < 1
+    def begin_paginate! data, default_per_page=30, max_per_page=100
+      @data = data
+      # clamp page and per_page request.params
+      request.params['page'] = (request.params['page'] || 1).to_i
+      request.params['page'] = 1 if request.params['page'] < 1
 
-      params['per_page'] = (params['per_page'] || default_per_page).to_i
-      params['per_page'] = max_per_page if params['per_page'] > max_per_page
-      params['per_page'] = 1 if params['per_page'] < 1
+      request.params['per_page'] = (request.params['per_page'] || default_per_page).to_i
+      request.params['per_page'] = max_per_page if request.params['per_page'] > max_per_page
+      request.params['per_page'] = 1 if request.params['per_page'] < 1
 
-      @limit = params['per_page']
-      @page  = params['page']
+      @limit = request.params['per_page']
+      @page  = request.params['page']
 
       # create the next & prev page links
       path = request.fullpath.split('?')[0]
       base = base_url + path + '?'
 
       # next page
-      params['page'] += 1
-      @next_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
+      request.params['page'] += 1
+      @next_page = base + request.params.map{|k,v| "#{k}=#{v}"}.join('&')
 
-      @count = @db.exec("SELECT COUNT(*) FROM #{@table}").first.count
+      @count = @data.count
 
       # prev page
-      params['page'] -= 2
-      if (params['page']*@limit > @count)
-        params['page'] = (@count.to_f / @limit).ceil.to_i
+      request.params['page'] -= 2
+      if (request.params['page']*@limit > @count)
+        request.params['page'] = (@count.to_f / @limit).ceil.to_i
       end
-      @prev_page = base + params.map{|k,v| "#{k}=#{v}"}.join('&')
+      @prev_page = base + request.params.map{|k,v| "#{k}=#{v}"}.join('&')
     end
 
     # sets the response headers Link and X-Total-Count based on the results
@@ -51,141 +50,102 @@ module UMDIO
       headers['X-Total-Count'] = @count.to_s
     end
 
-    def params_sorting_array default=''
-      params['sort'] ||= default
+    def parse_sorting_params default=''
+      request.params['sort'] ||= default
 
-      if params['sort'] == ''
-        return "id ASC"
+      if request.params['sort'] == ''
+        return [Sequel.asc(:pid)]
       end
 
-      sort_query = ""
-      params['sort'].split(',').each do |sort|
-        # Figure out what order, and strip it from the field name
+      sorting = []
+      request.params['sort'].split(',').each do |sort|
         order_str = '+'
         if sort[0] == '+' or sort[0] == '-'
           order_str = sort[0]
           sort = sort[1..sort.length]
         end
 
-        # Turn that into a postgres ORDER BY clause
-        order = (order_str == '+' ? "ASC" : "DESC")
-        sort_query += "#{sort} #{order},"
+        if order_str == "+"
+          sorting << Sequel.asc(sort.to_sym)
+        else
+          sorting << Sequel.desc(sort.to_sym)
+        end
       end
 
-      return sort_query.chomp(',')
+      sorting
     end
 
-    def parse_param key, value, arr_params=[]
-      # For sections, we want to collapse `meeting.foo` into `foo`
-      if key.include? 'meeting.'
-        key = key.split('.')[1]
-      end
+    # Turn request.params into a reasonable format
+    def standardize_params
+      std_params = {}
 
-      # Next, we want to find a delimiter
-      delim = ''
-      split = ''
-      if key.include? ('<') or key.include? ('>')
-        delim = (key.include? ('<')) ? '<' : '>'
+      request.params.keys.each do |key|
+        value = request.params[key]
+        key = key.to_s
 
-        # Check for =
-        parts = key.split(delim)
-        if parts.length == 1
-          key = parts[0]
-          delim += '='
-        else
-          key = parts[0]
-          value = parts[1]
-        end
-
-      elsif key.include? ('!')
-        key = key.split('!')[0]
-
-        if value.include? (',') or value.include? ('|') or arr_params.include? key
-          split = value.include?(',') ? ',' : '|'
-          delim = value.include?(',') ? '&&' : '@>'
-        else
-          delim = '!='
-        end
-
-      elsif not value.nil?
-        if arr_params.include? key
-          # Just the plain equals case
-          l = value.split(',').length
-          # Array Search
-          if value.include? (',') or (arr_params.include? key and l == 1)
-            delim = '&&'
-            split = ','
-          elsif value.include? ('|')
-            delim = '@>'
-            split = '|'
-          end
-        else
-          delim = '='
-        end
-      else
-        # Error
-        # TODO: Make more descriptive
-        halt 400, { error_code: 400, message: "Invalid seach query" }.to_json
-      end
-
-      return key, delim, value, split
-    end
-
-    def params_search_query db, ignore=nil
-      # Sinatra adds this param in some cases, and we don't want it
-      # TODO: Is there a better way we can delete this?
-      params.delete(:captures) if params.key?(:captures)
-      # What params need to be represented as arrays
-      arr_params = ['gen_ed', 'grading_method', 'instructors', 'departments']
-
-      query = ''
-      # TODO: Error on =''
-      params.keys.each do |key| unless ignore.include?(key) or params[key] == ''
         if key.include? ('<') or key.include? ('>')
-          # Check which delim
           delim = (key.include? ('<')) ? '<' : '>'
 
           # Check for =
           parts = key.split(delim)
           if parts.length == 1
-            parts[1] = params[key]
+            key = parts[0]
             delim += '='
+          else
+            key = parts[0]
+            value = parts[1]
           end
-
-          # Build sql
-          query += db::escape_string(parts[0]) + delim +  "'" +db::escape_string(parts[1]) +  "'"
         elsif key.include? ('!')
-          # Delete !
-          parts = key.split('!')
+          key = key.split('!')[0]
+          delim = '!='
+        elsif not value.nil?
+          delim = '='
+        else
+          halt 400, { error_code: 400, message: "Malformed parameters" }.to_json
+        end
 
-          # Now look at the other side of the !=
-          if params[key].include? (',') or params[key].include? ('|') or arr_params.include? key
-            delim = params[key].include?(',') ? ',' : '|'
-            op = params[key].include?(',') ? '&&' : '@>'
+        if value.is_a? String
+          value = value.squeeze(' ')
+        end
+        std_params[key] = [value, delim]
+      end
 
-            # TODO: injection?
-            query += "NOT (" + db::escape_string(parts[0]) + op + "ARRAY[#{params[key].split(delim).join(',')}])"
+      std_params
+    end
+
+    # Uses a whitelist of request.params to parse
+    def parse_query_v0 valid_params, valid_array_params=[], valid_json_array_params=[]
+      conds = []
+
+      std_params = standardize_params
+      std_params.keys.each do |key| if (valid_params.include? key) or (valid_array_params.include? key) or (valid_json_array_params.include? key)
+        value = std_params[key][0]
+        delim = std_params[key][1]
+
+        if valid_array_params.include? key
+          j = Sequel.pg_jsonb_op(key.to_sym)
+
+          if value.include? ','
+            conds << j.contain_any(value.split(','))
           else
-            query += db::escape_string(parts[0]) + "!=" +  "'" + db::escape_string(params[key]) +  "'"
+            conds << j.contain_all(value.split('|'))
           end
-        elsif not params[key].nil?
-          l = params[key].split(',').length
-          # Array Search
-          if params[key].include? (',') or (arr_params.include? key and l == 1)
-            query += db::escape_string(key) + "&&" + "ARRAY['#{params[key].split(',').join("','")}']"
-          elsif params[key].include? ('|')
-            query += db::escape_string(key) + "@>" + "ARRAY['#{params[key].split('|').join("','")}']"
+        elsif valid_json_array_params.include? key
+          key_parts = key.split('.')
+          nkey = key_parts[1]
+
+          conds << {section_key: $DB[key_parts[0].to_sym].where(Sequel.lit("#{key} #{delim} ?", value)).map{|m| m[:section_key]}}
+        else
+          if delim.include? '!'
+            conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
           else
-            query += db::escape_string(key) + "=" + "'" + db::escape_string(params[key]) + "'"
+            conds << Sequel.lit("#{key} #{delim} ?", value)
           end
         end
-        query += " AND "
       end
-
-      end
-
-      return query.chomp("AND ")
     end
+    conds
   end
+end
 end
 end

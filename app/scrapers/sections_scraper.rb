@@ -2,13 +2,14 @@
 
 require 'open-uri'
 require 'nokogiri'
-require 'pg'
 
 require_relative '../helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
+
+require_relative '../models/courses.rb'
 
 # Parses a given section page
 # Returns [sections, professors]
@@ -76,7 +77,6 @@ end
 # Inital setup
 prog_name = "sections_scraper"
 logger = ScraperCommon::logger
-db = ScraperCommon::postgres
 
 semesters = ScraperCommon::get_semesters(ARGV)
 courses = []
@@ -89,46 +89,78 @@ semesters.each do |semester|
   logger.info(prog_name) {"Searching for sections in term #{semester}"}
 
   # Loop through all courses from that semester's courses table
-  db.exec("SELECT * FROM courses WHERE semester=#{semester}") do |result|
-    result.each do |row|
-      course_id = row.values_at('course_id')
-      courses << course_id
+  $DB[:courses].where(semester: semester).each do |row|
+    course_id = row[:course_id]
+    courses << course_id
 
-      # Every 200, parse a sections page, reset courses
-      if courses.length == 200
-        query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
-        res = parse_sections(query, semester)
-        courses = []
-        sections.concat(res)
-      end
+    # Every 200, parse a sections page, reset courses
+    if courses.length == 200
+      query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+      res = parse_sections(query, semester)
+      courses = []
+      sections.concat(res)
     end
+  end
 
     # parse the last entries
     query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
     res = parse_sections(query, semester)
     sections.concat(res)
     courses = []
-  end
 
   # Now, insert all our stuff to the db
   sections.each do |section|
-    res = db.exec_prepared("insert_section", [
-      section[:section_id],
-      section[:course_id],
-      section[:semester],
-      section[:number],
-      section[:seats],
-      section[:meetings].to_json,
-      section[:open_seats],
-      section[:waitlist],
-      PG::TextEncoder::Array.new.encode(section[:instructors]),
-    ])
+    section_key = $DB[:sections].insert_ignore.insert(
+      :section_id => section[:section_id],
+      :course_id => section[:course_id],
+      :semester => section[:semester],
+      :number => section[:number],
+      :seats => section[:seats],
+      :open_seats => section[:open_seats],
+      :waitlist => section[:waitlist],
+      :instructors => Sequel.pg_jsonb_wrap(section[:instructors])
+    )
 
-    row_id = res.first['id']
-    section[:instructors].each do |prof|
-      res2 = db.exec_prepared("insert_professor", [prof])
-      prof_id = res2.first['id']
-      db.exec_prepared("insert_section_professors", [prof_id, row_id])
+    section[:meetings].each do |meeting|
+      $DB[:meetings].insert_ignore.insert(
+        :section_key => section_key,
+        :days => meeting[:days],
+        :room => meeting[:room],
+        :building => meeting[:building],
+        :classtype => meeting[:classtype],
+        :start_time => meeting[:start_time],
+        :end_time => meeting[:end_time],
+        :start_seconds => meeting[:start_seconds],
+        :end_seconds => meeting[:end_seconds]
+      )
+    end
+
+  section[:instructors].each do |prof|
+    profs = Professor.where(name: prof).map{|p| p.to_v0}
+
+    if profs.length > 1
+      raise "Prof uniqueness violated"
+    end
+
+    if profs.length == 0
+      $DB[:professors].insert(
+        :name => prof,
+        :semester => Sequel.pg_jsonb_wrap([section[:semester]]),
+        :courses => Sequel.pg_jsonb_wrap([section[:course_id]]),
+        :department => Sequel.pg_jsonb_wrap([section[:course_id][0,4]])
+      )
+    else
+      sems = Sequel.pg_jsonb_wrap(profs[0][:semester].to_a.push(section[:semester]).uniq)
+      courses = Sequel.pg_jsonb_wrap(profs[0][:courses].to_a.push(section[:course_id]).uniq)
+      depts = Sequel.pg_jsonb_wrap(profs[0][:depts].to_a.push(section[:course_id][0,4]).uniq)
+
+      $DB[:professors].insert_conflict(target: :name, update: {semester: sems, courses: courses, department: depts}).insert(
+        :name => prof,
+        :semester => Sequel.pg_jsonb_wrap([section[:semester]]),
+        :courses => Sequel.pg_jsonb_wrap([section[:course_id]]),
+        :department => Sequel.pg_jsonb_wrap([section[:course_id][0,4]])
+      )
     end
   end
+end
 end

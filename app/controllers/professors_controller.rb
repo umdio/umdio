@@ -9,40 +9,35 @@ module Sinatra
 
           app.before '/v0/professors*' do
             @special_params = ['sort', 'semester', 'per_page', 'page']
+            @prof_params = ['name']
+            @prof_array_params = ['semester', 'courses', 'dept']
 
-            params[:semester] ||= current_semester
-            check_semester app, params[:semester], 'courses'
+            if !request.params[:semester]
+              request.update_param('semester', current_semester)
+            end
+            check_semester app, request.params['semester']
 
-            @db = app.settings.postgres
           end
 
           # Route for professors, use 'name' or 'course' to filter
           app.get '/v0/professors' do
-            begin_paginate! @db, "professors"
+            begin_paginate! $DB[:professors]
 
-            query = params_search_query @db, @special_params
-            sorting = params_sorting_array "name"
+            sorting = parse_sorting_params 'name'
+            std_params = parse_query_v0 @prof_params, @prof_array_params
 
-            if query == ''
-              query = 'TRUE'
-            end
+            res =
+              Professor
+                .where{Sequel.&(*std_params)}
+                .order(*sorting)
+                .limit(@limit)
+                .offset((@page - 1)*@limit)
+                .map{|p| p.to_v0}
 
-            offset = (@page - 1)*@limit
-            limit = @limit
-
-            query.chomp! "AND "
-
-            profs = []
-            res = @db.exec("SELECT * FROM professor_view as p WHERE semester=#{params[:semester] || current_semester} AND #{query} ORDER BY #{sorting} LIMIT #{limit} OFFSET #{offset}")
-
-            res.each do |row|
-              profs << clean_professor(@db, (params[:semester] || current_semester), row)
-            end
-
-            end_paginate! profs
+            end_paginate! res
 
             #Throw a 404 if prof is empty. (Doesn't exist or invalid)
-            if profs == []
+            if res == []
               halt 404, {
                 error_code: 404,
                 message: "There were no professors that matched your search.",
@@ -50,7 +45,7 @@ module Sinatra
               }.to_json
             end
 
-            json profs
+            json res
           end
         end
       end

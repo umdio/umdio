@@ -3,15 +3,14 @@
 
 require 'open-uri'
 require 'nokogiri'
-require 'pg'
 
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+require_relative '../models/courses.rb'
+
 prog_name = "courses_scraper"
 logger = ScraperCommon::logger
-
-db = ScraperCommon::postgres
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
@@ -24,10 +23,10 @@ dep_urls = []
 semesters.each do |semester|
   logger.info(prog_name) {"Searching for courses in term #{semester}"}
 
-  base_url = "https://ntst.umd.edu/soc/#{semester}"
+  base_url = "https://app.testudo.umd.edu/soc/#{semester}"
 
   Nokogiri::HTML(open(base_url)).search('span.prefix-abbrev').each do |e|
-    dep_urls << "https://ntst.umd.edu/soc/#{semester}/#{e.text}"
+    dep_urls << "https://app.testudo.umd.edu/soc/#{semester}/#{e.text}"
   end
 
   logger.info(prog_name) {"#{dep_urls.length} department/semesters so far"}
@@ -155,18 +154,18 @@ dep_urls.each do |url|
   end
 
   courses.each do |course|
-    res = db.exec_prepared("insert_courses", [
-      course[:course_id],
-      course[:semester],
-      course[:name],
-      course[:dept_id],
-      course[:department],
-      course[:credits],
-      course[:description],
-      PG::TextEncoder::Array.new.encode(course[:grading_method]),
-      PG::TextEncoder::Array.new.encode(course[:gen_ed]),
-      PG::TextEncoder::Array.new.encode(course[:core]),
-      course[:relationships].to_json
-    ])
+    $DB[:courses].insert_ignore.insert(
+      :course_id => course[:course_id],
+      :semester => course[:semester],
+      :name => course[:name],
+      :dept_id => course[:dept_id],
+      :department => course[:department],
+      :credits => course[:credits],
+      :description => course[:description],
+      :grading_method => Sequel.pg_jsonb_wrap(course[:grading_method]),
+      :gen_ed => Sequel.pg_jsonb_wrap(course[:gen_ed]),
+      :core => Sequel.pg_jsonb_wrap(course[:core]),
+      :relationships => Sequel.pg_jsonb_wrap(course[:relationships])
+    )
   end
 end
