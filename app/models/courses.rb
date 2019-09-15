@@ -93,7 +93,7 @@ class Section < Sequel::Model
 
     def to_v0
         {
-            course_id: course_id,
+            course: course,
             section_id: section_id,
             semester: semester.to_s,
             number: number,
