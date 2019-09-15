@@ -88,7 +88,7 @@ module Sinatra
 
           # list the bus stops
           app.get '/v0/bus/stops' do
-            json Stop.all.map{|s| s.to_v0}
+            json Stop.all.map{|s| s.to_v0_info}
           end
 
           # get info about a particular bus stop

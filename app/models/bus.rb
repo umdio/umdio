@@ -57,7 +57,7 @@ class Stop < Sequel::Model
     def to_v0_info
         {
             stop_id: stop_id,
-            title: titile
+            title: title
         }
     end
 

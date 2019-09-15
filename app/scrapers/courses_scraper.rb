@@ -7,6 +7,8 @@ require 'nokogiri'
 require_relative 'scraper_common.rb'
 include ScraperCommon
 
+require_relative '../models/courses.rb'
+
 prog_name = "courses_scraper"
 logger = ScraperCommon::logger
 
