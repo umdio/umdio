@@ -54,57 +54,9 @@ module Sinatra
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1)*@limit)
-                .map{|c| c.to_v0}
+                .map{|s| s.to_v0}
 
             return json [res]
-            meeting_properties = []
-
-            request.params.keys.each do |key|
-              nkey, delim, value, split = parse_param key, request.params[key]
-
-              next unless (meeting_properties).include? nkey
-
-              request.params.delete(key)
-
-              if nkey == 'start_time'
-                nkey = 'start_seconds'
-                value = time_to_int(value)
-              elsif nkey == 'end_time'
-                nkey = 'end_seconds'
-                value = time_to_int(value)
-              end
-
-              # TODO: More consice
-              if nkey == 'start_time' or nkey == 'end_time'
-                query += " EXISTS(SELECT 1 from jsonb_array_elements(meetings) elem WHERE (elem->>'#{nkey}')::int #{delim} #{value}) AND "
-              else
-                query += " EXISTS(SELECT 1 from jsonb_array_elements(meetings) elem WHERE elem->>'#{nkey}' #{delim} '#{value}') AND "
-              end
-            end
-
-            # get parse the search and sort
-            sorting = request.params_sorting_array 'section_id'
-            query  += request.params_search_query @db, (@special_request.params + meeting_properties)
-
-            if query == ''
-              query = 'TRUE'
-            end
-
-            offset = (@page - 1)*@limit
-            limit = @limit
-
-            query.chomp! "AND "
-
-            res = @db.exec("SELECT * FROM sections WHERE semester=#{semester} AND #{query} LIMIT #{limit} OFFSET #{offset}")
-            sections = []
-
-            res.each do |row|
-              sections << (clean_section @db, semester, row)
-            end
-
-            end_paginate! sections
-
-            json sections
           end
 
           # all of the semesters that we have
