@@ -4,7 +4,7 @@ email: hi@umd.io
 description: > # this means to ignore newlines until "baseurl:"
   An API for the University of Maryland.
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://umd.io" # the base hostname & protocol for your site
+url: "https://umd.io" # the base hostname & protocol for your site
 github_username: umdio
 permalink: none
 

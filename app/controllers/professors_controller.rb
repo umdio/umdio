@@ -41,7 +41,7 @@ module Sinatra
               halt 404, {
                 error_code: 404,
                 message: "There were no professors that matched your search.",
-                docs: "https://umd.io/professors"
+                docs: "https://docs.umd.io/professors"
               }.to_json
             end
 

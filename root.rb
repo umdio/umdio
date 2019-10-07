@@ -31,17 +31,17 @@ module Sinatra
                 {
                   name: 'Courses',
                   url: 'https://api.umd.io/v0/courses',
-                  docs: 'https://umd.io/courses/'
+                  docs: 'https://docs.umd.io/courses/'
                 },
                 {
                   name: 'Bus',
                   url: 'https://api.umd.io/v0/bus',
-                  docs: 'https://umd.io/bus/'
+                  docs: 'https://docs.umd.io/bus/'
                 },
                 {
                   name: 'Map',
                   url: 'https://api.umd.io/v0/map',
-                  docs: 'https://umd.io/map/'
+                  docs: 'https://docs.umd.io/map/'
                 },
               ]
             }
@@ -58,7 +58,7 @@ module Sinatra
             resp = {
               error_code: 404,
               message: "We couldn't find what you're looking for. Please see the docs for more information.",
-              docs: "https://umd.io/"
+              docs: "https://docs.umd.io/"
             }
             status 404
             json resp

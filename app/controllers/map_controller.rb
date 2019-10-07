@@ -13,7 +13,7 @@ module Sinatra
               resp = {
                 message: "This is the map endpoint.",
                 version: "1.0.0",
-                docs: "https://umd.io/map",
+                docs: "https://docs.umd.io/map",
                 endpoints: ["/buildings", "/buildings/{:building_id}"]
               }
               json resp
@@ -35,7 +35,7 @@ module Sinatra
               resp = {
                 message: "This is the map endpoint.",
                 status: "in development",
-                docs: "https://umd.io/map",
+                docs: "https://docs.umd.io/map",
               }
               json resp
             end
