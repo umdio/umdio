@@ -75,6 +75,13 @@ module UMDIO
       sorting
     end
 
+    def fix_sem
+      if !request.params[:semester]
+        request.update_param('semester', current_semester)
+      end
+      check_semester app, request.params['semester']
+    end
+
     # Turn request.params into a reasonable format
     def standardize_params
       std_params = {}

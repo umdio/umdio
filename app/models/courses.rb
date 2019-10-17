@@ -21,7 +21,6 @@ $DB.create_table? :sections do
     Integer :semester
     String :number
     String :seats
-    column :meetings, :jsonb
     String :open_seats
     String :waitlist
     column :instructors, :jsonb
@@ -44,9 +43,6 @@ end
 $DB.create_table? :professors do
     primary_key :pid
     String :name, {:unique => true}
-    column :semester, :jsonb
-    column :courses, :jsonb
-    column :department, :jsonb
 end
 
 class Course < Sequel::Model
@@ -107,6 +103,8 @@ class Section < Sequel::Model
 end
 
 class Professor < Sequel::Model
+    one_to_many :sections, key: :section_key
+
     def to_v0
         {
             name: name,
