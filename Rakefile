@@ -92,4 +92,10 @@ RSpec::Core::RakeTask.new :test do |task|
 end
 task :spec => :test
 
+desc "Run tests in /tests/v1 that look like *_spec.rb"
+RSpec::Core::RakeTask.new :testv1 do |task|
+  task.pattern = Dir['tests/v1/*_spec.rb']
+  task.rspec_opts = "--format documentation" #default to verbose testing, comment for silence
+end
+
 task :default => ['test']
