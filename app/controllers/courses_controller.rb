@@ -28,7 +28,7 @@ module Sinatra
 
             section_ids.each do |section_id|
               if not is_full_section_id? section_id
-                halt 400, { error_code: 400, message: "Invalid section_id #{section_id}"}.to_json
+                halt 400, bad_url_error("Invalid section_id #{section_id}", "https://docs.umd.io/courses/")
               end
             end
 
@@ -82,7 +82,7 @@ module Sinatra
             # TODO: validate_section_ids
             section_numbers.each do |number|
               if not is_section_number? number
-                halt 400, { error_code: 400, message: "Invalid section_number #{number}" }.to_json
+                halt 400,  bad_url_error("Invalid section number #{number}", "https://docs.umd.io/courses/")
               end
             end
 

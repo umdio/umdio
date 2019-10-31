@@ -37,8 +37,7 @@ module Sinatra
         section_ids.each do |id|
           if not is_full_section_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid section_id #{id}.", docs: "https://docs.umd.io/courses/" }.to_json
-            halt 400, error_msg
+            halt 400, bad_url_error("Invalid section_id #{id}.", "https://docs.umd.io/courses/")
           end
         end
 
@@ -53,8 +52,7 @@ module Sinatra
         course_ids.each do |id|
           if not is_course_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid course_id #{id}.", docs: "https://docs.umd.io/courses/" }.to_json
-            halt 400, error_msg
+            halt 400, bad_url_error("Invalid course_id #{id}.", "https://docs.umd.io/courses/")
           end
         end
 
