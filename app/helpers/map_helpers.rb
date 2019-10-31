@@ -3,7 +3,10 @@
 module Sinatra
   module UMDIO
     module Helpers
+
       def get_buildings_by_id id
+        bad_id_message = "Check the building id in the url."
+
         building_ids = id.upcase.split(",")
         building_ids.each { |building_id| halt 400, bad_url_error(bad_id_message) unless is_building_id? building_id }
 

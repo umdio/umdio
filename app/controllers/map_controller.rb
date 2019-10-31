@@ -6,8 +6,6 @@ module Sinatra
         def self.registered(app)
           app.register Sinatra::Namespace
 
-          bad_id_message = "Check the building id in the url."
-
           app.namespace '/v1/map' do
             get do
               resp = {

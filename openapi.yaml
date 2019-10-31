@@ -35,7 +35,7 @@ tags:
   - name: majors
     description: Data about the various majors offered on campus.
 paths:
-  /v1/majors:
+  /v1/majors/list:
     get:
       tags:
         - majors
