@@ -95,14 +95,27 @@ paths:
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: "#/components/schemas/Building"
-                  - type: array
-                    items:
-                      $ref: "#/components/schemas/Building"
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Building"
+                  count:
+                    type: number
+                    description: Number of buildings returned
+                    example: 1
+        "400":
+          description: Malformed building code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
-          description: Invalid building code
-          content: {}
+          description: Unknown building code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 components:
   schemas:
     Major:
@@ -149,3 +162,13 @@ components:
           type: number
           description: Latitude
           example: 38.986699
+    Error:
+      type: object
+      description: Represents an HTTP error
+      properties:
+        error_code:
+          type: number
+        message:
+          type: string
+        docs:
+          type: string

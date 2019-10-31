@@ -24,7 +24,12 @@ module Sinatra
 
             # get buildings by building_id or code
             get '/buildings/:building_id' do
-              json get_buildings_by_id(params[:building_id]).map {|b| b.to_v1}
+              buildings = get_buildings_by_id(params[:building_id]).map {|b| b.to_v1}
+              resp = {
+                data: buildings,
+                count: buildings.length
+              }
+              json resp
             end
           end
 
