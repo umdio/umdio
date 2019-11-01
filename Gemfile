@@ -5,13 +5,13 @@ gem 'sinatra-contrib'
 gem 'sinatra-param', '~> 1.3'
 gem 'rake'
 gem 'dotenv'
-gem 'jekyll'
-gem 'rouge'
+gem "pg", "~> 1.1"
+gem "sequel", "~> 5.21"
+gem "puma", "~> 4.0"
 
 group :development do
   gem 'rspec'
   gem 'sinatra-reloader', :require => 'sinatra/reloader'
-  gem 'pry'
   gem 'shotgun'
   gem 'better_errors'
 end
@@ -25,9 +25,3 @@ end
 group :scrape do
   gem 'nokogiri'
 end
-
-gem "pg", "~> 1.1"
-
-gem "sequel", "~> 5.21"
-
-gem "puma", "~> 4.0"
