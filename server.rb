@@ -8,6 +8,7 @@ require 'sinatra/base'
 require 'sinatra/reloader'
 require 'sinatra/param'
 require 'sinatra/namespace'
+require 'sinatra/cross_origin'
 require 'json'
 require 'sequel'
 
@@ -20,10 +21,15 @@ class UMDIO < Sinatra::Base
   $DB.extension :pg_array, :pg_json, :pagination
   Sequel.extension :pg_json_ops
 
+  configure do
+    enable :cross_origin
+  end
+
   # before application/request starts
   before do
     content_type 'application/json'
     cache_control :public, max_age: 86400
+    response.headers['Access-Control-Allow-Origin'] = *
   end
 
   helpers do
@@ -49,4 +55,11 @@ class UMDIO < Sinatra::Base
   register Sinatra::UMDIO::Routing::Map
   register Sinatra::UMDIO::Routing::Majors
   register Sinatra::UMDIO::Routing::Root
+
+  options "*" do
+    response.headers["Allow"] = "GET"
+    response.headers["Access-Control-Allow-Headers"] = 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Expose-Headers"] = "Content-Length,Content-Range"
+  end
 end
