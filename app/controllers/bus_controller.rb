@@ -4,7 +4,6 @@ module Sinatra
   module UMDIO
     module Routing
       module Bus
-
         def self.registered(app)
           #this should probably be a more specific error message where we error out!
           bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
@@ -49,9 +48,6 @@ module Sinatra
 
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-            # address = apiRoot + "&command=schedule"
-            # Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
-            #json schedules_collection.find({route: route_id},{fields:{_id:0,schedule_class:0}}).to_a
             json Schedule.where(route: route_id).map{|r| r.to_v0}
           end
 
@@ -64,8 +60,7 @@ module Sinatra
             stop_id = params[:stop_id]
             halt 400, bad_url_error(bad_route_message)  unless is_route_id? route_id
             halt 400, bad_url_error(bad_stop_message) unless is_stop_id? stop_id
-            address  = apiRoot + "&command=predictions"
-            Net::HTTP.get(URI(address + "&r=#{route_id}&s=#{stop_id}")).to_s #this weirdness is from nextbus's api. I swear.
+            wrapRequest(apiRoot + "&command=predictions&r=#{route_id}&s=#{stop_id}")
           end
 
           # locations of buses on route
@@ -74,16 +69,14 @@ module Sinatra
 
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-            address = apiRoot + "&command=vehicleLocations"
-            Net::HTTP.get(URI(address + "&r=#{route_id}")).to_s
+            wrapRequest(apiRoot + "&command=vehicleLocations&r=#{route_id}")
           end
 
           # locations of all buses
           app.get '/v0/bus/locations' do
             cache_control :public, :must_revalidate, max_age: 60
 
-            address = apiRoot + "&command=vehicleLocations"
-            Net::HTTP.get(URI(address)).to_s
+            wrapRequest(apiRoot + "&command=vehicleLocations")
           end
 
           # list the bus stops
@@ -97,12 +90,6 @@ module Sinatra
             halt 400, bad_url_error(bad_stop_message) unless is_stop_id? stop_id
             json Stop.where(stop_id: stop_id).map {|s| s.to_v0}
           end
-
-          # get predicted arrivals for a stop -- this one isn't working because the NextBus API docs lie. Frustrating.
-          # app.get 'v0/bus/stops/:stop_id/arrivals'
-
-          # end
-
         end
       end
     end
