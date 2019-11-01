@@ -24,7 +24,6 @@ module Sinatra
 
             res =
               Professor
-                .where{Sequel.&(*std_params)}
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1)*@limit)

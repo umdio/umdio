@@ -42,6 +42,7 @@ end
 
 $DB.create_table? :professors do
     primary_key :pid
+    foreign_key :section_key
     String :name, {:unique => true}
 end
 
@@ -106,11 +107,22 @@ class Professor < Sequel::Model
     one_to_many :sections, key: :section_key
 
     def to_v0
+        sections = Section.where(:section_key => section_key).map{|s| s.to_v0}
+        semesters = []
+        courses = []
+        depts = []
+
+        sections.each {|s|
+            semesters << s[:semester]
+            courses << s[:course]
+            depts << s[:course][0..3]
+        }
+
         {
             name: name,
-            semester: semester,
-            courses: courses,
-            department: department
+            semester: semesters.uniq,
+            courses: courses.uniq,
+            department: depts.uniq
         }
     end
 end

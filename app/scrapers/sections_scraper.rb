@@ -136,31 +136,10 @@ semesters.each do |semester|
     end
 
   section[:instructors].each do |prof|
-    profs = Professor.where(name: prof).map{|p| p.to_v0}
-
-    if profs.length > 1
-      raise "Prof uniqueness violated"
-    end
-
-    if profs.length == 0
-      $DB[:professors].insert(
-        :name => prof,
-        :semester => Sequel.pg_jsonb_wrap([section[:semester]]),
-        :courses => Sequel.pg_jsonb_wrap([section[:course_id]]),
-        :department => Sequel.pg_jsonb_wrap([section[:course_id][0,4]])
-      )
-    else
-      sems = Sequel.pg_jsonb_wrap(profs[0][:semester].to_a.push(section[:semester]).uniq)
-      courses = Sequel.pg_jsonb_wrap(profs[0][:courses].to_a.push(section[:course_id]).uniq)
-      depts = Sequel.pg_jsonb_wrap(profs[0][:depts].to_a.push(section[:course_id][0,4]).uniq)
-
-      $DB[:professors].insert_conflict(target: :name, update: {semester: sems, courses: courses, department: depts}).insert(
-        :name => prof,
-        :semester => Sequel.pg_jsonb_wrap([section[:semester]]),
-        :courses => Sequel.pg_jsonb_wrap([section[:course_id]]),
-        :department => Sequel.pg_jsonb_wrap([section[:course_id][0,4]])
-      )
-    end
+    $DB[:professors].insert_ignore.insert(
+      :section_key => section_key,
+      :name => prof,
+    )
   end
 end
 end
