@@ -125,7 +125,7 @@ dep_urls.each do |url|
       additional_info = additional_info && additional_info.strip.empty? ? nil : additional_info.strip
 
     elsif other.css('> div').length > 0
-      description = text.strip.empty? ? nil : text.strip
+      description = text.strip.empty? ? nil : text.strip.gsub(/\t|\r|\n/, '')
     end
 
     relationships = {
