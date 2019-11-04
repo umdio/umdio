@@ -69,7 +69,7 @@ module Sinatra
           end
 
           app.get '/v0/courses/list' do
-            json (find_courses_in_sem request.params[:semester])
+            json (find_courses_in_sem request.params['semester'])
           end
 
           # Returns section info about particular sections of a course, comma separated

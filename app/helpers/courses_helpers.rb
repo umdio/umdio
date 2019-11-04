@@ -62,7 +62,7 @@ module Sinatra
       end
 
       def find_courses_in_sem semester
-        Course.where(semester: 201908).order(Sequel.asc(:course_id)).map{|c| c.to_v0_info}
+        Course.where(semester: semester).order(Sequel.asc(:course_id)).map{|c| c.to_v0_info}
       end
 
       # gets a single course or an array or courses and halts if none are found
