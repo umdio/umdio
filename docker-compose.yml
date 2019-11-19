@@ -23,5 +23,4 @@ services:
     ports:
       - 3000:3000
     command: bundle exec rake up
-    restart_policy:
-        condition: on-failure
+    restart: always
