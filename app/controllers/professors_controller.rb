@@ -47,8 +47,10 @@ module Sinatra
 
           app.before '/v0/professors*' do
             @special_params = ['sort', 'semester', 'per_page', 'page']
+
+            @section_params = ['semester', 'course_id', 'dept_id']
+
             @prof_params = ['name']
-            @prof_array_params = ['semester', 'courses', 'dept']
 
             fix_sem
           end
@@ -58,11 +60,13 @@ module Sinatra
             begin_paginate! $DB[:professors]
 
             sorting = parse_sorting_params 'name'
-            std_params = parse_query_v0 @prof_params, @prof_array_params
+            std_params = parse_query_v0 @prof_params
+
+            section_std_params = parse_query_v0 @section_params
 
             res =
               Professor
-                .where{Sequel.&(*std_params)}
+                .where(Sequel.&(*std_params, sections: Section.where{Sequel.&(*section_std_params)}))
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1)*@limit)

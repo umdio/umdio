@@ -95,7 +95,8 @@ semesters.each do |semester|
 
     # Every 200, parse a sections page, reset courses
     if courses.length == 200
-      query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+      query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+
       res = parse_sections(query, semester)
       courses = []
       sections.concat(res)
@@ -103,27 +104,28 @@ semesters.each do |semester|
   end
 
     # parse the last entries
-    query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+    query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
     res = parse_sections(query, semester)
     sections.concat(res)
     courses = []
 
   # Now, insert all our stuff to the db
   sections.each do |section|
-    section_key = $DB[:sections].insert_ignore.insert(
-      :section_id => section[:section_id],
+    $DB[:sections].insert_ignore.insert(
+      :section_id_str => section[:section_id],
       :course_id => section[:course_id],
       :semester => section[:semester],
       :number => section[:number],
       :seats => section[:seats],
       :open_seats => section[:open_seats],
       :waitlist => section[:waitlist],
-      :instructors => Sequel.pg_jsonb_wrap(section[:instructors])
     )
+
+    s = $DB[:sections].where(section_id_str: section[:section_id], course_id: section[:course_id], semester: section[:semester]).first
 
     section[:meetings].each do |meeting|
       $DB[:meetings].insert_ignore.insert(
-        :section_key => section_key,
+        :section_key => s[:section_id],
         :days => meeting[:days],
         :room => meeting[:room],
         :building => meeting[:building],
@@ -137,8 +139,14 @@ semesters.each do |semester|
 
   section[:instructors].each do |prof|
     $DB[:professors].insert_ignore.insert(
-      :section_key => section_key,
       :name => prof,
+    )
+
+    pr = $DB[:professors].where(name: prof).first
+
+    $DB[:professors_sections].insert_ignore.insert(
+      :section_id => s[:section_id],
+      :professor_id => pr[:professor_id]
     )
   end
 end
