@@ -128,33 +128,18 @@ module UMDIO
     end
 
     # Uses a whitelist of request.params to parse
-    def parse_query_v0 valid_params, valid_array_params=[], valid_json_array_params=[]
+    def parse_query_v0 valid_params
       conds = []
 
       std_params = standardize_params
-      std_params.keys.each do |key| if (valid_params.include? key) or (valid_array_params.include? key) or (valid_json_array_params.include? key)
+      std_params.keys.each do |key| if (valid_params.include? key)
         value = std_params[key][0]
         delim = std_params[key][1]
 
-        if valid_array_params.include? key
-          j = Sequel.pg_jsonb_op(key.to_sym)
-
-          if value.include? ','
-            conds << j.contain_any(value.split(','))
-          else
-            conds << j.contain_all(value.split('|'))
-          end
-        elsif valid_json_array_params.include? key
-          key_parts = key.split('.')
-          nkey = key_parts[1]
-
-          conds << {section_key: $DB[key_parts[0].to_sym].where(Sequel.lit("#{key} #{delim} ?", value)).map{|m| m[:section_key]}}
+        if delim.include? '!'
+          conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
         else
-          if delim.include? '!'
-            conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
-          else
-            conds << Sequel.lit("#{key} #{delim} ?", value)
-          end
+          conds << Sequel.lit("#{key} #{delim} ?", value)
         end
       end
     end

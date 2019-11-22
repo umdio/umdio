@@ -7,8 +7,11 @@ module Sinatra
           app.before '/v0/courses*' do
             @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
             @section_params = ['section_id_str', 'course_id', 'seats', 'semester']
-            @section_array_params = ['instructors']
-            @section_json_array_params = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
+            @meeting_params = ['days', 'room', 'building', 'classtype', 'start_time', 'end_time']
+
+            @meeting_params.each do |p|
+              rename_param "meetings.#{p}", p
+            end
 
             fix_sem
             check_semester app, request.params['semester']
@@ -47,10 +50,11 @@ module Sinatra
             begin_paginate! $DB[:sections]
 
             sorting = parse_sorting_params 'section_id'
-            std_params = parse_query_v0 @section_params, @section_array_params, ['meetings.days']
+            std_params = parse_query_v0 @section_params
+            m_std_params = parse_query_v0 @meeting_params
             res =
               Section
-                .where{Sequel.&(*std_params)}
+                .where{Sequel.&(*std_params, meetings: Meeting.where(Sequel.&(*m_std_params)))}
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1)*@limit)
