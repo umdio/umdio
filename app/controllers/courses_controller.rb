@@ -87,7 +87,7 @@ module Sinatra
             end
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
-            puts section_ids
+
             sections = find_sections request.params['semester'], section_ids
 
             if sections.nil? or sections.empty?

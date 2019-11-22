@@ -1,5 +1,3 @@
-# Scrapes sections and puts them into mongo
-
 require 'open-uri'
 require 'nokogiri'
 

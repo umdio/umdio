@@ -52,6 +52,18 @@ module Sinatra
 
             @prof_params = ['name']
 
+            rename_param 'courses', 'course_id'
+            rename_param 'departments', 'dept_id'
+
+            # TODO: this is pretty ugly
+            if request.params['course_id']
+              request.update_param('course_id', request.params['course_id'].upcase)
+            end
+
+            if request.params['dept_id']
+              request.update_param('dept_id', request.params['dept_id'].upcase)
+            end
+
             fix_sem
           end
 
