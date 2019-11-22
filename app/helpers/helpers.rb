@@ -83,7 +83,7 @@ module UMDIO
     end
 
     def rename_param from, to
-      if request[from]
+      if request.params[from]
         request.update_param(to, request[from])
         request.delete_param(from)
       end

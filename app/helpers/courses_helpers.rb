@@ -18,7 +18,7 @@ module Sinatra
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections semester, section_ids
         # Turn section_ids into string
-        res = Section.where(semester: semester, section_id: section_ids).map{|s| s.to_v0}
+        res = Section.where(semester: semester, section_id_str: section_ids).map{|s| s.to_v0}
 
         if !res
           halt 404, {
@@ -92,7 +92,7 @@ module Sinatra
         if expand
           sections = Section.where(semester: semester, course_id: course_id).map{|s| s.to_v0}
         else
-          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id]}
+          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id_str]}
         end
 
         return sections

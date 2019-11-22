@@ -10,9 +10,7 @@ module Sinatra
             @section_array_params = ['instructors']
             @section_json_array_params = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
 
-            if !request.params['semester'] or (request.params['semester'] == '')
-              request.update_param('semester', current_semester)
-            end
+            fix_sem
             check_semester app, request.params['semester']
 
             rename_param 'section_id', 'section_id_str'
@@ -89,6 +87,7 @@ module Sinatra
             end
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
+            puts section_ids
             sections = find_sections request.params['semester'], section_ids
 
             if sections.nil? or sections.empty?

@@ -1,8 +1,3 @@
-#$DB.drop_table? :professors_sections
-#$DB.drop_table? :professors
-#$DB.drop_table? :sections
-#$DB.drop_table? :meetings
-
 $DB.create_table? :courses do
     primary_key :pid
     String :course_id
@@ -101,7 +96,7 @@ class Section < Sequel::Model
 
         {
             course: course_id,
-            section_id: section_id,
+            section_id: section_id_str,
             semester: semester.to_s,
             number: number,
             seats: seats,
