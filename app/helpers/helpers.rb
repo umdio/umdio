@@ -82,6 +82,13 @@ module UMDIO
       check_semester app, request.params['semester']
     end
 
+    def rename_param from, to
+      if request[from]
+        request.update_param(to, request[from])
+        request.delete_param(from)
+      end
+    end
+
     # Turn request.params into a reasonable format
     def standardize_params
       std_params = {}

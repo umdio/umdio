@@ -6,7 +6,7 @@ module Sinatra
         def self.registered(app)
           app.before '/v0/courses*' do
             @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
-            @section_params = ['section_id', 'course_id', 'seats', 'semester']
+            @section_params = ['section_id_str', 'course_id', 'seats', 'semester']
             @section_array_params = ['instructors']
             @section_json_array_params = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
 
@@ -14,6 +14,8 @@ module Sinatra
               request.update_param('semester', current_semester)
             end
             check_semester app, request.params['semester']
+
+            rename_param 'section_id', 'section_id_str'
 
             # TODO: This could be more concise
             if request.params['expand']
