@@ -8,6 +8,7 @@ module Sinatra
           #this should probably be a more specific error message where we error out!
           bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
           bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
+          bus_docs_url = "https://docs.umd.io/bus"
           apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 
@@ -30,7 +31,7 @@ module Sinatra
           # in nextbus api terms, this is routeConfig - the info for a route
           app.get '/v0/bus/routes/:route_id' do
             route_ids = params[:route_id].downcase.split(",")
-            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id}
+            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id}
             routes = Route.where(route_id: route_ids).map {|r| r.to_v0}
             # get rid of [] on single object return
             routes = routes[0] if route_ids.length == 1
@@ -47,7 +48,7 @@ module Sinatra
             cache_control :public, :must_revalidate, max_age: 60*60
 
             route_id = params[:route_id]
-            halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
+            halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
             json Schedule.where(route: route_id).map{|r| r.to_v0}
           end
 
@@ -58,8 +59,9 @@ module Sinatra
 
             route_id = params[:route_id]
             stop_id = params[:stop_id]
-            halt 400, bad_url_error(bad_route_message)  unless is_route_id? route_id
-            halt 400, bad_url_error(bad_stop_message) unless is_stop_id? stop_id
+
+            halt 400, bad_url_error(bad_route_message, bus_docs_url)  unless is_route_id? route_id
+            halt 400, bad_url_error(bad_stop_message, bus_docs_url) unless is_stop_id? stop_id
             wrapRequest(apiRoot + "&command=predictions&r=#{route_id}&s=#{stop_id}")
           end
 
@@ -68,6 +70,8 @@ module Sinatra
             cache_control :public, :must_revalidate, :no_cache, max_age: 60
 
             route_id = params[:route_id]
+            
+            halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
             wrapRequest(apiRoot + "&command=vehicleLocations&r=#{route_id}")
           end
@@ -87,7 +91,7 @@ module Sinatra
           # get info about a particular bus stop
           app.get '/v0/bus/stops/:stop_id' do
             stop_id = params[:stop_id]
-            halt 400, bad_url_error(bad_stop_message) unless is_stop_id? stop_id
+            halt 400, bad_url_error(bad_stop_message, bus_docs_url) unless is_stop_id? stop_id
             json Stop.where(stop_id: stop_id).map {|s| s.to_v0}
           end
         end

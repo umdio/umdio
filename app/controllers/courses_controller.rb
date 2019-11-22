@@ -6,14 +6,17 @@ module Sinatra
         def self.registered(app)
           app.before '/v0/courses*' do
             @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
-            @section_params = ['section_id', 'course_id', 'seats', 'semester']
-            @section_array_params = ['instructors']
-            @section_json_array_params = ['meetings.days', 'meetings.start_time', 'meetings.end_time', 'meetings.building', 'meetings.room', 'meetings.classtype']
+            @section_params = ['section_id_str', 'course_id', 'seats', 'semester']
+            @meeting_params = ['days', 'room', 'building', 'classtype', 'start_time', 'end_time']
 
-            if !request.params['semester'] or (request.params['semester'] == '')
-              request.update_param('semester', current_semester)
+            @meeting_params.each do |p|
+              rename_param "meetings.#{p}", p
             end
+
+            fix_sem
             check_semester app, request.params['semester']
+
+            rename_param 'section_id', 'section_id_str'
 
             # TODO: This could be more concise
             if request.params['expand']
@@ -28,7 +31,7 @@ module Sinatra
 
             section_ids.each do |section_id|
               if not is_full_section_id? section_id
-                halt 400, { error_code: 400, message: "Invalid section_id #{section_id}"}.to_json
+                halt 400, bad_url_error("Invalid section_id #{section_id}", "https://docs.umd.io/courses/")
               end
             end
 
@@ -47,10 +50,11 @@ module Sinatra
             begin_paginate! $DB[:sections]
 
             sorting = parse_sorting_params 'section_id'
-            std_params = parse_query_v0 @section_params, @section_array_params, ['meetings.days']
+            std_params = parse_query_v0 @section_params
+            m_std_params = parse_query_v0 @meeting_params
             res =
               Section
-                .where{Sequel.&(*std_params)}
+                .where{Sequel.&(*std_params, meetings: Meeting.where(Sequel.&(*m_std_params)))}
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1)*@limit)
@@ -82,11 +86,12 @@ module Sinatra
             # TODO: validate_section_ids
             section_numbers.each do |number|
               if not is_section_number? number
-                halt 400, { error_code: 400, message: "Invalid section_number #{number}" }.to_json
+                halt 400,  bad_url_error("Invalid section number #{number}", "https://docs.umd.io/courses/")
               end
             end
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
+
             sections = find_sections request.params['semester'], section_ids
 
             if sections.nil? or sections.empty?

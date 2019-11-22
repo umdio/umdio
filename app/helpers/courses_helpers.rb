@@ -18,7 +18,7 @@ module Sinatra
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections semester, section_ids
         # Turn section_ids into string
-        res = Section.where(semester: semester, section_id: section_ids).map{|s| s.to_v0}
+        res = Section.where(semester: semester, section_id_str: section_ids).map{|s| s.to_v0}
 
         if !res
           halt 404, {
@@ -37,8 +37,7 @@ module Sinatra
         section_ids.each do |id|
           if not is_full_section_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid section_id #{id}.", docs: "https://docs.umd.io/courses/" }.to_json
-            halt 400, error_msg
+            halt 400, bad_url_error("Invalid section_id #{id}.", "https://docs.umd.io/courses/")
           end
         end
 
@@ -53,8 +52,7 @@ module Sinatra
         course_ids.each do |id|
           if not is_course_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid course_id #{id}.", docs: "https://docs.umd.io/courses/" }.to_json
-            halt 400, error_msg
+            halt 400, bad_url_error("Invalid course_id #{id}.", "https://docs.umd.io/courses/")
           end
         end
 
@@ -94,7 +92,7 @@ module Sinatra
         if expand
           sections = Section.where(semester: semester, course_id: course_id).map{|s| s.to_v0}
         else
-          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id]}
+          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id_str]}
         end
 
         return sections

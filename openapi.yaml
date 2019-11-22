@@ -8,16 +8,12 @@ info:
     all supported API calls.
 
 
-    Read more about the motivation and vision for the project in the blog post.
-
-
     umd.io is a GETful API. It follows RESTful conventions, but for now, you can
     only get data – you can’t create, update, or destroy.
 
 
-    The API is in version 0. We are adding, changing, and breaking things all
-    the time. Contact the team or (preferably) create an issue on github if
-    something isn’t working the way you think it should.
+    We're now in version 1! We might add new endpoints or more data to existing responses,
+    but we won't remove anything without a major version change.
 
 
     We are actively looking for contributors! Tweet, email, or otherwise get in
@@ -26,18 +22,36 @@ info:
     email: hi@umd.io
   license:
     name: MIT
-    url: 'https://github.com/umdio/umdio/LICENSE'
+    url: "https://github.com/umdio/umdio/LICENSE"
   version: 1.0.0
 externalDocs:
   description: Github
-  url: 'https://github.com/umdio/umdio'
+  url: "https://github.com/umdio/umdio"
 servers:
-  - url: 'https://api.umd.io/v1'
+  - url: "https://api.umd.io/v1"
 tags:
-- name: map
-  description: Building data
+  - name: map
+    description: Data about things on campus, such as buildings, dining halls, and other facilities.
+  - name: majors
+    description: Data about the various majors offered on campus.
 paths:
-  /map:
+  /v1/majors/list:
+    get:
+      tags:
+        - majors
+      summary: List majors
+      description: Get a list of all majors
+      operationId: findMajors
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Major"
+  /v1/map/buildings:
     get:
       tags:
         - map
@@ -45,15 +59,15 @@ paths:
       description: Get a list of the available buildings.
       operationId: findBuildings
       responses:
-        '200':
+        "200":
           description: Successful Operation
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Building'
-  /map/{building_id}:
+                  $ref: "#/components/schemas/Building"
+  /v1/map/buildings/{building_id}:
     get:
       tags:
         - map
@@ -76,21 +90,54 @@ paths:
           description: Numeric building ID
           explode: true
       responses:
-        '200':
+        "200":
           description: Successful Operation
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/Building'
-                  - type: array
-                    items:
-                      $ref: '#/components/schemas/Building'
-        '404':
-          description: Invalid building code
-          content: {}
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Building"
+                  count:
+                    type: number
+                    description: Number of buildings returned
+                    example: 1
+        "400":
+          description: Malformed building code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown building code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
 components:
   schemas:
+    Major:
+      type: object
+      description: Represents a major
+      properties:
+        major_id:
+          type: number
+          description: Numeric id of a major. No real meaning here, just an ascending count.
+          example: 19
+        name:
+          type: string
+          description: The name of the major.
+          example: Behavioral and Community Health
+        college:
+          type: string
+          description: The college the major is under.
+          example: School of Public Health
+        url:
+          type: string
+          description: Home page for the major.
+          example: http://sph.umd.edu/department/bch/
     Building:
       type: object
       description: Represents a building on campus.
@@ -104,14 +151,24 @@ components:
           description: Shortened building code. Not all buildings have these.
           example: ESJ
         number:
-          type: integer
-          description: Unique building number
+          type: string
+          description: Unique building id
           example: 226
         long:
           type: number
           description: Longitude
-          example: '-76.941914'
+          example: -76.941914
         lat:
           type: number
           description: Latitude
-          example: '38.986699'
+          example: 38.986699
+    Error:
+      type: object
+      description: Represents an HTTP error
+      properties:
+        error_code:
+          type: number
+        message:
+          type: string
+        docs:
+          type: string
