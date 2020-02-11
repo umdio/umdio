@@ -34,14 +34,32 @@ tags:
     description: Data about things on campus, such as buildings, dining halls, and other facilities.
   - name: majors
     description: Data about the various majors offered on campus.
+  - name: professors
+    description: Data about professors and courses they teach
 paths:
+  /v1/professors:
+    get:
+      tags:
+        - proessors
+      summary: List professors
+      description: Returns list of all professors
+      operationId: getProfessors
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Professor"
   /v1/majors/list:
     get:
       tags:
         - majors
       summary: List majors
       description: Get a list of all majors
-      operationId: findMajors
+      operationId: getMajors
       responses:
         "200":
           description: Successful Operation
@@ -57,7 +75,7 @@ paths:
         - map
       summary: List buildings
       description: Get a list of the available buildings.
-      operationId: findBuildings
+      operationId: getBuildings
       responses:
         "200":
           description: Successful Operation
@@ -75,7 +93,7 @@ paths:
       description: >-
         Get location data about one or more buildings. Comma separated building
         numbers are the parameters.
-      operationId: findBuildingById
+      operationId: getBuildingById
       parameters:
         - in: path
           name: building_id
@@ -118,6 +136,25 @@ paths:
 
 components:
   schemas:
+    Professor:
+      type: object
+      description: Represents a professor
+      properties:
+        name:
+          type: string
+          description: Professor's name on Testudo
+          example: ""
+        taught:
+          type: array
+          items:
+            type: object
+            properties:
+              semester:
+                type: integer
+                example: 202001
+              course:
+                type: string
+                example: ""
     Major:
       type: object
       description: Represents a major

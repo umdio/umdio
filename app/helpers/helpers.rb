@@ -89,6 +89,12 @@ module UMDIO
       end
     end
 
+    def upper_param name
+      if request.params[name]
+        request.update_param(name, request.params[name].upcase)
+      end
+    end
+
     # Turn request.params into a reasonable format
     def standardize_params
       std_params = {}

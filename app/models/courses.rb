@@ -130,4 +130,18 @@ class Professor < Sequel::Model
             department: depts.uniq
         }
     end
+
+    def to_v1
+        ss = sections.map{|s| s.to_v0}
+        taught = []
+
+        ss.each {|s|
+            taught << {course_id: s[:course], semester: s[:semester]}
+        }
+
+        {
+            name: name,
+            taught: taught.uniq
+        }
+    end
 end
