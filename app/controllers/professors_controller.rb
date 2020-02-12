@@ -8,16 +8,15 @@ module Sinatra
           app.register Sinatra::Namespace
 
           app.namespace '/v1/professors' do
-            app.before '*' do
+            before '*' do
               @special_params = ['sort', 'per_page', 'page']
-              @section_params = ['semester', 'course_id', 'dept_id']
+              @section_params = ['semester', 'course_id']
               @prof_params = ['name']
 
+              rename_param 'course', 'course_id'
               rename_param 'courses', 'course_id'
-              rename_param 'departments', 'dept_id'
 
               upper_param 'course_id'
-              upper_param 'dept_id'
             end
 
             get do
