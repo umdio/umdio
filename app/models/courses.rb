@@ -1,4 +1,3 @@
-$DB.drop_table? :courses
 $DB.create_table? :courses do
     primary_key :pid
     String :course_id
@@ -51,6 +50,16 @@ $DB.create_join_table?(:professor_id=>:professors, :section_id=>:sections)
 
 class Course < Sequel::Model
     def to_v1
+        ge = gen_ed.gsub(/\s/, '').split('or').map do |s|
+            s.split(',').map do |s2|
+                ret = s2
+                if m = s2.match(/^(.{4})\(iftakenwith(.*)\)$/)
+                    ret = "#{m[1]}|#{m[2]}"
+                end
+                ret
+            end
+        end
+
         {
             course_id: course_id,
             semester: semester.to_s,
@@ -60,7 +69,7 @@ class Course < Sequel::Model
             credits: credits,
             description: description,
             grading_method: grading_method,
-            gen_ed: gen_ed,
+            gen_ed: ge,
             core: core,
             relationships: relationships
         }
@@ -84,7 +93,7 @@ class Course < Sequel::Model
             credits: credits,
             description: description,
             grading_method: grading_method,
-            gen_ed: gen_ed,
+            gen_ed: gen_ed.gsub(/\s/, '').gsub("iftakenwith","fkwh").split(','),
             core: core,
             relationships: relationships
         }
