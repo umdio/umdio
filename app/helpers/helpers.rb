@@ -95,6 +95,43 @@ module UMDIO
       end
     end
 
+    def parse_delim d
+      vals = {
+        eq: "=",
+        neq: "!=",
+        lt: "<",
+        gt: ">",
+        leq: "<=",
+        geq: ">="
+      }
+
+      halt 400, { error_code: 400, message: "Malformed parameters" }.to_json if (!vals.key? d)
+
+      vals[d]
+    end
+
+    def standardize_params_v1
+      std_params = {}
+
+      request.params.keys.each do |key|
+        value = request.params[key]
+
+        v = ""
+        d = ""
+        if value.to_s.include? "|"
+          x = value.split("|")
+          v = x[0]
+          d = parse_delim x[1].to_sym
+        else
+          v = value
+          d = "="
+        end
+
+        std_params[key] = [v, d]
+      end
+
+      std_params
+    end
     # Turn request.params into a reasonable format
     def standardize_params
       std_params = {}
@@ -146,6 +183,32 @@ module UMDIO
           conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
         else
           conds << Sequel.lit("#{key} #{delim} ?", value)
+        end
+      end
+    end
+    conds
+  end
+
+  def parse_query_v1 valid_params
+      conds = []
+
+      std_params = standardize_params_v1
+      std_params.keys.each do |key| if (valid_params.include? key)
+        value = std_params[key][0]
+        delim = std_params[key][1]
+
+        if key == "gen_ed"
+          if delim.include? '!'
+            conds << Sequel.~(Sequel.lit("#{key} LIKE ?", "%#{value}%"))
+          else
+            conds << Sequel.lit("#{key} LIKE ?", "%#{value}%")
+          end
+        else
+          if delim.include? '!'
+            conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
+          else
+            conds << Sequel.lit("#{key} #{delim} ?", value)
+          end
         end
       end
     end

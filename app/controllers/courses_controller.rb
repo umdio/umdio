@@ -46,8 +46,8 @@ module Sinatra
               begin_paginate! $DB[:sections]
 
               sorting = parse_sorting_params 'section_id'
-              std_params = parse_query_v0 @section_params
-              m_std_params = parse_query_v0 @meeting_params
+              std_params = parse_query_v1 @section_params
+              m_std_params = parse_query_v1 @meeting_params
               res =
                 Section
                   .where{Sequel.&(*std_params, meetings: Meeting.where(Sequel.&(*m_std_params)))}
@@ -129,7 +129,7 @@ module Sinatra
               upper_param 'dept_id'
 
               sorting = parse_sorting_params 'course_id'
-              std_params = parse_query_v0 @course_params
+              std_params = parse_query_v1 @course_params
 
               res =
                 Course
