@@ -1,3 +1,4 @@
+$DB.drop_table? :courses
 $DB.create_table? :courses do
     primary_key :pid
     String :course_id
@@ -8,7 +9,7 @@ $DB.create_table? :courses do
     String :credits
     String :description
     column :grading_method, :jsonb
-    column :gen_ed, :jsonb
+    String :gen_ed
     column :core, :jsonb
     column :relationships, :jsonb
     unique [:course_id, :semester]

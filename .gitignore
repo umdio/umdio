@@ -21,3 +21,5 @@ mime.types
 
 # editor configurations
 .idea/
+
+imports/
