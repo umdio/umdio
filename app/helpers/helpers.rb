@@ -76,10 +76,10 @@ module UMDIO
     end
 
     def fix_sem
-      if !request.params['semester']
+      if !params['semester']
         request.update_param('semester', current_semester)
       end
-      check_semester app, params['semester']
+      check_semester app, request.params['semester']
     end
 
     def rename_param from, to
