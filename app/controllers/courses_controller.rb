@@ -4,6 +4,153 @@ module Sinatra
     module Routing
       module Courses
         def self.registered(app)
+
+          app.register Sinatra::Namespace
+
+          app.namespace '/v1/courses' do
+            before do
+              @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
+              @section_params = ['section_id_str', 'course_id', 'seats', 'semester']
+              @meeting_params = ['days', 'room', 'building', 'classtype', 'start_time', 'end_time']
+
+              @meeting_params.each do |p|
+                rename_param "meetings.#{p}", p
+              end
+
+              fix_sem
+
+              rename_param 'section_id', 'section_id_str'
+
+              # TODO: This could be more concise
+              if request.params['expand']
+                request.update_param('expand', request.params['expand'].to_s.downcase == 'sections')
+              end
+            end
+
+            get '/sections/:section_id' do
+              # separate into an array on commas, turn it into uppercase
+              section_ids = "#{params[:section_id]}".upcase.split(",")
+
+              section_ids.each do |section_id|
+                if not is_full_section_id? section_id
+                  halt 400, bad_url_error("Invalid section_id #{section_id}", "https://docs.umd.io/courses/")
+                end
+              end
+
+              res = (find_sections (request.params['semester']), section_ids).map {|s| s.to_v0}
+
+              json res
+            end
+
+            get '/sections' do
+              begin_paginate! $DB[:sections]
+
+              sorting = parse_sorting_params 'section_id'
+              std_params = parse_query_v1 @section_params
+              m_std_params = parse_query_v1 @meeting_params
+              res =
+                Section
+                  .where{Sequel.&(*std_params, meetings: Meeting.where(Sequel.&(*m_std_params)))}
+                  .order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|s| s.to_v1}
+
+              return json [res]
+            end
+
+          get '/semesters' do
+            json list_semesters
+          end
+
+          get '/departments' do
+            json list_depts
+          end
+
+          get '/list' do
+            json (find_courses_in_sem request.params['semester']).map{|c| c.to_v1_info}
+          end
+
+          # Returns section info about particular sections of a course, comma separated
+          get '/:course_id/sections/:section_id' do
+            course_id = "#{params[:course_id]}".upcase
+
+            validate_course_ids course_id
+
+            section_numbers = "#{params[:section_id]}".upcase.split(',')
+            # TODO: validate_section_ids
+            section_numbers.each do |number|
+              if not is_section_number? number
+                halt 400,  bad_url_error("Invalid section number #{number}", "https://docs.umd.io/courses/")
+              end
+            end
+
+            section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
+
+            sections = (find_sections request.params['semester'], section_ids).map{|s| s.to_v1}
+
+            if sections.nil? or sections.empty?
+              halt 404, { error_code: 404, message: "No sections found." }.to_json
+            end
+
+            json sections
+          end
+
+          # TODO: sort??
+          # Returns section objects of a given course
+          get '/:course_id/sections' do
+            course_id = params[:course_id].upcase
+            res = find_sections_for_course_v1 request.params['semester'], course_id, true
+
+            if res.empty?
+              halt 404, {
+                error_code: 404,
+                message: "Course with course_id #{course_id} not found!",
+                available_courses: "https://api.umd.io/v0/courses",
+                docs: "https://docs.umd.io/courses/"
+              }.to_json
+            end
+
+            json res
+          end
+
+          # returns courses specified by :course_id
+          get '/:course_id' do
+            course_ids = params[:course_id].upcase.split(',')
+            courses = find_courses_v1 request.params['semester'], course_ids, request.params
+
+            json courses
+          end
+
+            # returns a paginated list of courses, with the full course objects
+            get do
+              begin_paginate! $DB[:courses]
+
+              upper_param 'dept_id'
+
+              sorting = parse_sorting_params 'course_id'
+              std_params = parse_query_v1 @course_params
+
+              res =
+                Course
+                  .where{Sequel.&(*std_params)}
+                  .order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|c| c.to_v1}
+
+              end_paginate! res
+
+              res.each {|c|
+                c[:sections] = find_sections_for_course_v1 request.params['semester'], c[:course_id], request.params['expand']
+              }
+
+              return json res
+            end
+          end
+
+          # BEGIN v0
+
           app.before '/v0/courses*' do
             @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
             @section_params = ['section_id_str', 'course_id', 'seats', 'semester']
@@ -35,7 +182,7 @@ module Sinatra
               end
             end
 
-            res = find_sections (request.params['semester']), section_ids
+            res = (find_sections (request.params['semester']), section_ids).map{|s| s.to_v0}
 
             # If we only have 1 result, we have to just return it (for compatibility)
             # TODO (v1): Fix this
@@ -65,15 +212,15 @@ module Sinatra
 
           # all of the semesters that we have
           app.get '/v0/courses/semesters' do
-            json Course.distinct(:semester).map {|c| c[:semester]}.sort
+            json list_semesters
           end
 
           app.get '/v0/courses/departments' do
-            json Course.distinct(:dept_id, :department).map {|c| {dept_id: c[:dept_id], department: c[:department]}}.sort_by! {|d| d[:dept_id]}
+            json list_depts
           end
 
           app.get '/v0/courses/list' do
-            json (find_courses_in_sem request.params['semester'])
+            json (find_courses_in_sem request.params['semester']).map{|c| c.to_v0_info}
           end
 
           # Returns section info about particular sections of a course, comma separated
@@ -92,7 +239,7 @@ module Sinatra
 
             section_ids = section_numbers.map { |number| "#{course_id}-#{number}" }
 
-            sections = find_sections request.params['semester'], section_ids
+            sections = (find_sections request.params['semester'], section_ids).map {|s| s.to_v0}
 
             if sections.nil? or sections.empty?
               halt 404, { error_code: 404, message: "No sections found." }.to_json

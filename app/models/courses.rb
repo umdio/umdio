@@ -8,7 +8,7 @@ $DB.create_table? :courses do
     String :credits
     String :description
     column :grading_method, :jsonb
-    column :gen_ed, :jsonb
+    String :gen_ed
     column :core, :jsonb
     column :relationships, :jsonb
     unique [:course_id, :semester]
@@ -49,6 +49,40 @@ end
 $DB.create_join_table?(:professor_id=>:professors, :section_id=>:sections)
 
 class Course < Sequel::Model
+    def to_v1
+        ge = gen_ed.gsub(/\s/, '').split('or').map do |s|
+            s.split(',').map do |s2|
+                ret = s2
+                if m = s2.match(/^(.{4})\(iftakenwith(.*)\)$/)
+                    ret = "#{m[1]}|#{m[2]}"
+                end
+                ret
+            end
+        end
+
+        {
+            course_id: course_id,
+            semester: semester.to_s,
+            name: name,
+            dept_id: dept_id,
+            department: department,
+            credits: credits,
+            description: description,
+            grading_method: grading_method,
+            gen_ed: ge,
+            core: core,
+            relationships: relationships
+        }
+    end
+
+    def to_v1_info
+        {
+            course_id: course_id,
+            dept_id: dept_id,
+            name: name
+        }
+    end
+
     def to_v0
         {
             course_id: course_id,
@@ -59,7 +93,7 @@ class Course < Sequel::Model
             credits: credits,
             description: description,
             grading_method: grading_method,
-            gen_ed: gen_ed,
+            gen_ed: gen_ed.gsub(/\s/, '').gsub("iftakenwith","fkwh").split(','),
             core: core,
             relationships: relationships
         }
@@ -75,6 +109,17 @@ class Course < Sequel::Model
 end
 
 class Meeting < Sequel::Model
+    def to_v1
+        {
+            days: days,
+            room: room,
+            building: building,
+            classtype: classtype,
+            start_time: start_time,
+            end_time: end_time
+        }
+    end
+
     def to_v0
         {
             days: days,
@@ -90,6 +135,22 @@ end
 class Section < Sequel::Model
     one_to_many :meetings, key: :section_key
     many_to_many :professors
+
+    def to_v1
+        profs = professors.map {|p| p[:name]}
+
+        {
+            course: course_id,
+            section_id: section_id_str,
+            semester: semester.to_s,
+            number: number,
+            seats: seats,
+            meetings: meetings.map {|m| m.to_v1},
+            open_seats: open_seats,
+            waitlist: waitlist,
+            instructors: profs
+        }
+    end
 
     def to_v0
         profs = professors.map {|p| p[:name]}
@@ -128,6 +189,20 @@ class Professor < Sequel::Model
             semester: semesters.uniq,
             courses: courses.uniq,
             department: depts.uniq
+        }
+    end
+
+    def to_v1
+        ss = sections.map{|s| s.to_v0}
+        taught = []
+
+        ss.each {|s|
+            taught << {course_id: s[:course], semester: s[:semester]}
+        }
+
+        {
+            name: name,
+            taught: taught.uniq
         }
     end
 end

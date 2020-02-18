@@ -3,7 +3,7 @@ require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 ###### Scraping
-desc "Scrape to fill databases (takes ~20 minutes)"
+desc "Scrape to fill databases"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
 desc "Scrapes enough to run the tests"
@@ -63,8 +63,6 @@ namespace :scrape do
 end
 
 ###### Server
-
-task :setup => ['db:clean','db:up','scrape']
 
 desc "Start the web server for dev"
 task :up do
