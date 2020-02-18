@@ -36,11 +36,206 @@ tags:
     description: Data about the various majors offered on campus.
   - name: professors
     description: Data about professors and courses they teach
+  - name: courses
+    description: Course data from Testudo
 paths:
-  /v1/professors:
+  /courses:
     get:
       tags:
-        - proessors
+        - courses
+      summary: List courses
+      description: Returns paginated list of courses
+      operationId: getCourses
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+  /courses/list:
+    get:
+      tags:
+        - courses
+      summary: List courses
+      description: Returns list of all minimized courses
+      operationId: getCourses
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+  /courses/sections:
+    get:
+      tags:
+        - courses
+      summary: List sections
+      description: Returns paginated list of sections
+      operationId: getSections
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Section"
+  /courses/sections/{section_ids}:
+    get:
+      tags:
+        - courses
+      summary: List sections
+      description: Returns paginated list of sections
+      operationId: getSections
+      parameters:
+        - in: path
+          name: section_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: One or more comma separated section ids
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Section"
+  /courses/{course_ids}:
+    get:
+      tags:
+        - courses
+      summary: View course
+      description: Returns info about one or more courses
+      operationId: getCoursesById
+      parameters:
+        - in: path
+          name: course_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: One or more comma separated course ids
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+  /courses/{course_ids}/sections:
+    get:
+      tags:
+        - courses
+      summary: View course
+      description: Returns info about one or more courses
+      operationId: getCourseSectionsById
+      parameters:
+        - in: path
+          name: course_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: One or more comma separated course ids
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Section"
+  /courses/{course_ids}/sections/{section_ids}:
+    get:
+      tags:
+        - courses
+      summary: View course
+      description: Returns info about one or more courses
+      operationId: getCourseSectionsById
+      parameters:
+        - in: path
+          name: course_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: One or more comma separated course ids
+          explode: true
+        - in: path
+          name: section_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: One or more comma separated section ids
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Section"
+  /courses/semesters:
+    get:
+      tags:
+        - courses
+      summary: List semesters
+      description: Returns list of all available semesters
+      operationId: getSemesters
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /courses/departments:
+    get:
+      tags:
+        - courses
+      summary: List departments
+      description: Returns list of all available departments
+      operationId: getDepartments
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+  /professors:
+    get:
+      tags:
+        - professors
       summary: List professors
       description: Returns list of all professors
       operationId: getProfessors
@@ -53,7 +248,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Professor"
-  /v1/majors/list:
+  /majors/list:
     get:
       tags:
         - majors
@@ -69,7 +264,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Major"
-  /v1/map/buildings:
+  /map/buildings:
     get:
       tags:
         - map
@@ -85,7 +280,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Building"
-  /v1/map/buildings/{building_id}:
+  /map/buildings/{building_id}:
     get:
       tags:
         - map
@@ -136,6 +331,108 @@ paths:
 
 components:
   schemas:
+    Course:
+      type: object
+      description: Represents a course on Testudo
+      properties:
+        course_id:
+          type: string
+        semester:
+          type: string
+        name:
+          type: string
+        dept_id:
+          type: string
+        department:
+          type: string
+        credits:
+          type: string
+        description:
+          type: string
+        grading_method:
+          type: array
+          items:
+            type: string
+        gen_ed:
+          type: array
+          items:
+            type: array
+            items:
+              type: string
+        core:
+          type: array
+          items:
+            type: string
+        relationships:
+          type: object
+          properties:
+            coreqs:
+              type: string
+              nullable: true
+            prereqs:
+              type: string
+              nullable: true
+            formerly:
+              type: string
+              nullable: true
+            restrictions:
+              type: string
+              nullable: true
+            additional_info:
+              type: string
+              nullable: true
+            also_offered_as:
+              type: string
+              nullable: true
+            credit_granted_for:
+              type: string
+              nullable: true
+        sections:
+          type: array
+          items:
+            oneOf:
+              - type: string
+              - $ref: "#/components/schemas/Section"
+    Section:
+      type: object
+      properties:
+        course:
+          type: string
+        section_id:
+          type: string
+        semester:
+          type: string
+        number:
+          type: string
+        seats:
+          type: string
+        meetings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Meeting"
+        open_seats:
+          type: string
+        waitlist:
+          type: string
+        instructors:
+          type: array
+          items:
+            type: string
+    Meeting:
+      type: object
+      properties:
+        days:
+          type: string
+        room:
+          type: string
+        building:
+          type: string
+        classtype:
+          type: string
+        start_time:
+          type: string
+        end_time:
+          type: string
     Professor:
       type: object
       description: Represents a professor
