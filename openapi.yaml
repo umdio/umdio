@@ -30,14 +30,16 @@ externalDocs:
 servers:
   - url: "https://api.umd.io/v1"
 tags:
+  - name: courses
+    description: Course data from Testudo
+  - name: professors
+    description: Data about professors and courses they teach
+  - name: bus
+    description: Bus data
   - name: map
     description: Data about things on campus, such as buildings, dining halls, and other facilities.
   - name: majors
     description: Data about the various majors offered on campus.
-  - name: professors
-    description: Data about professors and courses they teach
-  - name: courses
-    description: Course data from Testudo
 paths:
   /courses:
     get:
@@ -328,9 +330,288 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /bus/routes:
+    get:
+      tags:
+        - bus
+      summary: List routes
+      description: Get a list of the available routes.
+      operationId: getRoutes
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    route_id:
+                      type: string
+                    title:
+                      type: string
+  /bus/routes/{route_ids}:
+    get:
+      tags:
+        - bus
+      summary: Get buses
+      description: Get route data for one or more routes
+      operationId: getRoutesById
+      parameters:
+        - in: path
+          name: route_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Route ids
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Route"
+                  count:
+                    type: number
+                    description: Number of routes returned
+                    example: 1
+        "400":
+          description: Malformed route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /bus/stops:
+    get:
+      tags:
+        - bus
+      summary: List stops
+      description: Get a list of the available stops.
+      operationId: getStops
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    stop_id:
+                      type: string
+                    title:
+                      type: string
+  /bus/stops/{stop_ids}:
+    get:
+      tags:
+        - bus
+      summary: Get stops
+      description: Get data for one or more stops
+      operationId: getStopsById
+      parameters:
+        - in: path
+          name: stop_ids
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Stop ids
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Stop"
+                  count:
+                    type: number
+                    description: Number of routes returned
+                    example: 1
+        "400":
+          description: Malformed route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /bus/locations:
+    get:
+      tags:
+        - bus
+      summary: Current bus locations
+      description: Get bus locations
+      operationId: getLocations
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: string
+  /bus/routes/{route_id}/locations:
+    get:
+      tags:
+        - bus
+      summary: Current bus locations
+      description: Get bus locations
+      operationId: getLocations
+      parameters:
+        - in: path
+          name: route_id
+          required: true
+          schema:
+            type: string
+          description: Route id
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: string
+  /bus/routes/{route_id}/schedules:
+    get:
+      tags:
+        - bus
+      summary: Bus schedules
+      description: Get bus schedules
+      operationId: getLocations
+      parameters:
+        - in: path
+          name: route_id
+          required: true
+          schema:
+            type: string
+          description: Route id
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: string
+  /bus/routes/{route_id}/arrivals/{stop_id}:
+    get:
+      tags:
+        - bus
+      summary: Current bus locations
+      description: Get bus locations
+      operationId: getLocations
+      parameters:
+        - in: path
+          name: route_id
+          required: true
+          schema:
+            type: string
+          description: Route id
+          explode: true
+        - in: path
+          name: stop_id
+          required: true
+          schema:
+            type: string
+          description: Stop id
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: string
 
 components:
   schemas:
+    Route:
+      type: object
+      description: Bus route
+      properties:
+        route_id:
+          type: string
+        title:
+          type: string
+        stops:
+          type: array
+          items:
+            $ref: "#/components/schemas/Stop"
+        directions:
+          type: array
+          items:
+            type: object
+            properties:
+              direction_id:
+                type: string
+              title:
+                type: string
+              stops:
+                type: array
+                items:
+                  type: string
+        paths:
+          type: array
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                lat:
+                  type: number
+                  format: float
+                long:
+                  type: number
+                  format: float
+        lat_max:
+          type: number
+          format: float
+        lat_min:
+          type: number
+          format: float
+        long_max:
+          type: number
+          format: float
+        long_min:
+          type: number
+          format: float
+    Stop:
+      type: object
+      description: Bus stop
+      properties:
+        stop_id:
+          type: string
+        title:
+          type: string
+        lat:
+          type: number
+          format: float
+        long:
+          type: number
+          format: float
     Course:
       type: object
       description: Represents a course on Testudo
