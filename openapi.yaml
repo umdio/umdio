@@ -62,8 +62,8 @@ paths:
       tags:
         - courses
       summary: List courses
-      description: Returns list of all minimized courses
-      operationId: getCourses
+      description: Returns list of all course codes and names
+      operationId: getCourseList
       responses:
         "200":
           description: Successful Operation
@@ -72,7 +72,12 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Course"
+                  type: object
+                  properties:
+                    course_id:
+                      type: string
+                    name:
+                      type: string
   /courses/sections:
     get:
       tags:
@@ -115,6 +120,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Section"
+        "400":
+          description: Malformed section id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown section id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /courses/{course_ids}:
     get:
       tags:
@@ -141,6 +158,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Course"
+        "400":
+          description: Malformed course id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown course id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /courses/{course_ids}/sections:
     get:
       tags:
@@ -167,6 +196,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Section"
+        "400":
+          description: Malformed course id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown course id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /courses/{course_ids}/sections/{section_ids}:
     get:
       tags:
@@ -202,6 +243,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Section"
+        "400":
+          description: Malformed course id or section id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown course id or section id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /courses/semesters:
     get:
       tags:
@@ -296,12 +349,10 @@ paths:
           name: building_id
           required: true
           schema:
-            oneOf:
-              - type: string
-              - type: array
-                items:
-                  type: string
-            example: 226
+            type: array
+            items:
+              type: string
+            example: ["226"]
           description: Numeric building ID
           explode: true
       responses:
@@ -494,6 +545,18 @@ paths:
             application/json:
               schema:
                 type: string
+        "400":
+          description: Malformed route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /bus/routes/{route_id}/schedules:
     get:
       tags:
@@ -516,6 +579,18 @@ paths:
             application/json:
               schema:
                 type: string
+        "400":
+          description: Malformed route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /bus/routes/{route_id}/arrivals/{stop_id}:
     get:
       tags:
@@ -545,7 +620,18 @@ paths:
             application/json:
               schema:
                 type: string
-
+        "400":
+          description: Malformed route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Route:
@@ -618,62 +704,98 @@ components:
       properties:
         course_id:
           type: string
+          example: "MATH140"
         semester:
           type: string
+          example: "202001"
         name:
           type: string
+          example: "Calculus I"
         dept_id:
           type: string
+          example: "MATH"
         department:
           type: string
+          example: "Mathematics"
         credits:
           type: string
+          example: "4"
         description:
           type: string
+          example: "Introduction to calculus, including functions, limits, continuity, derivatives and applications of the derivative, sketching of graphs of functions, definite and indefinite integrals, and calculation of area. The course is especially recommended for science, engineering and mathematics majors."
         grading_method:
           type: array
           items:
             type: string
+          example: ["Regular", "Pass-Fail", "Audit"]
         gen_ed:
           type: array
           items:
             type: array
             items:
               type: string
+          example: [["FSAR", "FSMA"]]
         core:
           type: array
           items:
             type: string
+          example: ["MS"]
         relationships:
           type: object
           properties:
             coreqs:
               type: string
               nullable: true
+              example: null
             prereqs:
               type: string
               nullable: true
+              example: "Minimum grade of C- in MATH115."
             formerly:
               type: string
               nullable: true
+              example: null
             restrictions:
               type: string
               nullable: true
+              example: null
             additional_info:
               type: string
               nullable: true
+              example: "Or must have math eligibility of MATH140 or higher; and math eligibility is based on the Math Placement Test.  All sections will require the use of a TI graphics calculator. Instructor will use a TI-83, TI-83+, or TI-86 calculator. If purchasing used books additional software may be required."
             also_offered_as:
               type: string
               nullable: true
+              example: null
             credit_granted_for:
               type: string
               nullable: true
+              example: "MATH120, MATH130, MATH136, MATH140 or MATH220."
         sections:
           type: array
           items:
             oneOf:
               - type: string
               - $ref: "#/components/schemas/Section"
+          example:
+            [
+              "MATH140-0111",
+              "MATH140-0121",
+              "MATH140-0131",
+              "MATH140-0141",
+              "MATH140-0211",
+              "MATH140-0221",
+              "MATH140-0231",
+              "MATH140-0241",
+              "MATH140-0311",
+              "MATH140-0321",
+              "MATH140-0112",
+              "MATH140-0113",
+              "MATH140-0122",
+              "MATH140-0123",
+              "MATH140-0132",
+              "MATH140-0142",
+            ]
     Section:
       type: object
       properties:
@@ -760,15 +882,15 @@ components:
         name:
           type: string
           description: Name of the building
-          example: Edward St. John Learning and Teaching Center
+          example: "Edward St. John Learning and Teaching Center"
         code:
           type: string
           description: Shortened building code. Not all buildings have these.
-          example: ESJ
-        number:
+          example: "ESJ"
+        id:
           type: string
           description: Unique building id
-          example: 226
+          example: "226"
         long:
           type: number
           description: Longitude
