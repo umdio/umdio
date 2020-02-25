@@ -27,9 +27,16 @@ module Sinatra
 
               section_std_params = parse_query_v0 @section_params
 
+              y = Section.where{Sequel.&(*section_std_params)} unless section_std_params == []
+              y = Section.all if section_std_params == []
+
+              x = Sequel.&(*std_params, sections: y) unless std_params == []
+              x = {sections: y} if std_params == []
+
+
               res =
                 Professor
-                  .where(Sequel.&(*std_params, sections: Section.where{Sequel.&(*section_std_params)}))
+                  .where(x)
                   .order(*sorting)
                   .limit(@limit)
                   .offset((@page - 1)*@limit)
@@ -37,14 +44,8 @@ module Sinatra
 
               end_paginate! res
 
-              #Throw a 404 if prof is empty. (Doesn't exist or invalid)
-              if res == []
-                halt 404, {
-                  error_code: 404,
-                  message: "There were no professors that matched your search.",
-                  docs: "https://docs.umd.io/professors"
-                }.to_json
-              end
+              # If no professors found, 404
+              halt 404, not_found_error("There were no professors that matched your search.", "https://docs.umd.io/#tag/professors") if res == []
 
               json res
               end

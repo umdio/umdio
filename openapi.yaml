@@ -303,6 +303,18 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Professor"
+        "400":
+          description: "Malformed query parameters"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: "No Professors Found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /majors/list:
     get:
       tags:

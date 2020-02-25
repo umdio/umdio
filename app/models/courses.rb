@@ -192,7 +192,7 @@ class Professor < Sequel::Model
     end
 
     def to_v1
-        ss = sections.map{|s| s.to_v0}
+        ss = sections.map{|s| s.to_v1}
         taught = []
 
         ss.each {|s|
