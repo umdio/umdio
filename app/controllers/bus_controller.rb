@@ -9,14 +9,14 @@ module Sinatra
             #this should probably be a more specific error message where we error out!
             bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
             bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
-            bus_docs_url = "https://docs.umd.io/bus"
+            bus_docs_url = "https://docs.umd.io/#tags/bus"
             apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
             require 'net/http'
 
             get do
               resp = {
                 message: "This is the bus endpoint.",
-                docs: "https://docs.umd.io/bus/",
+                docs: "https://docs.umd.io/#tags/bus/",
               }
               json resp
             end
@@ -30,17 +30,17 @@ module Sinatra
               route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id}
               routes = Route.where(route_id: route_ids).map {|r| r.to_v1}
 
-              halt 404, "No routes found" if not routes
+              halt 404, not_found_error("No routes found.", "https://docs.umd.io/#tags/bus/") if routes == []
               json routes
             end
 
-
             get '/routes/:route_id/schedules' do
-              cache_control :public, :must_revalidate, max_age: 60*60
-
               route_id = params[:route_id]
               halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
-              json Schedule.where(route: route_id).map{|r| r.to_v1}
+              res = Schedule.where(route: route_id).map{|r| r.to_v1}
+
+              halt 404, not_found_error("No routes found.", "https://docs.umd.io/#tags/bus/") if res == []
+              json res
             end
 
             # next arriving buses for a particular stop on the route (in nextbus, the predictions)
