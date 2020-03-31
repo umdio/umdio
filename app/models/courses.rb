@@ -78,7 +78,6 @@ class Course < Sequel::Model
     def to_v1_info
         {
             course_id: course_id,
-            dept_id: dept_id,
             name: name
         }
     end
@@ -193,7 +192,7 @@ class Professor < Sequel::Model
     end
 
     def to_v1
-        ss = sections.map{|s| s.to_v0}
+        ss = sections.map{|s| s.to_v1}
         taught = []
 
         ss.each {|s|
