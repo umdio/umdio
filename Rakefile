@@ -14,7 +14,7 @@ task :test_scrape do
   sh "ruby app/scrapers/courses_scraper.rb #{current_semester}"
   sh "ruby app/scrapers/sections_scraper.rb #{current_semester}"
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
-  sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper.rb'
   sh 'ruby app/scrapers/map_scraper.rb'
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
@@ -23,7 +23,7 @@ namespace :scrape do
   desc "Run bus route scrapers"
   task :bus do
     sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
-    sh 'ruby app/scrapers/bus_schedules_scraper_small.rb rebuild'
+    sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
   end
 
   desc "Run course scrapers"
