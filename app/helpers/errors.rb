@@ -20,6 +20,16 @@ module Sinatra
             docs: docs
           }.to_json
       end
+
+      def service_unavailable_error message, docs
+        message ||= "The path you requested is not currently available. Please try again later"
+          docs ||= "https://docs.umd.io"
+          {
+            error_code: 502,
+            message: message,
+            docs: docs
+          }.to_json
+      end
     end
   end
 end

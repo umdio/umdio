@@ -23,7 +23,7 @@ info:
   license:
     name: MIT
     url: "https://github.com/umdio/umdio/LICENSE"
-  version: 1.0.0
+  version: 1.0.0 Beta
 externalDocs:
   description: Github
   url: "https://github.com/umdio/umdio"
@@ -718,8 +718,8 @@ components:
           type: string
           example: "MATH140"
         semester:
-          type: string
-          example: "202001"
+          type: number
+          example: 202001
         name:
           type: string
           example: "Calculus I"
@@ -813,10 +813,13 @@ components:
       properties:
         course:
           type: string
+          example: "ENGL101"
         section_id:
           type: string
+          example: "ENGL101-0101"
         semester:
-          type: string
+          type: number
+          example: 201501
         number:
           type: string
         seats:
