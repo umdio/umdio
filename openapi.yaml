@@ -48,6 +48,13 @@ paths:
       summary: List of courses
       description: Returns paginated list of courses
       operationId: getCourses
+      parameters:
+        - $ref: "#/components/parameters/semesterParam"
+        - $ref: "#/components/parameters/creditsParam"
+        - $ref: "#/components/parameters/deptIdParam"
+        - $ref: "#/components/parameters/gradingMethodParam"
+        - $ref: "#/components/parameters/coreParam"
+        - $ref: "#/components/parameters/genEdParam"
       responses:
         "200":
           description: Successful Operation
@@ -85,6 +92,12 @@ paths:
       summary: List of sections
       description: Returns paginated list of sections
       operationId: getSections
+      parameters:
+        - $ref: "#/components/parameters/courseIdParam"
+        - $ref: "#/components/parameters/seatsParam"
+        - $ref: "#/components/parameters/openSeatsParam"
+        - $ref: "#/components/parameters/waitlistParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation
@@ -294,6 +307,9 @@ paths:
       summary: List professors
       description: Returns list of all professors
       operationId: getProfessors
+      parameters:
+        - $ref: "#/components/parameters/nameParam"
+        - $ref: "#/components/parameters/courseIdParam"
       responses:
         "200":
           description: Successful Operation
@@ -521,54 +537,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /bus/locations:
-    get:
-      tags:
-        - bus
-      summary: Current bus locations
-      description: Get bus locations
-      operationId: getLocations
-      responses:
-        "200":
-          description: Successful Operation
-          content:
-            application/json:
-              schema:
-                type: string
-  /bus/routes/{route_id}/locations:
-    get:
-      tags:
-        - bus
-      summary: Current bus locations by route
-      description: Get bus locations for a route
-      operationId: getLocations
-      parameters:
-        - in: path
-          name: route_id
-          required: true
-          schema:
-            type: string
-          description: Route id
-          explode: true
-      responses:
-        "200":
-          description: Successful Operation
-          content:
-            application/json:
-              schema:
-                type: string
-        "400":
-          description: Malformed route code
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "404":
-          description: Unknown route code
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+  #/bus/locations:
+  #  get:
+  #    tags:
+  #      - bus
+  #    summary: Current bus locations
+  #    description: Get bus locations
+  #    operationId: getLocations
+  #    responses:
+  #      "200":
+  #        description: Successful Operation
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/"
+  #/bus/routes/{route_id}/locations:
+  #  get:
+  #    tags:
+  #      - bus
+  #    summary: Current bus locations by route
+  #    description: Get bus locations for a route
+  #    operationId: getLocations
+  #    parameters:
+  #      - in: path
+  #        name: route_id
+  #        required: true
+  #        schema:
+  #          type: string
+  #        description: Route id
+  #        explode: true
+  #    responses:
+  #      "200":
+  #        description: Successful Operation
+  #        content:
+  #          application/json:
+  #            schema:
+  #              type: string
+  #      "400":
+  #        description: Malformed route code
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/Error"
+  #      "404":
+  #        description: Unknown route code
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/Error"
   /bus/routes/{route_id}/schedules:
     get:
       tags:
@@ -590,7 +606,9 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  $ref: "#/components/schemas/BusSchedule"
         "400":
           description: Malformed route code
           content:
@@ -603,47 +621,47 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /bus/routes/{route_id}/arrivals/{stop_id}:
-    get:
-      tags:
-        - bus
-      summary: Get arrivals for a stop for a route
-      description: Get arrivals for a stop for a route
-      operationId: getLocations
-      parameters:
-        - in: path
-          name: route_id
-          required: true
-          schema:
-            type: string
-          description: Route id
-          explode: true
-        - in: path
-          name: stop_id
-          required: true
-          schema:
-            type: string
-          description: Stop id
-          explode: true
-      responses:
-        "200":
-          description: Successful Operation
-          content:
-            application/json:
-              schema:
-                type: string
-        "400":
-          description: Malformed route id or stop id
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "404":
-          description: Unknown route id or stop id
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
+  #/bus/routes/{route_id}/arrivals/{stop_id}:
+  #  get:
+  #    tags:
+  #      - bus
+  #    summary: Get arrivals for a stop for a route
+  #    description: Get arrivals for a stop for a route
+  #    operationId: getLocations
+  #    parameters:
+  #      - in: path
+  #        name: route_id
+  #        required: true
+  #        schema:
+  #          type: string
+  #        description: Route id
+  #        explode: true
+  #      - in: path
+  #        name: stop_id
+  #        required: true
+  #        schema:
+  #          type: string
+  #        description: Stop id
+  #        explode: true
+  #    responses:
+  #      "200":
+  #        description: Successful Operation
+  #        content:
+  #          application/json:
+  #            schema:
+  #              type: string
+  #      "400":
+  #        description: Malformed route id or stop id
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/Error"
+  #      "404":
+  #        description: Unknown route id or stop id
+  #        content:
+  #          application/json:
+  #            schema:
+  #              $ref: "#/components/schemas/Error"
 components:
   schemas:
     Route:
@@ -735,7 +753,37 @@ components:
           format: float
           description: Longitude
           example: 38.9922185
-
+    BusSchedule:
+      type: object
+      properties:
+        days:
+          type: string
+        directions:
+          type: string
+        route:
+          type: string
+        stops:
+          type: array
+          items:
+            type: object
+            properties:
+              stop_id:
+                type: string
+              name:
+                type: string
+        trips:
+          type: array
+          items:
+            type: array
+            items:
+              type: object
+              properties:
+                stop_id:
+                  type: string
+                arrival_time:
+                  type: string
+                arrival_time_secs:
+                  type: string
     Course:
       type: object
       description: Represents a course on Testudo
@@ -1015,3 +1063,117 @@ components:
         type: boolean
       description: Expands sections into full objects
       example: 3
+    semesterParam:
+      in: query
+      name: semester
+      schema:
+        type: string
+      description: 6-digit semester ID to search, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
+      example: 202008|leq
+    nameParam:
+      in: query
+      name: name
+      schema:
+        type: string
+      description: Professor's name.
+    courseIdParam:
+      in: query
+      name: course_id
+      schema:
+        type: string
+      description: 7 or 8 digit course id. See the course object for more info.
+    creditsParam:
+      in: query
+      name: credits
+      schema:
+        type: string
+      description: The number of credits to watch, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
+      example: "3|leq"
+    deptIdParam:
+      in: query
+      name: dept_id
+      schema:
+        type: string
+      description: 4 Letter department code to search.
+      example: CMSC
+    gradingMethodParam:
+      in: query
+      name: grading_method
+      schema:
+        type: string
+      description: Grading method to search on.
+    coreParam:
+      in: query
+      name: core
+      schema:
+        type: string
+      description: Core requirement to search on.
+    genEdParam:
+      in: query
+      name: gen_ed
+      schema:
+        type: string
+      description: Gened requirement to search.
+    seatsParam:
+      in: query
+      name: seats
+      schema:
+        type: string
+      description: Number of total seats in a section, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
+      example: 200
+    openSeatsParam:
+      in: query
+      name: open_seats
+      schema:
+        type: string
+      description: Number of open seats in a section, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
+      example: 5
+    waitlistParam:
+      in: query
+      name: waitlist
+      schema:
+        type: string
+      description: Number of people on the waitlist for a class, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
+      example: 10
+    daysParam:
+      in: query
+      name: days
+      schema:
+        type: string
+      description: The days of the week that a course meets. Will be some combination of M, Tu, W, Th, F in that order.
+      example: MWF
+    roomParam:
+      in: query
+      name: room
+      schema:
+        type: string
+      description: The room a class meeting is in.
+      example: 0120
+    buildingParam:
+      in: query
+      name: building
+      schema:
+        type: string
+      description: The code for the building the class meeting is in.
+      example: KEY
+    classtypeParam:
+      in: query
+      name: classtype
+      schema:
+        type: string
+      description: Indicates type of meeting. Could be "Lecture", "Discussion", or "Lab"
+      example: c
+    startTimeParam:
+      in: query
+      name: start_time
+      schema:
+        type: string
+      description: Start time of the meeting.
+      example: 9:00am
+    endTimeParam:
+      in: query
+      name: end_time
+      schema:
+        type: string
+      description: End time of the meeting.
+      example: 10:50am
