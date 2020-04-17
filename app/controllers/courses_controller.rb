@@ -9,8 +9,8 @@ module Sinatra
 
           app.namespace '/v1/courses' do
             before do
-              @course_params = ['semester', 'course_id', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed', 'name']
-              @section_params = ['section_id_str', 'course_id', 'seats', 'semester']
+              @course_params = ['semester', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed']
+              @section_params = ['course_id', 'seats', 'open_seats', 'waitlist', 'semester']
               @meeting_params = ['days', 'room', 'building', 'classtype', 'start_time', 'end_time']
 
               @meeting_params.each do |p|
@@ -18,8 +18,6 @@ module Sinatra
               end
 
               fix_sem
-
-              rename_param 'section_id', 'section_id_str'
 
               # TODO: This could be more concise
               if request.params['expand']
