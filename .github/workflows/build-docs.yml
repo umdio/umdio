@@ -1,8 +1,8 @@
-name: CI
+name: build-docs
 
 on:
   release:
-    branches: [ master ]
+    types: [published]
 
 jobs:
   build:
@@ -12,6 +12,6 @@ jobs:
     - uses: actions/checkout@v2
     - uses: actions/setup-node@v1.4.1
     - name: Install redoc-cli
-      run: npm install -g redoc-cli
+      run: sudo npm install -g redoc-cli
     - name: Build
       run: redoc-cli bundle ./openapi.yml
