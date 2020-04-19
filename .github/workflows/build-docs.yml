@@ -1,0 +1,17 @@
+name: CI
+
+on:
+  release:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1.4.1
+    - name: Install redoc-cli
+      run: npm install -g redoc-cli
+    - name: Build
+      run: redoc-cli bundle ./openapi.yml
