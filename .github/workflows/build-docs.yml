@@ -14,4 +14,13 @@ jobs:
     - name: Install redoc-cli
       run: sudo npm install -g redoc-cli
     - name: Build
-      run: redoc-cli bundle ./openapi.yml
+      run: redoc-cli bundle ./openapi.yaml
+    - name: Move
+      run: mv redoc-static docs/index.html
+    - name: Commit
+      run: |
+        git config user.name "$GITHUB_ACTOR"
+        git config user.email "${GITHUB_ACTOR}@bots.github.com"
+        git add docs/index.html
+        git commit -m "[Build] Build docs"
+        git push
