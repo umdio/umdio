@@ -16,7 +16,9 @@ jobs:
     - name: Build
       run: redoc-cli bundle ./openapi.yaml
     - name: Move
-      run: mv redoc-static docs/index.html
+      run: |
+        mkdir -p docs
+        mv redoc-static.html docs/index.html
     - name: Commit
       run: |
         git config user.name "$GITHUB_ACTOR"
