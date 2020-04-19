@@ -23,6 +23,7 @@ jobs:
       run: |
         git config user.name "$GITHUB_ACTOR"
         git config user.email "${GITHUB_ACTOR}@bots.github.com"
+        git checkout master
         git add docs/index.html
         git commit -m "[Build] Build docs"
-        git push
+        git push origin master
