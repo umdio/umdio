@@ -75,6 +75,63 @@ module UMDIO
       sorting
     end
 
+    def fix_sem
+      if !params['semester']
+        request.update_param('semester', current_semester)
+      end
+      check_semester app, request.params['semester']
+    end
+
+    def rename_param from, to
+      if request.params[from]
+        request.update_param(to, request[from])
+        request.delete_param(from)
+      end
+    end
+
+    def upper_param name
+      if request.params[name]
+        request.update_param(name, request.params[name].upcase)
+      end
+    end
+
+    def parse_delim d
+      vals = {
+        eq: "=",
+        neq: "!=",
+        lt: "<",
+        gt: ">",
+        leq: "<=",
+        geq: ">="
+      }
+
+      halt 400, { error_code: 400, message: "Malformed parameters" }.to_json if (!vals.key? d)
+
+      vals[d]
+    end
+
+    def standardize_params_v1
+      std_params = {}
+
+      request.params.keys.each do |key|
+        value = request.params[key]
+
+        v = ""
+        d = ""
+        if value.to_s.include? "|"
+          x = value.split("|")
+          v = x[0]
+          d = parse_delim x[1].to_sym
+        else
+          v = value
+          d = "="
+        end
+
+        std_params[key] = [v, d]
+      end
+
+      std_params
+    end
     # Turn request.params into a reasonable format
     def standardize_params
       std_params = {}
@@ -114,27 +171,38 @@ module UMDIO
     end
 
     # Uses a whitelist of request.params to parse
-    def parse_query_v0 valid_params, valid_array_params=[], valid_json_array_params=[]
+    def parse_query_v0 valid_params
       conds = []
 
       std_params = standardize_params
-      std_params.keys.each do |key| if (valid_params.include? key) or (valid_array_params.include? key) or (valid_json_array_params.include? key)
+      std_params.keys.each do |key| if (valid_params.include? key)
         value = std_params[key][0]
         delim = std_params[key][1]
 
-        if valid_array_params.include? key
-          j = Sequel.pg_jsonb_op(key.to_sym)
+        if delim.include? '!'
+          conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
+        else
+          conds << Sequel.lit("#{key} #{delim} ?", value)
+        end
+      end
+    end
+    conds
+  end
 
-          if value.include? ','
-            conds << j.contain_any(value.split(','))
+  def parse_query_v1 valid_params
+      conds = []
+
+      std_params = standardize_params_v1
+      std_params.keys.each do |key| if (valid_params.include? key)
+        value = std_params[key][0]
+        delim = std_params[key][1]
+
+        if key == "gen_ed"
+          if delim.include? '!'
+            conds << Sequel.~(Sequel.lit("#{key} LIKE ?", "%#{value}%"))
           else
-            conds << j.contain_all(value.split('|'))
+            conds << Sequel.lit("#{key} LIKE ?", "%#{value}%")
           end
-        elsif valid_json_array_params.include? key
-          key_parts = key.split('.')
-          nkey = key_parts[1]
-
-          conds << {section_key: $DB[key_parts[0].to_sym].where(Sequel.lit("#{key} #{delim} ?", value)).map{|m| m[:section_key]}}
         else
           if delim.include? '!'
             conds << Sequel.~(Sequel.lit("#{key} #{delim} ?", value))

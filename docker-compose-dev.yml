@@ -4,9 +4,14 @@ services:
     image: postgres
     environment:
       - POSTGRES_DB=umdio
-      - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+  redoc:
+    image: redocly/redoc
+    environment:
+      - SPEC_URL=http://localhost:3000/v1/spec.yaml
+    ports:
+      - 8080:80
   umdio:
     build: .
     links:

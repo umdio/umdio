@@ -42,7 +42,6 @@ class UMDIO < Sinatra::Base
   Dir["./app/helpers/*.rb"].each { |file| require file }
   Dir["./app/controllers/*.rb"].each { |file| require file }
   Dir["./app/models/*.rb"].each { |file| require file }
-  require './root.rb'
 
   # register the helpers
   helpers Sinatra::UMDIO::Helpers

@@ -28,6 +28,20 @@ RSpec.configure do |config|
     end
   end
 
+  shared_examples_for '400' do |url|
+    before {head url}
+    it 'responds with 400' do
+      expect(last_response.status).to be == 400
+    end
+  end
+
+  shared_examples_for '404' do |url|
+    before {head url}
+    it 'responds with 404' do
+      expect(last_response.status).to be == 404
+    end
+  end
+
   def app
     UMDIO
   end

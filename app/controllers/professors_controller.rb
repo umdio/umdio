@@ -4,19 +4,65 @@ module Sinatra
   module UMDIO
     module Routing
       module Professors
-
         def self.registered(app)
+          app.register Sinatra::Namespace
+
+          app.namespace '/v1/professors' do
+            before '*' do
+              @special_params = ['sort', 'per_page', 'page']
+              @section_params = ['semester', 'course_id']
+              @prof_params = ['name']
+
+              rename_param 'course', 'course_id'
+              rename_param 'courses', 'course_id'
+
+              upper_param 'course_id'
+            end
+
+            get do
+              begin_paginate! $DB[:professors]
+
+              sorting = parse_sorting_params 'name'
+              std_params = parse_query_v0 @prof_params
+
+              section_std_params = parse_query_v0 @section_params
+
+              y = Section.where{Sequel.&(*section_std_params)} unless section_std_params == []
+              y = Section.all if section_std_params == []
+
+              x = Sequel.&(*std_params, sections: y) unless std_params == []
+              x = {sections: y} if std_params == []
+
+
+              res =
+                Professor
+                  .where(x)
+                  .order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|p| p.to_v1}
+
+              end_paginate! res
+
+              # If no professors found, 404
+              halt 404, not_found_error("There were no professors that matched your search.", "https://docs.umd.io/#tag/professors") if res == []
+
+              json res
+              end
+            end
 
           app.before '/v0/professors*' do
             @special_params = ['sort', 'semester', 'per_page', 'page']
+            @section_params = ['semester', 'course_id', 'dept_id']
             @prof_params = ['name']
-            @prof_array_params = ['semester', 'courses', 'dept']
 
-            if !request.params[:semester]
-              request.update_param('semester', current_semester)
-            end
-            check_semester app, request.params['semester']
+            rename_param 'courses', 'course_id'
+            rename_param 'departments', 'dept_id'
 
+            upper_param 'course_id'
+            upper_param 'dept_id'
+
+            fix_sem
           end
 
           # Route for professors, use 'name' or 'course' to filter
@@ -24,11 +70,13 @@ module Sinatra
             begin_paginate! $DB[:professors]
 
             sorting = parse_sorting_params 'name'
-            std_params = parse_query_v0 @prof_params, @prof_array_params
+            std_params = parse_query_v0 @prof_params
+
+            section_std_params = parse_query_v0 @section_params
 
             res =
               Professor
-                .where{Sequel.&(*std_params)}
+                .where(Sequel.&(*std_params, sections: Section.where{Sequel.&(*section_std_params)}))
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1)*@limit)

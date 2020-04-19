@@ -1,5 +1,3 @@
-# Scrapes sections and puts them into mongo
-
 require 'open-uri'
 require 'nokogiri'
 
@@ -95,7 +93,8 @@ semesters.each do |semester|
 
     # Every 200, parse a sections page, reset courses
     if courses.length == 200
-      query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+      query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+
       res = parse_sections(query, semester)
       courses = []
       sections.concat(res)
@@ -103,27 +102,28 @@ semesters.each do |semester|
   end
 
     # parse the last entries
-    query = "https://ntst.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+    query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
     res = parse_sections(query, semester)
     sections.concat(res)
     courses = []
 
   # Now, insert all our stuff to the db
   sections.each do |section|
-    section_key = $DB[:sections].insert_ignore.insert(
-      :section_id => section[:section_id],
+    $DB[:sections].insert_ignore.insert(
+      :section_id_str => section[:section_id],
       :course_id => section[:course_id],
       :semester => section[:semester],
       :number => section[:number],
       :seats => section[:seats],
       :open_seats => section[:open_seats],
       :waitlist => section[:waitlist],
-      :instructors => Sequel.pg_jsonb_wrap(section[:instructors])
     )
+
+    s = $DB[:sections].where(section_id_str: section[:section_id], course_id: section[:course_id], semester: section[:semester]).first
 
     section[:meetings].each do |meeting|
       $DB[:meetings].insert_ignore.insert(
-        :section_key => section_key,
+        :section_key => s[:section_id],
         :days => meeting[:days],
         :room => meeting[:room],
         :building => meeting[:building],
@@ -136,31 +136,16 @@ semesters.each do |semester|
     end
 
   section[:instructors].each do |prof|
-    profs = Professor.where(name: prof).map{|p| p.to_v0}
+    $DB[:professors].insert_ignore.insert(
+      :name => prof,
+    )
 
-    if profs.length > 1
-      raise "Prof uniqueness violated"
-    end
+    pr = $DB[:professors].where(name: prof).first
 
-    if profs.length == 0
-      $DB[:professors].insert(
-        :name => prof,
-        :semester => Sequel.pg_jsonb_wrap([section[:semester]]),
-        :courses => Sequel.pg_jsonb_wrap([section[:course_id]]),
-        :department => Sequel.pg_jsonb_wrap([section[:course_id][0,4]])
-      )
-    else
-      sems = Sequel.pg_jsonb_wrap(profs[0][:semester].to_a.push(section[:semester]).uniq)
-      courses = Sequel.pg_jsonb_wrap(profs[0][:courses].to_a.push(section[:course_id]).uniq)
-      depts = Sequel.pg_jsonb_wrap(profs[0][:depts].to_a.push(section[:course_id][0,4]).uniq)
-
-      $DB[:professors].insert_conflict(target: :name, update: {semester: sems, courses: courses, department: depts}).insert(
-        :name => prof,
-        :semester => Sequel.pg_jsonb_wrap([section[:semester]]),
-        :courses => Sequel.pg_jsonb_wrap([section[:course_id]]),
-        :department => Sequel.pg_jsonb_wrap([section[:course_id][0,4]])
-      )
-    end
+    $DB[:professors_sections].insert_ignore.insert(
+      :section_id => s[:section_id],
+      :professor_id => pr[:professor_id]
+    )
   end
 end
 end

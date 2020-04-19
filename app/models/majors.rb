@@ -7,6 +7,15 @@ $DB.create_table? :majors do
 end
 
 class Major < Sequel::Model
+    def to_v1
+        {
+            major_id: pid,
+            name: name,
+            college: college,
+            url: url
+        }
+    end
+
     def to_v0
         {
             major_id: major_id,

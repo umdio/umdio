@@ -3,7 +3,7 @@ require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 ###### Scraping
-desc "Scrape to fill databases (takes ~20 minutes)"
+desc "Scrape to fill databases"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
 desc "Scrapes enough to run the tests"
@@ -14,7 +14,7 @@ task :test_scrape do
   sh "ruby app/scrapers/courses_scraper.rb #{current_semester}"
   sh "ruby app/scrapers/sections_scraper.rb #{current_semester}"
   sh 'ruby app/scrapers/bus_routes_scraper.rb'
-  sh 'ruby app/scrapers/bus_schedules_scraper_small.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper.rb'
   sh 'ruby app/scrapers/map_scraper.rb'
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
@@ -23,7 +23,7 @@ namespace :scrape do
   desc "Run bus route scrapers"
   task :bus do
     sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
-    sh 'ruby app/scrapers/bus_schedules_scraper_small.rb rebuild'
+    sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
   end
 
   desc "Run course scrapers"
@@ -64,8 +64,6 @@ end
 
 ###### Server
 
-task :setup => ['db:clean','db:up','scrape']
-
 desc "Start the web server for dev"
 task :up do
   system "shotgun -p 3000 -o 0.0.0.0"
@@ -91,5 +89,11 @@ RSpec::Core::RakeTask.new :test do |task|
   task.rspec_opts = "--format documentation" #default to verbose testing, comment for silence
 end
 task :spec => :test
+
+desc "Run tests in /tests/v1 that look like *_spec.rb"
+RSpec::Core::RakeTask.new :testv1 do |task|
+  task.pattern = Dir['tests/v1/*_spec.rb']
+  task.rspec_opts = "--format documentation" #default to verbose testing, comment for silence
+end
 
 task :default => ['test']

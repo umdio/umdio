@@ -6,8 +6,6 @@ module Sinatra
         def self.registered(app)
           app.register Sinatra::Namespace
 
-          bad_id_message = "Check the building id in the url."
-
           app.namespace '/v1/map' do
             get do
               resp = {
@@ -26,7 +24,12 @@ module Sinatra
 
             # get buildings by building_id or code
             get '/buildings/:building_id' do
-              json get_buildings_by_id(params[:building_id]).map {|b| b.to_v1}
+              buildings = get_buildings_by_id(params[:building_id]).map {|b| b.to_v1}
+              resp = {
+                data: buildings,
+                count: buildings.length
+              }
+              json resp
             end
           end
 

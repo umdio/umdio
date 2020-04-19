@@ -3,6 +3,20 @@ module Sinatra
   module UMDIO
     module Helpers
 
+      # Generic course helpers
+
+      def list_semesters
+        Course.distinct(:semester).map {|c| c[:semester]}.sort
+      end
+
+      def list_depts
+        Course.distinct(:dept_id, :department).map {|c| {dept_id: c[:dept_id], department: c[:department]}}.sort_by! {|d| d[:dept_id]}
+      end
+
+      def find_courses_in_sem semester
+        Course.where(semester: semester).order(Sequel.asc(:course_id))
+      end
+
       # generalize logic for checking if semester param valid
       def check_semester app, semester
         # check for semester formatting
@@ -17,8 +31,7 @@ module Sinatra
 
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
       def find_sections semester, section_ids
-        # Turn section_ids into string
-        res = Section.where(semester: semester, section_id: section_ids).map{|s| s.to_v0}
+        res = Section.where(semester: semester, section_id_str: section_ids)
 
         if !res
           halt 404, {
@@ -32,13 +45,13 @@ module Sinatra
         return res
       end
 
+
       def validate_section_ids section_ids, do_halt=true
         section_ids = [section_ids] if section_ids.is_a?(String)
         section_ids.each do |id|
           if not is_full_section_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid section_id #{id}.", docs: "https://docs.umd.io/courses/" }.to_json
-            halt 400, error_msg
+            halt 400, bad_url_error("Invalid section_id #{id}.", "https://docs.umd.io/courses/")
           end
         end
 
@@ -53,16 +66,46 @@ module Sinatra
         course_ids.each do |id|
           if not is_course_id? id
             return false if not do_halt
-            error_msg = { error_code: 400, message: "Invalid course_id #{id}.", docs: "https://docs.umd.io/courses/" }.to_json
-            halt 400, error_msg
+            halt 400, bad_url_error("Invalid course_id #{id}.", "https://docs.umd.io/courses/")
           end
         end
 
         return true
       end
 
-      def find_courses_in_sem semester
-        Course.where(semester: 201908).order(Sequel.asc(:course_id)).map{|c| c.to_v0_info}
+      # gets a single course or an array or courses and halts if none are found
+      # @return: Array of courses
+      def find_courses_v1 semester, course_ids, params
+        course_ids = [course_ids] if course_ids.is_a?(String)
+
+        validate_course_ids course_ids
+
+        courses = Course.where(semester: semester, course_id: course_ids).map{|c| c.to_v1}
+        # check if found
+        if courses.empty?
+          s = course_ids.length > 1 ? 's' : ''
+          halt 404, {
+            error_code: 404,
+            message: "Course#{s} with course_id#{s} #{course_ids.join(',')} not found!",
+            available_courses: "https://api.umd.io/v0/courses",
+            docs: "https://docs.umd.io/courses/"
+          }.to_json
+        end
+
+        courses.each{|c| c['sections'] = find_sections_for_course_v1 semester, c[:course_id], params['expand']}
+        courses
+      end
+
+      def find_sections_for_course_v1 semester, course_id, expand
+        sections = []
+
+        if expand
+          sections = Section.where(semester: semester, course_id: course_id).map{|s| s.to_v1}
+        else
+          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id_str]}
+        end
+
+        return sections
       end
 
       # gets a single course or an array or courses and halts if none are found
@@ -94,7 +137,7 @@ module Sinatra
         if expand
           sections = Section.where(semester: semester, course_id: course_id).map{|s| s.to_v0}
         else
-          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id]}
+          sections = Section.where(semester: semester, course_id: course_id).map{|s| s[:section_id_str]}
         end
 
         return sections

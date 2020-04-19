@@ -31,6 +31,38 @@ $DB.create_table? :schedules do
 end
 
 class Route < Sequel::Model
+    def to_v1
+        p = paths.map do |path|
+            x = path.map do |pp|
+                pp['long'] = pp['lon'].to_f
+                pp.delete 'lon'
+
+                pp['lat'] = pp['lat'].to_f
+
+                pp
+            end
+        end
+
+        {
+            route_id: route_id,
+            title: title,
+            lat_max: lat_max,
+            lat_min: lat_min,
+            long_max: long_max,
+            long_min: long_min,
+            stops: stops,
+            directions: directions,
+            paths: paths
+        }
+    end
+
+    def to_v1_info
+        {
+            route_id: route_id,
+            title: title,
+        }
+    end
+
     def to_v0
         {
             route_id: route_id,
@@ -54,6 +86,22 @@ class Route < Sequel::Model
 end
 
 class Stop < Sequel::Model
+    def to_v1_info
+        {
+            stop_id: stop_id,
+            title: title
+        }
+    end
+
+    def to_v1
+        {
+            stop_id: stop_id,
+            title: title,
+            lat: lat,
+            long: long
+        }
+    end
+
     def to_v0_info
         {
             stop_id: stop_id,
@@ -72,6 +120,16 @@ class Stop < Sequel::Model
 end
 
 class Schedule < Sequel::Model
+    def to_v1
+        {
+            route: route,
+            days: days,
+            direction: direction,
+            stops: stops,
+            trips: trips
+        }
+    end
+
     def to_v0
         {
             route: route,
