@@ -29,7 +29,10 @@ class UMDIO < Sinatra::Base
   before do
     content_type 'application/json'
     cache_control :public, max_age: 86400
+    response.headers['Access-Control-Allow-Methods'] = 'GET, HEAD, OPTIONS'
+    response.headers["Access-Control-Allow-Headers"] = 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
     response.headers["Access-Control-Allow-Origin"] = '*'
+    response.headers["Access-Control-Expose-Headers"] = 'Content-Length,Content-Range'
   end
 
   helpers do
@@ -57,10 +60,6 @@ class UMDIO < Sinatra::Base
 
   # CORS
   options "*" do
-    response.headers['Access-Control-Allow-Methods'] = 'GET'
-    response.headers["Access-Control-Allow-Headers"] = 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range'
-    response.headers["Access-Control-Allow-Origin"] = '*'
-    response.headers["Access-Control-Expose-Headers"] = 'Content-Length,Content-Range'
     200
   end
 end
