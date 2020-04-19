@@ -9,6 +9,8 @@ jobs:
       - uses: actions/checkout@v1
       - name: "Run everything"
         run: |
+          mkdir data
+          mkdir data/postgres
           docker-compose pull
           docker-compose build
           docker-compose up -d
