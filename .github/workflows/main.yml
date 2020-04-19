@@ -13,5 +13,6 @@ jobs:
           docker-compose build
           docker-compose up -d
           sleep 10
+          docker ps -a
           docker exec umdio_umdio_1 bundle exec rake test_scrape
           docker exec umdio_umdio_1 bundle exec rake
