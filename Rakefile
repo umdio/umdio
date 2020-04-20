@@ -2,28 +2,48 @@ require 'rspec/core/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
+# Functions
+
+# Scrapes the current semester from Testudo
+def scrape_courses sems
+  sh "ruby app/scrapers/courses_scraper.rb #{sem}"
+  sh "ruby app/scrapers/sections_scraper.rb #{sem}"
+end
+
+# Imports old semesters from flat files
+def import_courses sems
+  puts "todo"
+end
+
+def scrape_bus
+  sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
+  sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
+end
+
+def scrape_majors
+  sh 'ruby app/scrapers/majors_scraper.rb'
+end
+
+def scrape_map
+  sh 'ruby app/scrapers/map_scraper.rb'
+end
+
 ###### Scraping
 desc "Scrape to fill databases"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
 desc "Scrapes enough to run the tests"
 task :test_scrape do
-  # Get the current semester
-  year = Time.now.month <= 10 ? Time.now.year : Time.now.year + 1
-  semesters = [] << current_semester
-  sh "ruby app/scrapers/courses_scraper.rb #{current_semester}"
-  sh "ruby app/scrapers/sections_scraper.rb #{current_semester}"
-  sh 'ruby app/scrapers/bus_routes_scraper.rb'
-  sh 'ruby app/scrapers/bus_schedules_scraper.rb'
-  sh 'ruby app/scrapers/map_scraper.rb'
-  sh 'ruby app/scrapers/majors_scraper.rb'
+  scrape_courses(current_semester)
+  scrape_bus()
+  scrape_majors()
+  scrape_map()
 end
 
 namespace :scrape do
   desc "Run bus route scrapers"
   task :bus do
-    sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
-    sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
+    scrape_bus()
   end
 
   desc "Run course scrapers"
@@ -32,33 +52,33 @@ namespace :scrape do
     # if fall is updated, we want to get the next year's courses
     year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
     years = ((year - 3)..year).to_a.join ' '
-    semesters = current_and_next_semesters
-    sh "ruby app/scrapers/courses_scraper.rb #{years}"
-    sh "ruby app/scrapers/sections_scraper.rb #{years}"
+    scrape_courses(years)
   end
 
   desc "Run course seat updater"
   task :seats do
-    year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
-    years = ((year - 3)..year).to_a.join ' '
     semesters = current_and_next_semesters
     sh "ruby app/scrapers/sections_scraper.rb #{semesters.join(' ')}"
   end
 
   desc "Run building scraper"
   task :buildings do
-    sh 'ruby app/scrapers/map_scraper.rb'
+    scrape_map()
   end
 
   desc "Majors scraper"
   task :majors do
-    sh 'ruby app/scrapers/majors_scraper.rb'
+    scrape_majors()
   end
 
   desc "Scrapes only the current semester courses/sections"
   task :current do
-    sh "ruby app/scrapers/courses_scraper.rb #{current_semester}"
-    sh "ruby app/scrapers/sections_scraper.rb #{current_semester}"
+    scrape_courses(current_semester)
+  end
+
+  desc "Import from file"
+  task :import_courses do
+    import_courses([])
   end
 end
 
@@ -96,4 +116,4 @@ RSpec::Core::RakeTask.new :testv1 do |task|
   task.rspec_opts = "--format documentation" #default to verbose testing, comment for silence
 end
 
-task :default => ['test']
+task :default => ['up']
