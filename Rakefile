@@ -17,8 +17,8 @@ end
 
 # Scrapes the current semester from Testudo
 def scrape_courses sems
-  sh "ruby app/scrapers/courses_scraper.rb #{sem}"
-  sh "ruby app/scrapers/sections_scraper.rb #{sem}"
+  sh "ruby app/scrapers/courses_scraper.rb #{sems}"
+  sh "ruby app/scrapers/sections_scraper.rb #{sems}"
 end
 
 # Imports old semesters from flat files
