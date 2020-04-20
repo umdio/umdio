@@ -4,6 +4,17 @@ include Sinatra::UMDIO::Helpers
 
 # Functions
 
+def get_semesters(args)
+  semesters = args.map do |e|
+    if e.length == 6
+      e
+    else
+      [e + '01', e + '05', e + '08', e + '12']
+    end
+  end
+  semesters.flatten
+end
+
 # Scrapes the current semester from Testudo
 def scrape_courses sems
   sh "ruby app/scrapers/courses_scraper.rb #{sem}"
@@ -12,7 +23,8 @@ end
 
 # Imports old semesters from flat files
 def import_courses sems
-  puts "todo"
+  sems = get_semesters(sems)
+  sems.each {|s| sh "ruby app/scrapers/courses_importer.rb #{s}"}
 end
 
 def scrape_bus
@@ -78,7 +90,8 @@ namespace :scrape do
 
   desc "Import from file"
   task :import_courses do
-    import_courses([])
+    years = ['201708', '201712', '201801', '201805', '201808', '201812', '201901', '201901', '201905', '201908', '201912']
+    import_courses(years)
   end
 end
 

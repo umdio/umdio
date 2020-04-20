@@ -1,11 +1,9 @@
 Gemfile.lock
 bower_components
 tmp
-docs/public/
-docs/node_modules
 
 # exclude database
-/data/*
+/data/postgres
 coverage
 log/
 
