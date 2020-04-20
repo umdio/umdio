@@ -1,4 +1,4 @@
-# [UMD.io](http://umd.io/) &middot; [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md#pull-requests)
+# [UMD.io](http://umd.io/) &middot; [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](README.md#Development)
 
 UMD.io is an open API for the University of Maryland. The main purpose is to give developers easy access to data to build great applications. In turn, developers can improve the University of Maryland with the things they build.
 
@@ -32,7 +32,7 @@ This will take some time, so in the meantime, review the rest of the guide.
 
 ## Documentation
 
-Within the codebase, comments and good practices are encouraged, and will later be enforced.
+Within the codebase, comments and [good practices](https://rubystyle.guide/) are encouraged, and will later be enforced.
 
 For the public-facing API, we use [OpenAPI v3](https://swagger.io/docs/specification/about/) to document everything. You can view our spec [here](https://github.com/umdio/umdio/blob/master/openapi.yaml). The docs are served with [ReDoc](https://github.com/Redocly/redoc) and are automatically built on every tagged commit.
 
