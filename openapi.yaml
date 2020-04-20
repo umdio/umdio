@@ -15,6 +15,9 @@ info:
     We're now in version 1! We might add new endpoints or more data to existing responses,
     but we won't remove anything without a major version change.
 
+    If you're looking for the v0 docs, you can find them at https://v0-docs.umd.io.
+    Please note that v0 is deprecated. It will continue to be supported until at least 2021,
+    but will get no further feature updates, and will eventually be discontinued.
 
     We are actively looking for contributors! Tweet, email, or otherwise get in
     touch with us.
