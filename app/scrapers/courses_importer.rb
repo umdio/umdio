@@ -52,7 +52,7 @@ end
 prog_name = "courses_importer"
 logger = ScraperCommon::logger
 
-file = File.read("./imports/#{ARGV[0]}.json")
+file = File.read("./data/umdio-data/courses/data/#{ARGV[0]}.json")
 
 j = JSON.parse(file)
 

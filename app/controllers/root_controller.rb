@@ -10,14 +10,53 @@ module Sinatra
             resp = {
               message: "This is the umd.io JSON API.",
               status: "working, most of the time",
-              docs: "https://umd.io/",
+              docs: "https://docs.umd.io/",
               current_version: "v0",
               versions: [
+                {
+                  id: "v1",
+                  url: "https://api.umd.io/v1"
+                },
                 {
                   id: "v0",
                   url: "https://api.umd.io/v0"
                 }
               ],
+            }
+            json resp
+          end
+
+          app.get '/v1' do
+            resp = {
+              id: "v1",
+              version: "1.0.0",
+              endpoints: [
+                {
+                  name: 'Courses',
+                  url: 'https://api.umd.io/v1/courses',
+                  docs: 'https://docs.umd.io/#tag/courses'
+                },
+                {
+                  name: 'Professors',
+                  url: 'https://api.umd.io/v1/professors',
+                  docs: 'https://docs.umd.io/#tag/professors'
+                },
+                {
+                  name: 'Bus',
+                  url: 'https://api.umd.io/v1/bus',
+                  docs: 'https://docs.umd.io/#tag/bus'
+                },
+                {
+                  name: 'Map',
+                  url: 'https://api.umd.io/v1/map',
+                  docs: 'https://docs.umd.io/#tag/map'
+                },
+                {
+                  name: 'Majors',
+                  url: 'https://api.umd.io/v1/majors',
+                  docs: 'https://docs.umd.io/#tag/majors'
+                },
+              ]
             }
             json resp
           end

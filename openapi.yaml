@@ -15,6 +15,9 @@ info:
     We're now in version 1! We might add new endpoints or more data to existing responses,
     but we won't remove anything without a major version change.
 
+    If you're looking for the v0 docs, you can find them at https://v0-docs.umd.io.
+    Please note that v0 is deprecated. It will continue to be supported until at least 2021,
+    but will get no further feature updates, and will eventually be discontinued.
 
     We are actively looking for contributors! Tweet, email, or otherwise get in
     touch with us.
@@ -49,11 +52,12 @@ paths:
       description: Returns paginated list of courses
       operationId: getCourses
       parameters:
+        - $ref: "#/components/parameters/sortParam"
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/perPageParam"
         - $ref: "#/components/parameters/semesterParam"
         - $ref: "#/components/parameters/creditsParam"
         - $ref: "#/components/parameters/deptIdParam"
-        - $ref: "#/components/parameters/gradingMethodParam"
-        - $ref: "#/components/parameters/coreParam"
         - $ref: "#/components/parameters/genEdParam"
       responses:
         "200":
@@ -71,6 +75,10 @@ paths:
       summary: List of minified courses
       description: Returns list of all course codes and names
       operationId: getCourseList
+      parameters:
+        - $ref: "#/components/parameters/sortParam"
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/perPageParam"
       responses:
         "200":
           description: Successful Operation
@@ -93,6 +101,9 @@ paths:
       description: Returns paginated list of sections
       operationId: getSections
       parameters:
+        - $ref: "#/components/parameters/sortParam"
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/perPageParam"
         - $ref: "#/components/parameters/courseIdParam"
         - $ref: "#/components/parameters/seatsParam"
         - $ref: "#/components/parameters/openSeatsParam"
@@ -755,23 +766,34 @@ components:
           example: 38.9922185
     BusSchedule:
       type: object
+      description: Each route has multiple schedules, because buses run differently on different days of the week
       properties:
         days:
           type: string
-        directions:
+          description: The days the schedule runs
+          example: f
+        direction:
           type: string
+          description: Direction id for the route. See Route object.
         route:
           type: string
+          description: Route id
         stops:
+          description: Scheduled stops on the route.
           type: array
           items:
             type: object
             properties:
               stop_id:
                 type: string
+                description: Stop id
+                example: laplat
               name:
                 type: string
+                description: Full stop name
+                example: La Plata Hall
         trips:
+          description: Scheduled stops for the route, and when busses should be stopping there.
           type: array
           items:
             type: array
@@ -780,10 +802,13 @@ components:
               properties:
                 stop_id:
                   type: string
+                  description: Stop id. See Stop object
                 arrival_time:
                   type: string
+                  description: Arrival time, localized to hh:mm:ss in EST/EDT
                 arrival_time_secs:
                   type: string
+                  description: Time in ms from start of the day
     Course:
       type: object
       description: Represents a course on Testudo
@@ -1076,12 +1101,14 @@ components:
       schema:
         type: string
       description: Professor's name.
+      example: "Aaron Bartlett"
     courseIdParam:
       in: query
       name: course_id
       schema:
         type: string
       description: 7 or 8 digit course id. See the course object for more info.
+      example: CMSC216
     creditsParam:
       in: query
       name: credits
@@ -1096,24 +1123,13 @@ components:
         type: string
       description: 4 Letter department code to search.
       example: CMSC
-    gradingMethodParam:
-      in: query
-      name: grading_method
-      schema:
-        type: string
-      description: Grading method to search on.
-    coreParam:
-      in: query
-      name: core
-      schema:
-        type: string
-      description: Core requirement to search on.
     genEdParam:
       in: query
       name: gen_ed
       schema:
         type: string
       description: Gened requirement to search.
+      example: DSNS
     seatsParam:
       in: query
       name: seats
@@ -1162,7 +1178,7 @@ components:
       schema:
         type: string
       description: Indicates type of meeting. Could be "Lecture", "Discussion", or "Lab"
-      example: c
+      example: Lecture
     startTimeParam:
       in: query
       name: start_time
