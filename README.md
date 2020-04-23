@@ -66,7 +66,7 @@ Our logger implementation is located at the `scraper_common.rb` file located at 
 
 ## Testing
 
-We use rspec to test. You can find the tests in the `tests` directory. Run tests with `./umdio test`.
+We use rspec to test. You can find the tests in the `tests` directory. Run tests with `./umdio.sh test`.
 
 ## Credits
 
