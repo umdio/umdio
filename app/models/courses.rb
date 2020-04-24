@@ -180,7 +180,7 @@ class Professor < Sequel::Model
     ss.each {|s|
       semesters << s[:semester]
       courses << s[:course]
-      depts << s[:course][0..3]
+      depts << s[:course][0..3] if s[:course]
     }
 
     {
