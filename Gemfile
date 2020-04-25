@@ -1,18 +1,17 @@
 source 'https://rubygems.org'
 
-gem 'sinatra'
-gem 'sinatra-cross_origin', '~> 0.4.0'
+gem 'sinatra', "~> 2.0.8.1"
 gem 'sinatra-contrib'
-gem 'sinatra-param', '~> 1.3'
+gem 'sinatra-cross_origin', '~> 0.4.0'
+gem 'sinatra-param', '~> 1.6'
 gem 'rake'
 gem 'dotenv'
-gem "pg", "~> 1.1"
-gem "sequel", "~> 5.21"
-gem "puma", "~> 4.0"
+gem "pg", "~> 1.2.3"
+gem "sequel", "~> 5.31"
+gem "puma", "~> 4.3"
 
 group :development do
   gem 'rspec'
-  gem 'sinatra-reloader', :require => 'sinatra/reloader'
   gem 'shotgun'
   gem 'better_errors'
 end

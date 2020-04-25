@@ -23,16 +23,24 @@ module Sinatra
               begin_paginate! $DB[:professors]
 
               sorting = parse_sorting_params 'name'
-              std_params = parse_query_v0 @prof_params
+              std_params = parse_query_v1 @prof_params
 
-              section_std_params = parse_query_v0 @section_params
+              section_std_params = parse_query_v1 @section_params
+
+              if std_params == [] and section_std_params == []
+                res = Professor.order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|p| p.to_v1}
+
+                  return json res
+              end
 
               y = Section.where{Sequel.&(*section_std_params)} unless section_std_params == []
               y = Section.all if section_std_params == []
 
               x = Sequel.&(*std_params, sections: y) unless std_params == []
               x = {sections: y} if std_params == []
-
 
               res =
                 Professor
