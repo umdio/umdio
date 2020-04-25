@@ -151,7 +151,7 @@ class Section < Sequel::Model
     }
   end
 
-  def to_v1_info
+  def to_info
     {
       course: course_id,
       semester: semester.to_s
@@ -179,15 +179,17 @@ class Professor < Sequel::Model
   many_to_many :sections
 
   def to_v0
-    ss = sections.map{|s| s.to_v0}
+    ss = sections.map{|s| s.to_info}
     semesters = []
     courses = []
     depts = []
 
     ss.each {|s|
-      semesters << s[:semester]
-      courses << s[:course]
-      depts << s[:course][0..3] if s[:course]
+      if s[:course]
+        semesters << s[:semester]
+        courses << s[:course]
+        depts << s[:course][0..3]
+      end
     }
 
     {
@@ -199,11 +201,13 @@ class Professor < Sequel::Model
   end
 
   def to_v1
-    ss = sections.map{|s| s.to_v1_info}
+    ss = sections.map{|s| s.to_info}
     taught = []
 
     ss.each {|s|
-      taught << {course_id: s[:course], semester: s[:semester]}
+      if s[:course]
+        taught << {course_id: s[:course], semester: s[:semester]}
+      end
     }
 
     {
