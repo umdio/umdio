@@ -42,6 +42,16 @@ If you're actively working on the documentation, use the `docker-compose-dev.yml
 
 umd.io runs on Ruby, with various libraries such as Rack, Sinatra, Puma, and Sequel. We use Postgresql as the database. Everything runs in docker.
 
+## Adding new data
+If you're interested in adding a new endpoint, here's a rough guide on how to do it. Our data for `majors` is a great, simple example.
+1. Create a model in `/app/models`. We use [Sequel](https://github.com/jeremyevans/sequel) on top of Postgres. It should include a `to_v1` method that translates whatever is in your table into the object you want to return.
+2. Create a scraper in `/app/scrapers`. This is to populate the table for the model you just created.
+   - If you're scraping a live webpage, `courses_scraper.rb` might be a good resource. We use nokogiri to parse HTML.
+   - If you're parsing a JSON file, consider adding it to [umdio-data](https://github.com/umdio/umdio-data), and creating an importer, such as `map_scraper.rb`. (NOTE: umdio-data is now included as a submodule; so this scraper should be updated)
+3. Create a controller in `/app/controllers`. Add endpoints as you see fit.
+4. Register the controller in `server.rb`.
+5. Write documentation in `openapi.yaml`
+
 ## Logging
 
 We use Ruby's built-in logger to output messages to standard output. Learn more about [Ruby's logging module](https://ruby-doc.org/stdlib-2.1.0/libdoc/logger/rdoc/Logger.html)
