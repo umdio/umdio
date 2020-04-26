@@ -5,18 +5,6 @@ module Sinatra
 
       # Generic course helpers
 
-      def list_semesters
-        Course.distinct(:semester).map {|c| c[:semester]}.sort
-      end
-
-      def list_depts
-        Course.distinct(:dept_id, :department).map {|c| {dept_id: c[:dept_id], department: c[:department]}}.sort_by! {|d| d[:dept_id]}
-      end
-
-      def find_courses_in_sem semester
-        Course.where(semester: semester).order(Sequel.asc(:course_id))
-      end
-
       # generalize logic for checking if semester param valid
       def check_semester app, semester
         # check for semester formatting

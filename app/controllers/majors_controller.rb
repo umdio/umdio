@@ -17,13 +17,13 @@ module Sinatra
             end
 
             get '/list' do
-              json Major.all.map {|m| m.to_v1}
+              json Major.all.map {|m| m.to_v1}.uniq
             end
           end
 
           app.namespace '/v0/majors' do
             get do
-              json Major.all.map {|m| m.to_v0}
+              json Major.all.map {|m| m.to_v0}.uniq
             end
           end
         end

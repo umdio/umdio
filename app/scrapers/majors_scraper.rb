@@ -30,10 +30,12 @@ major_divs.each do |link|
   end
 end
 
+$DB[:majors].delete
 majors.each do |major|
   logger.info(prog_name) { "inserting #{major[:name]}"}
 
   major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
+  major[:major_id] = major[:name].upcase if major[:major_id] == nil
   $DB[:majors].insert_ignore.insert(:major_id => major[:major_id], :name => major[:name], :college => major[:college], :url => major[:url])
 end
 logger.info(prog_name) {"Inserted #{majors.length} majors"}

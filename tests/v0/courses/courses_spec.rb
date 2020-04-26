@@ -1,7 +1,7 @@
 # TODO: implement controller tests and API endpoint tests
 # TODO: make extensive tests, test object structures and behaviors
 
-require_relative '../../tests/spec_helper.rb'
+require_relative '../../spec_helper.rb'
 
 describe 'Courses Endpoint' do
   # TODO: make this an instance variable @url

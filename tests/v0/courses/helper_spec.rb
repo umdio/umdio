@@ -1,5 +1,5 @@
-require_relative '../../tests/spec_helper.rb'
-require_relative '../../app/helpers/courses_helpers.rb'
+require_relative '../../spec_helper.rb'
+require_relative '../../../app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 describe 'Helpers' do

@@ -1,6 +1,6 @@
 # Tests for root of api
 
-require_relative '../tests/spec_helper'
+require_relative '../spec_helper'
 
 describe 'UMDIO API Version 0' do
   url = '/'

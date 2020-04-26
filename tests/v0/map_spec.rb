@@ -1,7 +1,7 @@
-require_relative '../tests/spec_helper'
+require_relative '../spec_helper'
 
-describe 'Map Endpoint' do
-  url = "v0/map"
+describe 'Map Endpoints v1' do
+  url = "v1/map"
 
   describe 'get /map' do
     it_has_behavior 'good status', url
@@ -13,6 +13,9 @@ describe 'Map Endpoint' do
 
   describe 'get /map/buildings/:building_id' do
     it_has_behavior 'good status', url + '/buildings/251'
-    it_has_behavior 'bad status', url + '/buildings/aaa'
+
+    it_has_behavior '404', url + '/buildings/aaa'
+    it_has_behavior '400', url + '/buildings/a'
+    it_has_behavior '400', url + '/buildings/aaaaaaa'
   end
 end

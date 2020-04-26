@@ -49,6 +49,20 @@ end
 $DB.create_join_table?(:professor_id=>:professors, :section_id=>:sections)
 
 class Course < Sequel::Model
+  dataset_module do
+    def all_semesters
+      Course.distinct(:semester).map {|c| c[:semester]}.sort
+    end
+
+    def all_depts
+      Course.distinct(:dept_id, :department).map {|c| {dept_id: c[:dept_id], department: c[:department]}}.sort_by! {|d| d[:dept_id]}
+    end
+
+    def list_sem semester
+      Course.where(semester: semester).order(Sequel.asc(:course_id))
+    end
+  end
+
   def to_v1
     ge = gen_ed.gsub(/\s/, '').split('or').map do |s|
       s.split(',').map do |s2|

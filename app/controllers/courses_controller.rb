@@ -5,6 +5,7 @@ module Sinatra
       module Courses
         def self.registered(app)
 
+          # TODO: Is this needed?
           app.register Sinatra::Namespace
 
           app.namespace '/v1/courses' do
@@ -58,15 +59,15 @@ module Sinatra
             end
 
           get '/semesters' do
-            json list_semesters
+            json Course.all_semesters
           end
 
           get '/departments' do
-            json list_depts
+            json Course.all_depts
           end
 
           get '/list' do
-            json (find_courses_in_sem request.params['semester']).map{|c| c.to_v1_info}
+            json (Course.list_sem request.params['semester']).map{|c| c.to_v1_info}
           end
 
           # Returns section info about particular sections of a course, comma separated
@@ -210,15 +211,15 @@ module Sinatra
 
           # all of the semesters that we have
           app.get '/v0/courses/semesters' do
-            json list_semesters
+            json Course.all_semesters
           end
 
           app.get '/v0/courses/departments' do
-            json list_depts
+            json Course.all_depts
           end
 
           app.get '/v0/courses/list' do
-            json (find_courses_in_sem request.params['semester']).map{|c| c.to_v0_info}
+            json (Course.list_sem request.params['semester']).map{|c| c.to_v0_info}
           end
 
           # Returns section info about particular sections of a course, comma separated

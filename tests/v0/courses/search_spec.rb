@@ -1,4 +1,4 @@
-require_relative '../../tests/spec_helper'
+require_relative '../../spec_helper'
 # TODO: implement
 
 describe 'Search' do
