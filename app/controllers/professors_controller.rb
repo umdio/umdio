@@ -23,9 +23,10 @@ module Sinatra
               begin_paginate! $DB[:professors]
 
               sorting = parse_sorting_params 'name'
-              std_params = parse_query_v1 @prof_params
 
-              section_std_params = parse_query_v1 @section_params
+              # v1 currently has a bug for double places
+              std_params = parse_query_v0 @prof_params
+              section_std_params = parse_query_v0 @section_params
 
               if std_params == [] and section_std_params == []
                 res = Professor.order(*sorting)

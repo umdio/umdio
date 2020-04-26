@@ -21,10 +21,16 @@ RSpec.configure do |config|
   end
 
   shared_examples_for 'bad status' do |url|
-    before {head url}
-    it 'responds with 4xx' do
-      expect(last_response.status).to be > 399
-      expect(last_response.status).to be < 500
+    before {get url}
+    it 'yields 4xx error code' do
+      expect(last_response.status).to be > 399 and be < 500
+    end
+  end
+
+  shared_examples_for 'error status' do |url, message|
+    before {get url}
+    it 'yields 5xx error code' do
+      expect(last_response.status).to be > 499 and be < 600
     end
   end
 

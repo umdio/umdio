@@ -9,6 +9,8 @@ module Sinatra
           app.register Sinatra::Namespace
 
           app.namespace '/v1/courses' do
+            course_docs_url = "https://docs.umd.io/courses/"
+
             before do
               @course_params = ['semester', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed']
               @section_params = ['course_id', 'seats', 'open_seats', 'waitlist', 'semester']
@@ -32,7 +34,7 @@ module Sinatra
 
               section_ids.each do |section_id|
                 if not is_full_section_id? section_id
-                  halt 400, bad_url_error("Invalid section_id #{section_id}", "https://docs.umd.io/courses/")
+                  halt 400, bad_url_error("Invalid section_id #{section_id}", course_docs_url)
                 end
               end
 
@@ -80,7 +82,7 @@ module Sinatra
             # TODO: validate_section_ids
             section_numbers.each do |number|
               if not is_section_number? number
-                halt 400,  bad_url_error("Invalid section number #{number}", "https://docs.umd.io/courses/")
+                halt 400,  bad_url_error("Invalid section number #{number}", course_docs_url)
               end
             end
 
@@ -105,8 +107,8 @@ module Sinatra
               halt 404, {
                 error_code: 404,
                 message: "Course with course_id #{course_id} not found!",
-                available_courses: "https://api.umd.io/v0/courses",
-                docs: "https://docs.umd.io/courses/"
+                available_courses: "https://api.umd.io/v1/courses",
+                docs: course_docs_url
               }.to_json
             end
 

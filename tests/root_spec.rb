@@ -1,8 +1,8 @@
 # Tests for root of api
 
-require_relative '../spec_helper'
+require_relative 'spec_helper'
 
-describe 'UMDIO API Version 0' do
+describe 'umdio API' do
   url = '/'
 
   describe 'Root' do
@@ -15,6 +15,10 @@ describe 'UMDIO API Version 0' do
   end
 
   describe 'v0' do
+    it_has_behavior 'good status', (url + 'v0')
+  end
+
+  describe 'v1' do
     it_has_behavior 'good status', (url + 'v0')
   end
 

@@ -7,8 +7,8 @@ module Sinatra
         def self.registered(app)
           app.namespace '/v1/bus' do
             #this should probably be a more specific error message where we error out!
-            bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
-            bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
+            bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
+            bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
             bus_docs_url = "https://docs.umd.io/#tags/bus"
             apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
             require 'net/http'
