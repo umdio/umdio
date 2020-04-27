@@ -1,28 +1,28 @@
 require_relative '../../spec_helper.rb'
 # TODO: make sorting spec
 
-describe 'Pagination' do
-  url = '/v0/courses'
+describe 'Pagination v0' do
+  url = '/v0/courses?semester=201808'
 
   describe '/courses' do
 
     describe 'per_page' do
       before { get url }
       it 'should not be > 100' do
-        get url + '?per_page=1000'
+        get url + '&per_page=1000'
         res = JSON.parse(last_response.body)
         expect(res.length).to be 100
       end
 
       it 'should always at least return 1 course' do
-        get url + '?per_page=0&page=2'
+        get url + '&per_page=0&page=2'
         res = JSON.parse(last_response.body)
         expect(res.length).to be 1
       end
 
       it 'should return the number of courses requested (between 1 and 100)' do
         num = 37
-        get url + "?per_page=#{num}"
+        get url + "&per_page=#{num}"
         res = JSON.parse(last_response.body)
         expect(res.length).to be num
       end

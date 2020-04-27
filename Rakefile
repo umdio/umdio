@@ -46,7 +46,7 @@ task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:maj
 
 desc "Scrapes enough to run the tests"
 task :test_scrape do
-  scrape_courses(current_semester)
+  import_courses(['201808'])
   scrape_bus()
   scrape_majors()
   scrape_map()

@@ -12,7 +12,6 @@ describe 'Major Endpoint v0' do
       expect(res).not_to be_empty
 
       res.each {|major|
-        puts major
         expect(major['major_id']).not_to be_nil
         expect(major['name']).not_to be_nil
         expect(major['college']).not_to be_nil
