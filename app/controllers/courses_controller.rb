@@ -49,13 +49,31 @@ module Sinatra
               sorting = parse_sorting_params 'section_id'
               std_params = parse_query_v1 @section_params
               m_std_params = parse_query_v1 @meeting_params
+
+              if std_params == [] and m_std_params == []
+                res = Section.order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|s| s.to_v1}
+
+                  return json res
+              end
+
+              y = Meeting.where{Sequel.&(*m_std_params)} unless m_std_params == []
+              y = Meeting.all if m_std_params == []
+
+              x = Sequel.&(*std_params, meetings: y) unless std_params == []
+              x = {meetings: y} if std_params == []
+
               res =
                 Section
-                  .where{Sequel.&(*std_params, meetings: Meeting.where(Sequel.&(*m_std_params)))}
+                  .where(x)
                   .order(*sorting)
                   .limit(@limit)
                   .offset((@page - 1)*@limit)
                   .map{|s| s.to_v1}
+
+              end_paginate! res
 
               return json [res]
             end
@@ -197,17 +215,33 @@ module Sinatra
           app.get '/v0/courses/sections' do
             begin_paginate! $DB[:sections]
 
-            sorting = parse_sorting_params 'section_id'
-            std_params = parse_query_v0 @section_params
-            m_std_params = parse_query_v0 @meeting_params
-            res =
-              Section
-                .where{Sequel.&(*std_params, meetings: Meeting.where(Sequel.&(*m_std_params)))}
-                .order(*sorting)
-                .limit(@limit)
-                .offset((@page - 1)*@limit)
-                .map{|s| s.to_v0}
+              sorting = parse_sorting_params 'section_id'
+              std_params = parse_query_v0 @section_params
+              m_std_params = parse_query_v0 @meeting_params
 
+              if std_params == [] and m_std_params == []
+                res = Section.order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|s| s.to_v0}
+
+                  return json res
+              end
+
+              y = Meeting.where{Sequel.&(*m_std_params)} unless m_std_params == []
+              y = Meeting.all if m_std_params == []
+
+              x = Sequel.&(*std_params, meetings: y) unless std_params == []
+              x = {meetings: y} if std_params == []
+
+              res =
+                Section
+                  .where(x)
+                  .order(*sorting)
+                  .limit(@limit)
+                  .offset((@page - 1)*@limit)
+                  .map{|s| s.to_v0}
+            end_paginate! res
             return json [res]
           end
 

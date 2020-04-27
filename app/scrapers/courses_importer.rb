@@ -74,7 +74,7 @@ j.to_a.each do |course|
     course['sections'].each do |section|
         $DB[:sections].insert_ignore.insert(
           :section_id_str => section['section_id'],
-          :course_id => section['course_id'],
+          :course_id => course['course_id'],
           :semester => section['semester'],
           :number => section['number'],
           :seats => section['seats'],
@@ -82,7 +82,7 @@ j.to_a.each do |course|
           :waitlist => section['waitlist'],
         )
 
-        s = $DB[:sections].where(section_id_str: section['section_id'], course_id: section['course_id'], semester: section['semester']).first
+        s = $DB[:sections].where(section_id_str: section['section_id'], course_id: course['course_id'], semester: section['semester']).first
 
         section['meetings'].each do |meeting|
             $DB[:meetings].insert_ignore.insert(
@@ -104,6 +104,9 @@ j.to_a.each do |course|
           )
 
           pr = $DB[:professors].where(name: prof).first
+
+          puts s
+          puts pr
 
           $DB[:professors_sections].insert_ignore.insert(
             :section_id => s[:section_id],

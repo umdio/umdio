@@ -9,7 +9,7 @@ describe 'Professors Endpoint v1' do
 
   describe 'get /professors?name=' do
     # Test for good behavior
-    it_has_behavior 'good status', url + '?name=A Shankar'
+    it_has_behavior 'good status', url + '?name=A.U. Shankar'
 
     # Test for TBA Instructor
     it_has_behavior 'bad status', url + '?name=Instructor: TBA'
