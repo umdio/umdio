@@ -129,4 +129,11 @@ RSpec::Core::RakeTask.new :testv1 do |task|
   task.rspec_opts = "--format documentation" #default to verbose testing, comment for silence
 end
 
+desc "Type check and lint codebase"
+task :validate do
+  system 'bundle exec solargraph scan', exception: true
+  system 'bundle exec solargraph typecheck', exception: true
+  # TODO: run rubocop
+end
+
 task :default => ['up']

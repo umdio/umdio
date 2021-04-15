@@ -16,6 +16,7 @@ group :development do
   gem 'rspec'
   gem 'shotgun'
   gem 'better_errors'
+  gem 'solargraph'
 end
 
 group :test do
