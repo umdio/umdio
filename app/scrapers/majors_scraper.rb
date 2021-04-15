@@ -11,16 +11,20 @@ prog_name = "majors_scraper"
 logger = ScraperCommon::logger
 
 url = "https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically"
-page = Nokogiri::HTML(open(url))
+page = Nokogiri::HTML(URI::open(url))
 major_divs = page.css(".page--inner-content a")
 majors = []
 major_divs.each do |link|
   # parse the name to grab the major's name and its college
-  major_parts = /(.+)\((.+)\)/.match(link.text)
-  if major_parts != nil then
-    major_name = major_parts[1].rstrip #Removes trailing space.
-    major_college = major_parts[2]
-    major_url = link['href']
+
+  major_url = link['href']
+  next unless major_url and major_url.include? 'umd.edu'
+  puts link.text
+  major_parts = /(.+)\|(.+)/.match(link.text)
+
+  if major_parts != nil
+    # 0th match is full string, 1st and 2nd elements are the two matches
+    major_name, major_college = major_parts[1, 3].map(&:strip)
 
     majors << {
       name: major_name,

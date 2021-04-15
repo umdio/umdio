@@ -19,6 +19,8 @@ module ScraperCommon
   # Takes in a list of years and semesters. It maps years to 4 semesters, and semesters to themselves
   # 2018 -> 201801, 201805, 201808, 201812
   # 201901 -> 201901
+  # @param [Array<String>] args  a list of years
+  # @return [Array<String>] list of semesters for each year
   def get_semesters(args)
   	semesters = args.map do |e|
     	if e.length == 6

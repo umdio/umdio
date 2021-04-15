@@ -18,7 +18,7 @@ url="https://raw.githubusercontent.com/umdio/umdio-data/master/umd-building-gis.
 
 
 $DB[:buildings].delete
-array = eval open(url).read
+array = eval URI::open(url).read
 array.each do |e|
   $DB[:buildings].insert_ignore.insert(:name => e[:name], :code => e[:code], :id => e[:number].upcase, :long => e[:lng], :lat => e[:lat])
   logger.info(prog_name) {"inserted #{e[:name]}"}

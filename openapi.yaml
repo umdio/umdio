@@ -36,7 +36,7 @@ tags:
   - name: courses
     description: This set of endpoints lets you get data about university courses and their sections. You can get one course or section at a time, several courses or sections at a time, or a list of all the courses. All the data is scraped from Testudo.
   - name: professors
-    description: This endpoint contains information about univeristy professors and the courses they have taught.
+    description: This endpoint contains information about university professors and the courses they have taught.
   - name: bus
     description: This endpoint lets you get data about bus routes, schedules, stops, locations, and predicted arrival times. The data is provided by NextBus, which monitors buses and gives the data to us via their API. We think our API is easier to use, but our data might be behind NextBus by a few seconds. If your app requires to-the-second bus location info, you can go right to the source. All bus data is copyright University of Maryland
   - name: map

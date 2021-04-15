@@ -14,7 +14,13 @@ require_relative '../models/courses.rb'
 # TODO: Remove semester param, infer from url
 def parse_sections(url, semester)
   # Parse with Nokogiri
-  page = Nokogiri::HTML(open(url))
+  begin
+    page = Nokogiri::HTML(URI::open(url))
+  rescue OpenURI::HTTPError => error
+    logger.error("Error raised for url '#{url}': #{error.message}")
+    raise
+  end
+
   course_divs = page.search("div.course-sections")
   section_array = []
 
@@ -25,7 +31,8 @@ def parse_sections(url, semester)
     course_div.search("div.section").each do |section|
       # add section to array to add
       instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip)
-      dept = course_id.match(/^([A-Z]{4})\d{3}[A-Z]?$/)[1]
+      # note: some courses have weird suffixes (e.g. MSBB99MB, yes thats a real class)
+      dept = course_id[0, 4]
 
       # add course and department to professor object for each instructor
       profs = []
@@ -77,12 +84,20 @@ prog_name = "sections_scraper"
 logger = ScraperCommon::logger
 
 semesters = ScraperCommon::get_semesters(ARGV)
+# course id accumulator. Flushed each time a sections GET request is made.
+# @type [Array<Number>]
 courses = []
 
 # Loop through the semesters we want to parse
 semesters.each do |semester|
   # Arrays to hold the things we want to insert
   sections = []
+  # @param [Array<String | Number>] courses
+  # @return [String]
+  def make_query courses
+    "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+  end
+
 
   logger.info(prog_name) {"Searching for sections in term #{semester}"}
 

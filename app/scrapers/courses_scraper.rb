@@ -25,14 +25,18 @@ semesters.each do |semester|
 
   base_url = "https://app.testudo.umd.edu/soc/#{semester}"
 
-  Nokogiri::HTML(open(base_url)).search('span.prefix-abbrev').each do |e|
+  Nokogiri::HTML(URI::open(base_url)).search('span.prefix-abbrev').each do |e|
     dep_urls << "https://app.testudo.umd.edu/soc/#{semester}/#{e.text}"
   end
 
   logger.info(prog_name) {"#{dep_urls.length} department/semesters so far"}
 end
 
+##
 # safely formats to UTF-8
+#
+# @param [String] text
+#
 def utf_safe text
   if !text.valid_encoding?
     text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '')
@@ -51,7 +55,7 @@ dep_urls.each do |url|
 
   logger.info(prog_name) {"Getting courses for #{dept_id} (#{semester})"}
 
-  page = Nokogiri::HTML(open(url), nil, "UTF-8")
+  page = Nokogiri::HTML(URI::open(url), nil, "UTF-8")
   department = page.search('span.course-prefix-name').text.strip
 
   page.search('div.course').each do |course|
