@@ -36,7 +36,7 @@ def scrape_majors
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
 
-def scrape_map args
+def scrape_map args=""
   sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
@@ -69,7 +69,7 @@ task :test_scrape do
   import_courses(['201808'])
   scrape_bus()
   scrape_majors()
-  scrape_map("")
+  scrape_map()
 end
 
 namespace :scrape do
@@ -95,7 +95,7 @@ namespace :scrape do
 
   desc "Run building scraper"
   task :buildings do
-    scrape_map("")
+    scrape_map()
   end
 
   desc "Majors scraper"
