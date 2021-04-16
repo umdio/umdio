@@ -83,8 +83,6 @@ module Sinatra
       end
 
       def find_sections_for_course_v1(semester, course_id, expand)
-        sections = []
-
         sections = if expand
                      Section.where(semester: semester, course_id: course_id).map { |s| s.to_v1 }
                    else
@@ -118,8 +116,6 @@ module Sinatra
       end
 
       def find_sections_for_course(semester, course_id, expand)
-        sections = []
-
         sections = if expand
                      Section.where(semester: semester, course_id: course_id).map { |s| s.to_v0 }
                    else
