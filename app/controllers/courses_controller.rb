@@ -4,17 +4,16 @@ module Sinatra
     module Routing
       module Courses
         def self.registered(app)
-
           # TODO: Is this needed?
           app.register Sinatra::Namespace
 
           app.namespace '/v1/courses' do
-            course_docs_url = "https://docs.umd.io/courses/"
+            course_docs_url = 'https://docs.umd.io/courses/'
 
             before do
-              @course_params = ['semester', 'credits', 'dept_id', 'grading_method', 'core', 'gen_ed']
-              @section_params = ['course_id', 'seats', 'open_seats', 'waitlist', 'semester']
-              @meeting_params = ['days', 'room', 'building', 'classtype', 'start_time', 'end_time']
+              @course_params = %w[semester credits dept_id grading_method core gen_ed]
+              @section_params = %w[course_id seats open_seats waitlist semester]
+              @meeting_params = %w[days room building classtype start_time end_time]
 
               @meeting_params.each do |p|
                 rename_param "meetings.#{p}", p
@@ -30,15 +29,16 @@ module Sinatra
 
             get '/sections/:section_id' do
               # separate into an array on commas, turn it into uppercase
-              section_ids = "#{params[:section_id]}".upcase.split(",")
+              section_ids = "#{params[:section_id]}".upcase.split(',')
 
               section_ids.each do |section_id|
-                if not is_full_section_id? section_id
+                unless is_full_section_id?(section_id)
                   halt 400, bad_url_error("Invalid section_id #{section_id}", course_docs_url)
                 end
               end
 
-              res = (find_sections (request.params['semester']), section_ids).map {|s| s.to_v0}
+              # TODO: ensure this change actually worked
+              res = find_sections(request.params['semester'], section_ids).map(&:to_v0)
 
               json res
             end
@@ -50,28 +50,27 @@ module Sinatra
               std_params = parse_query_v1 @section_params
               m_std_params = parse_query_v1 @meeting_params
 
-              if std_params == [] and m_std_params == []
+              if std_params == [] && m_std_params == []
                 res = Section.order(*sorting)
-                  .limit(@limit)
-                  .offset((@page - 1)*@limit)
-                  .map{|s| s.to_v1}
+                             .limit(@limit)
+                             .offset((@page - 1) * @limit)
+                             .map(&:to_v1)
 
-                  return json res
+                return json res
               end
 
-              y = Meeting.where{Sequel.&(*m_std_params)} unless m_std_params == []
+              y = Meeting.where { Sequel.&(*m_std_params) } unless m_std_params == []
               y = Meeting.all if m_std_params == []
 
               x = Sequel.&(*std_params, meetings: y) unless std_params == []
-              x = {meetings: y} if std_params == []
+              x = { meetings: y } if std_params == []
 
               res =
-                Section
-                  .where(x)
-                  .order(*sorting)
-                  .limit(@limit)
-                  .offset((@page - 1)*@limit)
-                  .map{|s| s.to_v1}
+                Section.where(x)
+                       .order(*sorting)
+                       .limit(@limit)
+                       .offset((@page - 1) * @limit)
+                       .map(&:to_v1)
 
               end_paginate! res
 
