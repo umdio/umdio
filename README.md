@@ -38,6 +38,10 @@ For the public-facing API, we use [OpenAPI v3](https://swagger.io/docs/specifica
 
 If you're actively working on the documentation, use the `docker-compose-dev.yml` file to view your changes live in ReDoc.
 
+```
+docker-compose -f docker-compose-dev.yml up
+```
+
 ## Tech Stack
 
 umd.io runs on Ruby, with various libraries such as Rack, Sinatra, Puma, and Sequel. We use Postgresql as the database. Everything runs in docker.
