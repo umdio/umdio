@@ -11,7 +11,7 @@ prog_name = "majors_scraper"
 logger = ScraperCommon::logger
 
 url = "https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically"
-page = ScraperCommon::page_url url, prog_name
+page = ScraperCommon::get_page url, prog_name
 major_divs = page.css(".page--inner-content a")
 majors = []
 major_divs.each do |link|
