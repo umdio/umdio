@@ -13,7 +13,7 @@ Easy API access to
 
 ## Getting Started
 
-To use the api, please refer to [our documentation](https://docs.umd.io).
+To use the api, please refer to [our documentation](https://beta.umd.io).
 
 # Development
 
