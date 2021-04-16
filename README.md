@@ -1,4 +1,4 @@
-# [UMD.io](http://umd.io/) &middot; [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](README.md#Development)
+# [UMD.io](http://umd.io/) &middot; [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](README.md#Development) [![CI](https://github.com/umdio/umdio/actions/workflows/main.yml/badge.svg)](https://github.com/umdio/umdio/actions/workflows/main.yml)
 
 UMD.io is an open API for the University of Maryland. The main purpose is to give developers easy access to data to build great applications. In turn, developers can improve the University of Maryland with the things they build.
 
