@@ -28,7 +28,7 @@ To work on umd.io, or to run your own instance, start by forking and cloning thi
 4. Run the scrapers `./umdio.sh scrape`
    - You might need to `chmod +x umdio.sh`
 5. Clone the umdio-data submodule
-   - `cd data && git submodule init && git submodule update`
+   - `cd data && git submodule update --init`
 
 This will take some time, so in the meantime, review the rest of the guide.
 
