@@ -7,7 +7,7 @@ describe 'Major Endpoint v1' do
     it_has_behavior 'good status', url
     before {get url}
     it 'returns properly formatted data' do
-      res = JSON::parse(last_response.body)
+      res = JSON.parse(last_response.body)
       expect(res).not_to be_nil
     end
   end
@@ -17,7 +17,7 @@ describe 'Major Endpoint v1' do
 
     before {get url + '/list'}
     it 'returns properly formatted data' do
-      res = JSON::parse(last_response.body)
+      res = JSON.parse(last_response.body)
       expect(res).not_to be_empty
 
       res.each {|major|

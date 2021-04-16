@@ -9,7 +9,7 @@ describe 'umdio API' do
     it_has_behavior 'good status', url
     before {get url}
     it 'Returns root message' do
-      res = JSON::parse(last_response.body)
+      res = JSON.parse(last_response.body)
       expect(res["message"]).to be
     end
   end
