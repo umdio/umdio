@@ -79,6 +79,7 @@ paths:
         - $ref: "#/components/parameters/sortParam"
         - $ref: "#/components/parameters/pageParam"
         - $ref: "#/components/parameters/perPageParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation

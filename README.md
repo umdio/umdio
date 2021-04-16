@@ -36,7 +36,7 @@ Within the codebase, comments and [good practices](https://rubystyle.guide/) are
 
 For the public-facing API, we use [OpenAPI v3](https://swagger.io/docs/specification/about/) to document everything. You can view our spec [here](https://github.com/umdio/umdio/blob/master/openapi.yaml). The docs are served with [ReDoc](https://github.com/Redocly/redoc) and are automatically built on every tagged commit.
 
-If you're actively working on the documentation, use the `docker-compose-dev.yml` file to view your changes live in ReDoc.
+If you're actively working on the documentation, use the `docker-compose-dev.yml` file to view your changes live in ReDoc, on `http://localhost:8080`.
 
 ```
 docker-compose -f docker-compose-dev.yml up
