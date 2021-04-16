@@ -6,17 +6,17 @@ module Sinatra
       module Bus
         def self.registered(app)
           app.namespace '/v1/bus' do
-            #this should probably be a more specific error message where we error out!
+            # this should probably be a more specific error message where we error out!
             bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
             bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
-            bus_docs_url = "https://docs.umd.io/#tags/bus"
-            apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
+            bus_docs_url = 'https://docs.umd.io/#tags/bus'
+            api_root = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
             require 'net/http'
 
             get do
               resp = {
-                message: "This is the bus endpoint.",
-                docs: "https://docs.umd.io/#tags/bus/",
+                message: 'This is the bus endpoint.',
+                docs: 'https://docs.umd.io/#tags/bus/',
               }
               json resp
             end
@@ -30,7 +30,7 @@ module Sinatra
               route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id}
               routes = Route.where(route_id: route_ids).map {|r| r.to_v1}
 
-              halt 404, not_found_error("No routes found.", "https://docs.umd.io/#tags/bus/") if routes == []
+              halt 404, not_found_error('No routes found.', 'https://docs.umd.io/#tags/bus/') if routes == []
               json routes
             end
 
@@ -39,7 +39,7 @@ module Sinatra
               halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
               res = Schedule.where(route: route_id).map{|r| r.to_v1}
 
-              halt 404, not_found_error("No routes found.", "https://docs.umd.io/#tags/bus/") if res == []
+              halt 404, not_found_error('No routes found.', 'https://docs.umd.io/#tags/bus/') if res == []
               json res
             end
 
@@ -53,7 +53,7 @@ module Sinatra
 
               halt 400, bad_url_error(bad_route_message, bus_docs_url)  unless is_route_id? route_id
               halt 400, bad_url_error(bad_stop_message, bus_docs_url) unless is_stop_id? stop_id
-              wrapRequest_v1(apiRoot + "&command=predictions&r=#{route_id}&s=#{stop_id}")
+              wrapRequest_v1(api_root + "&command=predictions&r=#{route_id}&s=#{stop_id}")
             end
 
             # locations of buses on route
@@ -64,14 +64,14 @@ module Sinatra
 
               halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
               halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-              wrapRequest_v1(apiRoot + "&command=vehicleLocations&r=#{route_id}")
+              wrapRequest_v1(api_root + "&command=vehicleLocations&r=#{route_id}")
             end
 
             # locations of all buses
             get '/locations' do
               cache_control :public, :must_revalidate, max_age: 60
 
-              wrapRequest_v1(apiRoot + "&command=vehicleLocations")
+              wrapRequest_v1(api_root + '&command=vehicleLocations')
             end
 
             # list the bus stops
@@ -87,22 +87,22 @@ module Sinatra
             end
           end
 
-          #this should probably be a more specific error message where we error out!
+          # this should probably be a more specific error message where we error out!
           bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
           bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
-          bus_docs_url = "https://docs.umd.io/bus"
-          apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
+          bus_docs_url = 'https://docs.umd.io/bus'
+          api_root = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 
           # root of bus endpoint
-           app.get '/v0/bus' do
-              resp = {
-                message: "This is the bus endpoint.",
-                status: "working (we think!)",
-                docs: "https://docs.umd.io/bus/",
-              }
-              json resp
-           end
+          app.get '/v0/bus' do
+            resp = {
+              message: 'This is the bus endpoint.',
+              status: 'working (we think!)',
+              docs: 'https://docs.umd.io/bus/'
+            }
+            json resp
+          end
 
           # lists bus routes
           app.get '/v0/bus/routes' do
@@ -112,7 +112,7 @@ module Sinatra
           # get info about one or more routes
           # in nextbus api terms, this is routeConfig - the info for a route
           app.get '/v0/bus/routes/:route_id' do
-            route_ids = params[:route_id].downcase.split(",")
+            route_ids = params[:route_id].downcase.split(',')
             route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id}
             routes = Route.where(route_id: route_ids).map {|r| r.to_v0}
             # get rid of [] on single object return
@@ -127,7 +127,7 @@ module Sinatra
           # schedules for a route
           # schedules are updated along with routes every semester or so
           app.get '/v0/bus/routes/:route_id/schedules' do
-            cache_control :public, :must_revalidate, max_age: 60*60
+            cache_control :public, :must_revalidate, max_age: 60 * 60
 
             route_id = params[:route_id]
             halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
@@ -142,9 +142,9 @@ module Sinatra
             route_id = params[:route_id]
             stop_id = params[:stop_id]
 
-            halt 400, bad_url_error(bad_route_message, bus_docs_url)  unless is_route_id? route_id
+            halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
             halt 400, bad_url_error(bad_stop_message, bus_docs_url) unless is_stop_id? stop_id
-            wrapRequest(apiRoot + "&command=predictions&r=#{route_id}&s=#{stop_id}")
+            wrapRequest(api_root + "&command=predictions&r=#{route_id}&s=#{stop_id}")
           end
 
           # locations of buses on route
@@ -155,14 +155,14 @@ module Sinatra
 
             halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-            wrapRequest(apiRoot + "&command=vehicleLocations&r=#{route_id}")
+            wrapRequest(api_root + "&command=vehicleLocations&r=#{route_id}")
           end
 
           # locations of all buses
           app.get '/v0/bus/locations' do
             cache_control :public, :must_revalidate, max_age: 60
 
-            wrapRequest(apiRoot + "&command=vehicleLocations")
+            wrapRequest(api_root + '&command=vehicleLocations')
           end
 
           # list the bus stops
