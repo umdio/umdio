@@ -28,16 +28,16 @@ def import_courses sems
 end
 
 def scrape_bus
-  sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
-  sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
+  sh 'ruby app/scrapers/bus_routes_scraper.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper.rb'
 end
 
 def scrape_majors
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
 
-def scrape_map
-  sh 'ruby app/scrapers/map_scraper.rb'
+def scrape_map args
+  sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
 # Imports
@@ -49,6 +49,11 @@ namespace :import do
   desc "Import a specific semester"
   task :semester, [:sem] do |task, args|
     import_courses([args[:sem]])
+  end
+
+  desc "Import map data"
+  task :map do
+    scrape_map "./data/umdio-data/umd-building-gis.json"
   end
 end
 
@@ -64,7 +69,7 @@ task :test_scrape do
   import_courses(['201808'])
   scrape_bus()
   scrape_majors()
-  scrape_map()
+  scrape_map("")
 end
 
 namespace :scrape do
@@ -90,7 +95,7 @@ namespace :scrape do
 
   desc "Run building scraper"
   task :buildings do
-    scrape_map()
+    scrape_map("")
   end
 
   desc "Majors scraper"

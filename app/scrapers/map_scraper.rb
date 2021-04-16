@@ -10,16 +10,21 @@ include ScraperCommon
 
 require_relative '../models/building.rb'
 
-prog_name = "buildings"
+$prog_name = "buildings"
 
 logger = ScraperCommon::logger
-
 url="https://raw.githubusercontent.com/umdio/umdio-data/master/umd-building-gis.json"
 
 
-$DB[:buildings].delete
-array = eval open(url).read
-array.each do |e|
-  $DB[:buildings].insert_ignore.insert(:name => e[:name], :code => e[:code], :id => e[:number].upcase, :long => e[:lng], :lat => e[:lat])
-  logger.info(prog_name) {"inserted #{e[:name]}"}
+def write_map_array(data)
+  data.each do |e|
+    $DB[:buildings].insert_ignore.insert(:name => e[:name], :code => e[:code], :id => e[:number].upcase, :long => e[:lng], :lat => e[:lat])
+    logger.info($prog_name) {"inserted #{e[:name]}"}
+  end
 end
+
+$DB[:buildings].delete
+
+uri = ARGF == 1 ? ARGV[0] : url
+array = eval URI.open(url).read
+write_map_array(array)
