@@ -20,8 +20,5 @@ services:
       - ./:/umdio
     ports:
       - 3000:3000
-      - 1234:1234
-      - 26162:26162
-    # command: bundle exec rdebug-ide --host 0.0.0.0 --port 1234 -- rake up
     command: bundle exec rake up
     restart: always

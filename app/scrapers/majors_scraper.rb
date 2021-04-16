@@ -11,7 +11,7 @@ prog_name = "majors_scraper"
 logger = ScraperCommon::logger
 
 url = "https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically"
-page = Nokogiri::HTML(URI::open(url))
+page = ScraperCommon::page_url url, prog_name
 major_divs = page.css(".page--inner-content a")
 majors = []
 major_divs.each do |link|
@@ -19,7 +19,6 @@ major_divs.each do |link|
 
   major_url = link['href']
   next unless major_url and major_url.include? 'umd.edu'
-  puts link.text
   major_parts = /(.+)\|(.+)/.match(link.text)
 
   if major_parts != nil

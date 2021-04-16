@@ -9,17 +9,19 @@ include ScraperCommon
 
 require_relative '../models/courses.rb'
 
+
 # Parses a given section page
 # Returns [sections, professors]
 # TODO: Remove semester param, infer from url
 def parse_sections(url, semester)
   # Parse with Nokogiri
-  begin
-    page = Nokogiri::HTML(URI::open(url))
-  rescue OpenURI::HTTPError => error
-    logger.error("Error raised for url '#{url}': #{error.message}")
-    raise
-  end
+  # begin
+  #   page = Nokogiri::HTML(URI::open(url))
+  # rescue OpenURI::HTTPError => error
+  #   logger.error("Error raised for url '#{url}': #{error.message}")
+  #   raise
+  # end
+  page = ScraperCommon::get_page url, prog_name
 
   course_divs = page.search("div.course-sections")
   section_array = []
@@ -92,6 +94,8 @@ courses = []
 semesters.each do |semester|
   # Arrays to hold the things we want to insert
   sections = []
+
+  # TODO use this below
   # @param [Array<String | Number>] courses
   # @return [String]
   def make_query courses

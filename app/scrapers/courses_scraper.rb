@@ -14,6 +14,7 @@ logger = ScraperCommon::logger
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
+# @type [Array<String>]
 semesters = ScraperCommon::get_semesters(ARGV)
 
 logger.info(prog_name) { semesters }
@@ -25,13 +26,9 @@ semesters.each do |semester|
 
   base_url = "https://app.testudo.umd.edu/soc/#{semester}"
 
-  begin
-    Nokogiri::HTML(URI.open(base_url)).search('span.prefix-abbrev').each do |e|
-      dep_urls << "https://app.testudo.umd.edu/soc/#{semester}/#{e.text}"
-    end
-  rescue OpenURI::HTTPError => e
-    logger.error(prog_name) { "Could not load department page '#{base_url}': #{e.message}" }
-    raise
+
+  ScraperCommon::get_page(base_url, prog_name).search('span.prefix-abbrev').each do |e|
+    dep_urls << "https://app.testudo.umd.edu/soc/#{semester}/#{e.text}"
   end
 
   logger.info(prog_name) { "#{dep_urls.length} department/semesters so far" }
@@ -45,6 +42,7 @@ end
 #
 def utf_safe(text)
   text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '') unless text.valid_encoding?
+  text
 end
 
 queries = []
@@ -57,7 +55,10 @@ dep_urls.each do |url|
   table_name = 'courses'
 
   logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester})" }
+  logger.debug(prog_name) { "fetching #{url}" }
 
+  # TODO replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
+  # options thingy
   begin
     page = Nokogiri::HTML(URI.open(url), nil, 'UTF-8')
   rescue OpenURI::HTTPError => e
