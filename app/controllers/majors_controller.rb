@@ -8,22 +8,22 @@ module Sinatra
           app.namespace '/v1/majors' do
             get do
               resp = {
-                message: "This is the majors endpoint.",
-                version: "1.0.0",
-                docs: "https://docs.umd.io/majors",
-                endpoints: ["/list"]
+                message: 'This is the majors endpoint.',
+                version: '1.0.0',
+                docs: 'https://docs.umd.io/majors',
+                endpoints: ['/list']
               }
               json resp
             end
 
             get '/list' do
-              json Major.all.map {|m| m.to_v1}.uniq
+              json Major.all.map { |m| m.to_v1 }.uniq
             end
           end
 
           app.namespace '/v0/majors' do
             get do
-              json Major.all.map {|m| m.to_v0}.uniq
+              json Major.all.map { |m| m.to_v0 }.uniq
             end
           end
         end

@@ -27,7 +27,9 @@ module Sinatra
 
             get '/routes/:route_id' do
               route_ids = params[:route_id].downcase.split(',')
-              route_ids.each { |route_id| halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id}
+              route_ids.each do |route_id|
+                halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
+              end
               routes = Route.where(route_id: route_ids).map(&:to_v1)
 
               halt 404, not_found_error('No routes found.', 'https://docs.umd.io/#tags/bus/') if routes == []
@@ -113,7 +115,9 @@ module Sinatra
           # in nextbus api terms, this is routeConfig - the info for a route
           app.get '/v0/bus/routes/:route_id' do
             route_ids = params[:route_id].downcase.split(',')
-            route_ids.each {|route_id| halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id}
+            route_ids.each do |route_id|
+              halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
+            end
             routes = Route.where(route_id: route_ids).map(&:to_v0)
             # get rid of [] on single object return
             routes = routes[0] if route_ids.length == 1

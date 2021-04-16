@@ -8,7 +8,7 @@ require 'sinatra/base'
 require 'sinatra/param'
 require 'sinatra/namespace'
 require 'sinatra/cross_origin'
-require "sinatra/json"
+require 'sinatra/json'
 require 'sequel'
 
 class UMDIO < Sinatra::Base
@@ -27,7 +27,7 @@ class UMDIO < Sinatra::Base
   # before application/request starts
   before do
     content_type 'application/json'
-    cache_control :public, max_age: 86400
+    cache_control :public, max_age: 86_400
   end
 
   helpers do
@@ -37,9 +37,9 @@ class UMDIO < Sinatra::Base
   end
 
   # load in app helpers & controllers
-  Dir["./app/helpers/*.rb"].each { |file| require file }
-  Dir["./app/controllers/*.rb"].each { |file| require file }
-  Dir["./app/models/*.rb"].each { |file| require file }
+  Dir['./app/helpers/*.rb'].each { |file| require file }
+  Dir['./app/controllers/*.rb'].each { |file| require file }
+  Dir['./app/models/*.rb'].each { |file| require file }
 
   # register the helpers
   helpers Sinatra::UMDIO::Helpers
