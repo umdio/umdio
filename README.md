@@ -27,6 +27,8 @@ To work on umd.io, or to run your own instance, start by forking and cloning thi
    - You might need to run docker-related commands with `sudo` if you're a linux user
 4. Run the scrapers `./umdio.sh scrape`
    - You might need to `chmod +x umdio.sh`
+5. Clone the umdio-data submodule
+   - `cd data && git submodule init && git submodule update`
 
 This will take some time, so in the meantime, review the rest of the guide.
 
@@ -76,7 +78,7 @@ Our logger implementation is located at the `scraper_common.rb` file located at 
 
 ## Testing
 
-We use rspec to test. You can find the tests in the `tests` directory. Run tests with `./umdio.sh test`.
+We use rspec to test. You can find the tests in the `tests` directory. Run tests with `./umdio.sh test`. Make sure that the database is populated with `./umdio test_scrape`.
 
 ## Credits
 
