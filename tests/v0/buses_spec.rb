@@ -28,5 +28,4 @@ describe 'Bus Endpoint' do
     it_has_behavior 'good status', url + '/routes/115/locations'
     it_has_behavior 'bad status', url + '/routes/NOTAROUTE/locations', bad_route_message
   end
-
 end
