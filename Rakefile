@@ -28,22 +28,42 @@ def import_courses sems
 end
 
 def scrape_bus
-  sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
-  sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
+  sh 'ruby app/scrapers/bus_routes_scraper.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper.rb'
 end
 
 def scrape_majors
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
 
-def scrape_map
-  sh 'ruby app/scrapers/map_scraper.rb'
+def scrape_map args=""
+  sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
+# Imports
+
+desc "Import previously scraped data from the umdio-data repo"
+task :import => ['import:courses']
+
+namespace :import do
+  desc "Import a specific semester"
+  task :semester, [:sem] do |task, args|
+    import_courses([args[:sem]])
+  end
+
+  desc "Import map data"
+  task :map do
+    scrape_map "./data/umdio-data/umd-building-gis.json"
+  end
+end
+
+# TODO: Add export - see https://github.com/umdio/umdio-data/blob/master/courses/download-sem.rb
+
 ###### Scraping
-desc "Scrape to fill databases"
+desc "Scrape live data to fill databases"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
+# TODO: Move this to an import task, once other datatypes are importable
 desc "Scrapes enough to run the tests"
 task :test_scrape do
   import_courses(['201808'])
@@ -86,6 +106,11 @@ namespace :scrape do
   desc "Scrapes only the current semester courses/sections"
   task :current do
     scrape_courses(current_semester)
+  end
+
+  desc "Scrape a specific semester"
+  task :semester, [:sem] do |task, args|
+    scrape_courses(args[:sem])
   end
 
   desc "Import from file"
