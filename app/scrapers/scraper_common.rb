@@ -48,7 +48,7 @@ module ScraperCommon
     begin
       page = Nokogiri::HTML(URI.open(url))
     rescue OpenURI::HTTPError => e
-      logger.error(prog_name) { "Could not load department page '#{url}': #{e.message}" }
+      logger.error(prog_name) { "Could not load page '#{url}': #{e.message}" }
       raise
     end
     page
