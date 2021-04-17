@@ -2,7 +2,9 @@ require 'rspec/core/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
-# Functions
+################################################################################
+################################## FUNCTIONS ###################################
+################################################################################
 
 def get_semesters(args)
   semesters = args.map do |e|
@@ -40,8 +42,11 @@ def scrape_map args=""
   sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
-# Imports
+################################################################################
+#################################### TASKS #####################################
+################################################################################
 
+################################### Imports ####################################
 desc "Import previously scraped data from the umdio-data repo"
 task :import => ['import:courses']
 
@@ -59,7 +64,7 @@ end
 
 # TODO: Add export - see https://github.com/umdio/umdio-data/blob/master/courses/download-sem.rb
 
-###### Scraping
+################################### Scraping ###################################
 desc "Scrape live data to fill databases"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
@@ -120,8 +125,20 @@ namespace :scrape do
   end
 end
 
-###### Server
+##################################### Dev ######################################
+namespace :dev do
+  desc 'Launches the dev environment with docker-compose'
+  task :up do
+    system 'docker-compose -f docker-compose-dev.yml up --build -d'
+  end
 
+  desc 'Brings down the dev environment'
+  task :down do
+    system 'docker-compose -f docker-compose-dev.yml down'
+  end
+end
+
+#################################### Server ####################################
 desc "Start the web server for dev"
 task :up do
   system "shotgun -p 3000 -o 0.0.0.0"
@@ -139,8 +156,7 @@ task :console do
 end
 task :c => :console
 
-###### Testing
-
+################################### Testing ####################################
 desc "Run tests in /tests that look like *_spec.rb"
 RSpec::Core::RakeTask.new :test do |task|
   task.pattern = Dir['tests/**/*_spec.rb']
