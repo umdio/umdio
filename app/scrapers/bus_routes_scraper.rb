@@ -45,11 +45,9 @@ route_array&.each do |route|
       direction_id: e['tag'],
       title: e['title'],
       stops: e['stop'].map do |stop|
-               begin
-                                      stop['tag']
-               rescue StandardError
-                 e['stop']
-                                    end
+               stop['tag']
+             rescue StandardError
+               e['stop']
              end
     }
   end

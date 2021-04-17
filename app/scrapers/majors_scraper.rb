@@ -10,27 +10,28 @@ prog_name = 'majors_scraper'
 
 logger = ScraperCommon.logger
 
-url = "https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically"
-page = ScraperCommon::get_page url, prog_name
-major_divs = page.css(".page--inner-content a")
+url = 'https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically'
+page = ScraperCommon.get_page url, prog_name
+major_divs = page.css('.page--inner-content a')
 majors = []
 major_divs.each do |link|
   # parse the name to grab the major's name and its college
 
   major_url = link['href']
-  next unless major_url and major_url.include? 'umd.edu'
+  next unless major_url&.include?('umd.edu')
+
   major_parts = /(.+)\|(.+)/.match(link.text)
 
-  if major_parts != nil
-    # 0th match is full string, 1st and 2nd elements are the two matches
-    major_name, major_college = major_parts[1, 3].map(&:strip)
+  next if major_parts.nil?
 
-    majors << {
-      name: major_name,
-      college: major_college,
-      url: major_url
-    }
-  end
+  # 0th match is full string, 1st and 2nd elements are the two matches
+  major_name, major_college = major_parts[1, 3].map(&:strip)
+
+  majors << {
+    name: major_name,
+    college: major_college,
+    url: major_url
+  }
 end
 
 $DB[:majors].delete

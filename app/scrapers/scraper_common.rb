@@ -39,7 +39,6 @@ module ScraperCommon
     semesters.flatten
   end
 
-
   # @param [String] url       location of the page to get
   # @param [string] prog_name the name of the scraper to pass as a label to the logger
   #
