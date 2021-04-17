@@ -2,8 +2,10 @@ name: build-docs
 
 on:
   push:
-    tags:
-      - v*
+    branches:
+      - master
+    paths:
+      - 'openapi.yaml'
 
 jobs:
   build:
