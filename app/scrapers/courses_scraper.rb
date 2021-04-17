@@ -46,7 +46,7 @@ def utf_safe(text)
 end
 
 queries = []
-dept_count = Float(dep_urls.length)
+dept_count = dep_urls.length
 
 # add the courses from each department to the database
 dep_urls.each_with_index do |url, i|
@@ -55,7 +55,7 @@ dep_urls.each_with_index do |url, i|
   courses = []
   table_name = 'courses'
 
-  progress = (Float(i) / dept_count * 100.0).round 2
+  progress = (i.to_f / dept_count * 100.0).round 2
   logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester}) (#{progress}%)" }
   logger.debug(prog_name) { "fetching #{url}" }
 
