@@ -26,5 +26,5 @@ end
 $DB[:buildings].delete
 
 uri = ARGF == 1 ? ARGV[0] : url
-array = eval URI.open(url).read
+array = eval URI.open(uri).read
 write_map_array(array)
