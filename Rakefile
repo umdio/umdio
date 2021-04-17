@@ -2,7 +2,9 @@ require 'rspec/core/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
-# Functions
+################################################################################
+################################## FUNCTIONS ###################################
+################################################################################
 
 def get_semesters(args)
   semesters = args.map do |e|
@@ -40,7 +42,12 @@ def scrape_map
   sh 'ruby app/scrapers/map_scraper.rb'
 end
 
-###### Scraping
+################################################################################
+#################################### TASKS #####################################
+################################################################################
+
+################################### Scraping ###################################
+
 desc "Scrape to fill databases"
 task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
@@ -95,7 +102,20 @@ namespace :scrape do
   end
 end
 
-###### Server
+##################################### Dev ######################################
+namespace :dev do
+  desc 'Launches the dev environment with docker-compose'
+  task :up do
+    system 'docker-compose -f docker-compose-dev.yml up --build -d'
+  end
+
+  desc 'Brings down the dev environment'
+  task :down do
+    system 'docker-compose -f docker-compose-dev.yml down'
+  end
+end
+
+#################################### Server ####################################
 
 desc "Start the web server for dev"
 task :up do
@@ -114,7 +134,7 @@ task :console do
 end
 task :c => :console
 
-###### Testing
+################################### Testing ####################################
 
 desc "Run tests in /tests that look like *_spec.rb"
 RSpec::Core::RakeTask.new :test do |task|
