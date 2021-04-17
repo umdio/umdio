@@ -36,7 +36,7 @@ tags:
   - name: courses
     description: This set of endpoints lets you get data about university courses and their sections. You can get one course or section at a time, several courses or sections at a time, or a list of all the courses. All the data is scraped from Testudo.
   - name: professors
-    description: This endpoint contains information about univeristy professors and the courses they have taught.
+    description: This endpoint contains information about university professors and the courses they have taught.
   - name: bus
     description: This endpoint lets you get data about bus routes, schedules, stops, locations, and predicted arrival times. The data is provided by NextBus, which monitors buses and gives the data to us via their API. We think our API is easier to use, but our data might be behind NextBus by a few seconds. If your app requires to-the-second bus location info, you can go right to the source. All bus data is copyright University of Maryland
   - name: map
@@ -79,6 +79,7 @@ paths:
         - $ref: "#/components/parameters/sortParam"
         - $ref: "#/components/parameters/pageParam"
         - $ref: "#/components/parameters/perPageParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation
@@ -124,17 +125,10 @@ paths:
         - courses
       summary: View specific sections
       description: Returns paginated list of sections
-      operationId: getSections
+      operationId: getSectionsByIds
       parameters:
-        - in: path
-          name: section_ids
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-          description: One or more comma separated section ids
-          explode: true
+        - $ref: "#/components/parameters/sectionIdsParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation
@@ -164,15 +158,8 @@ paths:
       description: Returns info about one or more courses
       operationId: getCoursesById
       parameters:
-        - in: path
-          name: course_ids
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-          description: One or more comma separated course ids
-          explode: true
+        - $ref: "#/components/parameters/courseIdsParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation
@@ -200,17 +187,10 @@ paths:
         - courses
       summary: View sections for a course
       description: Returns info about one or more courses
-      operationId: getCourseSectionsById
+      operationId: getSectionsForCourse
       parameters:
-        - in: path
-          name: course_ids
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-          description: One or more comma separated course ids
-          explode: true
+        - $ref: "#/components/parameters/courseIdsParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation
@@ -240,24 +220,9 @@ paths:
       description: Returns info about one or more courses
       operationId: getCourseSectionsById
       parameters:
-        - in: path
-          name: course_ids
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-          description: One or more comma separated course ids
-          explode: true
-        - in: path
-          name: section_ids
-          required: true
-          schema:
-            type: array
-            items:
-              type: string
-          description: One or more comma separated section ids
-          explode: true
+        - $ref: "#/components/parameters/courseIdsParam"
+        - $ref: "#/components/parameters/sectionIdsParam"
+        - $ref: "#/components/parameters/semesterParam"
       responses:
         "200":
           description: Successful Operation
@@ -284,7 +249,7 @@ paths:
       tags:
         - courses
       summary: List semesters
-      description: Returns list of all available semesters
+      description: Returns list of all available semesters, each in format YYYYMM
       operationId: getSemesters
       responses:
         "200":
@@ -295,6 +260,7 @@ paths:
                 type: array
                 items:
                   type: string
+                example: ["201901", "201905", "201908"]
   /courses/departments:
     get:
       tags:
@@ -311,6 +277,7 @@ paths:
                 type: array
                 items:
                   type: string
+                example: ["AAST", "CMSC", "MATH"]
   /professors:
     get:
       tags:
@@ -1060,6 +1027,28 @@ components:
         docs:
           type: string
   parameters:
+    courseIdsParam:
+      in: path
+      name: course_ids
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+        description: One or more comma separated course ids, in format DEPTNNN with up to 2 trailing characters.
+      explode: true
+      example: ["ENGL101", "MATH140", "CMSC388F"]
+    sectionIdsParam:
+      in: path
+      name: section_ids
+      required: true
+      schema:
+        type: array
+        items:
+          type: string
+        description: One or more comma separated section ids, of format DEPTNNN-XXXX.
+      explode: true
+      example: ["ENGL101-0101", "MATH140-0201"]
     sortParam:
       in: query
       name: sort

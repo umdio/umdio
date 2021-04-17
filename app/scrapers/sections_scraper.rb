@@ -9,13 +9,23 @@ include ScraperCommon
 
 require_relative '../models/courses.rb'
 
+
+
+# Inital setup
+prog_name = "sections_scraper"
+logger = ScraperCommon::logger
+
+semesters = ScraperCommon::get_semesters(ARGV)
+
 # Parses a given section page
 # Returns [sections, professors]
 # TODO: Remove semester param, infer from url
 def parse_sections(url, semester)
+  prog_name = "sections_scraper"
   # Parse with Nokogiri
-  page = Nokogiri::HTML(open(url))
-  course_divs = page.search('div.course-sections')
+  page = ScraperCommon::get_page url, prog_name
+
+  course_divs = page.search("div.course-sections")
   section_array = []
 
   # for each of the courses on the page
@@ -24,8 +34,9 @@ def parse_sections(url, semester)
     # for each section of the course
     course_div.search('div.section').each do |section|
       # add section to array to add
-      instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/, '').encode('UTF-8', invalid: :replace).split(',').map(&:strip)
-      dept = course_id.match(/^([A-Z]{4})\d{3}[A-Z]?$/)[1]
+      instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/,'').encode('UTF-8', :invalid => :replace).split(',').map(&:strip)
+      # note: some courses have weird suffixes (e.g. MSBB99MB, yes thats a real class)
+      dept = course_id[0, 4]
 
       # add course and department to professor object for each instructor
       profs = []
@@ -72,19 +83,23 @@ def parse_sections(url, semester)
   section_array
 end
 
-# Inital setup
-prog_name = 'sections_scraper'
-logger = ScraperCommon.logger
+# Makes a URL for getting sections for courses
+#
+# @param [Array<String | Number>] courses the courses to get (e.g. CMSC351)
+# @return [String] the URL to pass to `parse_sections`
+def make_query(semester, courses)
+  "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+end
 
-semesters = ScraperCommon.get_semesters(ARGV)
+# course id accumulator. Flushed each time a sections GET request is made.
+# @type [Array<Number>]
 courses = []
 
 # Loop through the semesters we want to parse
 semesters.each do |semester|
   # Arrays to hold the things we want to insert
   sections = []
-
-  logger.info(prog_name) { "Searching for sections in term #{semester}" }
+  logger.info(prog_name) {"Searching for sections in term #{semester}"}
 
   # Loop through all courses from that semester's courses table
   $DB[:courses].where(semester: semester).each do |row|
@@ -92,10 +107,13 @@ semesters.each do |semester|
     courses << course_id
 
     # Every 200, parse a sections page, reset courses
-    next unless courses.length == 200
+    if courses.length == 200
+      query = make_query(semester, courses)
 
     query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map { |e| e }.join(',')}"
 
+    # parse the last entries
+    query = make_query(semester, courses)
     res = parse_sections(query, semester)
     courses = []
     sections.concat(res)
@@ -148,4 +166,5 @@ semesters.each do |semester|
       )
     end
   end
+end
 end

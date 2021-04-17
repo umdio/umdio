@@ -1,0 +1,3 @@
+reporters:
+  # https://solargraph.org/guides/type-checking#the-typed-level
+  - typecheck:typed

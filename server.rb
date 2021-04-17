@@ -16,6 +16,7 @@ class UMDIO < Sinatra::Base
   set :root, File.dirname(__FILE__)
 
   # TODO: Load config from memory
+  # @type [Sequel::Database]
   $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
   $DB.extension :pg_array, :pg_json, :pagination
   Sequel.extension :pg_json_ops

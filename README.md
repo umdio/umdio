@@ -1,6 +1,8 @@
-# [UMD.io](http://umd.io/) &middot; [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](README.md#Development)
+# [UMD.io](http://umd.io/) &middot; [![license MIT](https://img.shields.io/github/license/mashape/apistatus.svg)](./LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](README.md#Development) [![CI](https://github.com/umdio/umdio/actions/workflows/main.yml/badge.svg)](https://github.com/umdio/umdio/actions/workflows/main.yml)
 
-UMD.io is an open API for the University of Maryland. The main purpose is to give developers easy access to data to build great applications. In turn, developers can improve the University of Maryland with the things they build.
+UMD.io is an open API for the University of Maryland. The main purpose is to
+give developers easy access to data to build great applications. In turn,
+developers can improve the University of Maryland with the things they build.
 
 ## Features
 
@@ -27,20 +29,39 @@ To work on umd.io, or to run your own instance, start by forking and cloning thi
    - You might need to run docker-related commands with `sudo` if you're a linux user
 4. Run the scrapers `./umdio.sh scrape`
    - You might need to `chmod +x umdio.sh`
+5. Clone the umdio-data submodule `git submodule update --init`
 
 This will take some time, so in the meantime, review the rest of the guide.
 
 ## Documentation
 
-Within the codebase, comments and [good practices](https://rubystyle.guide/) are encouraged, and will later be enforced.
+Within the codebase, comments and [good practices](https://rubystyle.guide/) are
+encouraged, and will later be enforced.
 
-For the public-facing API, we use [OpenAPI v3](https://swagger.io/docs/specification/about/) to document everything. You can view our spec [here](https://github.com/umdio/umdio/blob/master/openapi.yaml). The docs are served with [ReDoc](https://github.com/Redocly/redoc) and are automatically built on every tagged commit.
+For the public-facing API, we use [OpenAPI v3](https://swagger.io/docs/specification/about/)
+to document everything. You can view our spec
+[here](https://github.com/umdio/umdio/blob/master/openapi.yaml). The docs are
+served with [ReDoc](https://github.com/Redocly/redoc) and are automatically built
+on every tagged commit.
 
-If you're actively working on the documentation, use the `docker-compose-dev.yml` file to view your changes live in ReDoc.
+If you're actively working on the documentation, use the `docker-compose-dev.yml`
+file to view your changes live in ReDoc, on `http://localhost:8080`.
 
+```sh
+rake dev:up
+# If rake throws a LoadError (e.g. "LoadError: cannot load such file -- rspec/core/rake_task"),
+# try running the task below instead. You may need to run `bundle install` beforehand.
+sudo -E rake dev:up
+```
+
+All [rake](https://ruby.github.io/rake/) tasks should have descriptions. To list all rake tasks, run `bundle exec rake -T`.
 ## Tech Stack
 
-umd.io runs on Ruby, with various libraries such as Rack, Sinatra, Puma, and Sequel. We use Postgresql as the database. Everything runs in docker.
+umd.io runs on Ruby, with various libraries such as [Rack](https://github.com/rack/rack),
+[Sinatra](http://sinatrarb.com/), [Puma](https://puma.io/), and
+[Sequel](https://github.com/jeremyevans/sequel). We use
+[PostgreSQL](https://www.postgresql.org/) as the database. Everything runs in
+[Docker](https://www.docker.com/).
 
 ## Adding new data
 
@@ -56,7 +77,8 @@ If you're interested in adding a new endpoint, here's a rough guide on how to do
 
 ## Logging
 
-We use Ruby's built-in logger to output messages to standard output. Learn more about [Ruby's logging module](https://ruby-doc.org/stdlib-2.1.0/libdoc/logger/rdoc/Logger.html)
+We use Ruby's built-in logger to output messages to standard output. Learn more
+about [Ruby's logging module](https://ruby-doc.org/stdlib-2.1.0/libdoc/logger/rdoc/Logger.html)
 
 Here's an example of output from the courses scraper:
 
@@ -70,15 +92,22 @@ Here's an example of output from the courses scraper:
 The formatting for outputted messages is as follows:`[DATE TIME] LOG_LEVEL (PROGRAM_NAME): {MESSAGE}`
 
 An example of a log call in ruby:
-`logger.info(prog_name) {"MESSAGE"}`
+```ruby
+logger.info(prog_name) {"MESSAGE"}
+```
 
-You should use Ruby's built-in log-levels where appropriate, when displaying errors you should use logger.error, when displaying information you should use logger.info, and so on.
+You should use Ruby's built-in log-levels where appropriate, when displaying
+errors you should use logger.error, when displaying information you should use
+`logger.info`, and so on.
 
-Our logger implementation is located at the `scraper_common.rb` file located at `$app/scraper_common.rb`
+Our logger implementation is located at the `scraper_common.rb` file located at
+`$app/scrapers/scraper_common.rb`
 
 ## Testing
 
-We use rspec to test. You can find the tests in the `tests` directory. Run tests with `./umdio.sh test`.
+We use [RSpec](https://rspec.info/) to test. You can find the tests in the
+`tests` directory. Run tests with `./umdio.sh test`. Make sure that the database
+is populated with `./umdio test_scrape`.
 
 ## Credits
 

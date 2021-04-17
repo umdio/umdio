@@ -1,6 +1,14 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "**.rb"
+  pull_request:
+    paths:
+      - "**.rb"
 
 jobs:
   build:

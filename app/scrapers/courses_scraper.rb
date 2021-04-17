@@ -4,17 +4,18 @@
 require 'open-uri'
 require 'nokogiri'
 
-require_relative 'scraper_common.rb'
+require_relative 'scraper_common'
 include ScraperCommon
 
-require_relative '../models/courses.rb'
+require_relative '../models/courses'
 
 prog_name = 'courses_scraper'
-logger = ScraperCommon.logger
+logger = ScraperCommon::logger
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
-semesters = ScraperCommon.get_semesters(ARGV)
+# @type [Array<String>]
+semesters = ScraperCommon::get_semesters(ARGV)
 
 logger.info(prog_name) { semesters }
 
@@ -25,31 +26,48 @@ semesters.each do |semester|
 
   base_url = "https://app.testudo.umd.edu/soc/#{semester}"
 
-  Nokogiri::HTML(open(base_url)).search('span.prefix-abbrev').each do |e|
+
+  ScraperCommon::get_page(base_url, prog_name).search('span.prefix-abbrev').each do |e|
     dep_urls << "https://app.testudo.umd.edu/soc/#{semester}/#{e.text}"
   end
 
   logger.info(prog_name) { "#{dep_urls.length} department/semesters so far" }
 end
 
+##
 # safely formats to UTF-8
+#
+# @param [String] text
+# @return [String]
+#
 def utf_safe(text)
   text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '') unless text.valid_encoding?
   text
 end
 
 queries = []
+dept_count = dep_urls.length
 
 # add the courses from each department to the database
-dep_urls.each do |url|
+dep_urls.each_with_index do |url, i|
   dept_id = url.split('/soc/')[1][7, 10]
   semester = url.split('/soc/')[1][0, 6]
   courses = []
   table_name = 'courses'
 
-  logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester})" }
+  progress = (i.to_f / dept_count * 100.0).round 2
+  logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester}) (#{progress}%)" }
+  logger.debug(prog_name) { "fetching #{url}" }
 
-  page = Nokogiri::HTML(open(url), nil, 'UTF-8')
+  # TODO replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
+  # options thingy
+  begin
+    page = Nokogiri::HTML(URI.open(url), nil, 'UTF-8')
+  rescue OpenURI::HTTPError => e
+    logger.error(prog_name) { "Failed to get department page at '#{url}': #{e.message}" }
+    raise
+  end
+
   department = page.search('span.course-prefix-name').text.strip
 
   page.search('div.course').each do |course|
@@ -119,7 +137,7 @@ dep_urls.each do |url|
 
       description = (utf_safe approved.css('> div:last-child').text).strip.gsub(/\t|(\r\n)/, '')
       additional_info = additional_info ? additional_info += ' ' + text : text
-      additional_info = additional_info&.strip&.empty? ? nil : additional_info.strip
+      additional_info = additional_info && additional_info.strip.empty? ? nil : additional_info.strip
 
     elsif other.css('> div').length > 0
       description = text.strip.empty? ? nil : text.strip.gsub(/\t|\r|\n/, '')

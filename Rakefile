@@ -2,7 +2,9 @@ require 'rspec/core/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
-# Functions
+################################################################################
+################################## FUNCTIONS ###################################
+################################################################################
 
 def get_semesters(args)
   semesters = args.map do |e|
@@ -28,23 +30,46 @@ def import_courses(sems)
 end
 
 def scrape_bus
-  sh 'ruby app/scrapers/bus_routes_scraper.rb rebuild'
-  sh 'ruby app/scrapers/bus_schedules_scraper.rb rebuild'
+  sh 'ruby app/scrapers/bus_routes_scraper.rb'
+  sh 'ruby app/scrapers/bus_schedules_scraper.rb'
 end
 
 def scrape_majors
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
 
-def scrape_map
-  sh 'ruby app/scrapers/map_scraper.rb'
+def scrape_map args=""
+  sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
-###### Scraping
-desc 'Scrape to fill databases'
-task scrape: ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
+################################################################################
+#################################### TASKS #####################################
+################################################################################
 
-desc 'Scrapes enough to run the tests'
+################################### Imports ####################################
+desc "Import previously scraped data from the umdio-data repo"
+task :import => ['import:courses']
+
+namespace :import do
+  desc "Import a specific semester"
+  task :semester, [:sem] do |task, args|
+    import_courses([args[:sem]])
+  end
+
+  desc "Import map data"
+  task :map do
+    scrape_map "./data/umdio-data/umd-building-gis.json"
+  end
+end
+
+# TODO: Add export - see https://github.com/umdio/umdio-data/blob/master/courses/download-sem.rb
+
+################################### Scraping ###################################
+desc "Scrape live data to fill databases"
+task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
+
+# TODO: Move this to an import task, once other datatypes are importable
+desc "Scrapes enough to run the tests"
 task :test_scrape do
   import_courses(['201808'])
   scrape_bus
@@ -88,16 +113,33 @@ namespace :scrape do
     scrape_courses(current_semester)
   end
 
-  desc 'Import from file'
+  desc "Scrape a specific semester"
+  task :semester, [:sem] do |task, args|
+    scrape_courses(args[:sem])
+  end
+
+  desc "Import from file"
   task :import_courses do
     years = %w[201708 201712 201801 201805 201808 201812 201901 201901 201905 201908 201912]
     import_courses(years)
   end
 end
 
-###### Server
+##################################### Dev ######################################
+namespace :dev do
+  desc 'Launches the dev environment with docker-compose'
+  task :up do
+    system 'docker-compose -f docker-compose-dev.yml up --build -d'
+  end
 
-desc 'Start the web server for dev'
+  desc 'Brings down the dev environment'
+  task :down do
+    system 'docker-compose -f docker-compose-dev.yml down'
+  end
+end
+
+#################################### Server ####################################
+desc "Start the web server for dev"
 task :up do
   system 'shotgun -p 3000 -o 0.0.0.0'
 end
@@ -114,19 +156,25 @@ task :console do
 end
 task c: :console
 
-###### Testing
-
-desc 'Run tests in /tests that look like *_spec.rb'
+################################### Testing ####################################
+desc "Run tests in /tests that look like *_spec.rb"
 RSpec::Core::RakeTask.new :test do |task|
   task.pattern = Dir['tests/**/*_spec.rb']
-  task.rspec_opts = '--format documentation' # default to verbose testing, comment for silence
+  task.rspec_opts = "--format documentation" # default to verbose testing, comment for silence
 end
 task spec: :test
 
 desc 'Run tests in /tests/v1 that look like *_spec.rb'
 RSpec::Core::RakeTask.new :testv1 do |task|
   task.pattern = Dir['tests/v1/*_spec.rb']
-  task.rspec_opts = '--format documentation' # default to verbose testing, comment for silence
+  task.rspec_opts = "--format documentation" # default to verbose testing, comment for silence
+end
+
+desc "Type check and lint codebase"
+task :validate do
+  system 'bundle exec solargraph scan', exception: true
+  system 'bundle exec solargraph typecheck', exception: true
+  # TODO: run rubocop
 end
 
 task default: ['up']

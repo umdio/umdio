@@ -1,3 +1,4 @@
+require 'sequel'
 # TODO: None of this is actually "relational". Really, all we've done here is define a schema.
 
 $DB.create_table? :routes do
