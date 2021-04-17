@@ -54,6 +54,7 @@ rake dev:up
 sudo -E rake dev:up
 ```
 
+All [rake](https://ruby.github.io/rake/) tasks should have descriptions. To list all rake tasks, run `bundle exec rake -T`.
 ## Tech Stack
 
 umd.io runs on Ruby, with various libraries such as [Rack](https://github.com/rack/rack),
