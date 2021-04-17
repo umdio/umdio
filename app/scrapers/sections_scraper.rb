@@ -10,17 +10,19 @@ include ScraperCommon
 require_relative '../models/courses.rb'
 
 
+
+# Inital setup
+prog_name = "sections_scraper"
+logger = ScraperCommon::logger
+
+semesters = ScraperCommon::get_semesters(ARGV)
+
 # Parses a given section page
 # Returns [sections, professors]
 # TODO: Remove semester param, infer from url
 def parse_sections(url, semester)
+  prog_name = "sections_scraper"
   # Parse with Nokogiri
-  # begin
-  #   page = Nokogiri::HTML(URI::open(url))
-  # rescue OpenURI::HTTPError => error
-  #   logger.error("Error raised for url '#{url}': #{error.message}")
-  #   raise
-  # end
   page = ScraperCommon::get_page url, prog_name
 
   course_divs = page.search("div.course-sections")
@@ -81,11 +83,14 @@ def parse_sections(url, semester)
   return section_array
 end
 
-# Inital setup
-prog_name = "sections_scraper"
-logger = ScraperCommon::logger
+# Makes a URL for getting sections for courses
+#
+# @param [Array<String | Number>] courses the courses to get (e.g. CMSC351)
+# @return [String] the URL to pass to `parse_sections`
+def make_query(semester, courses)
+  "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+end
 
-semesters = ScraperCommon::get_semesters(ARGV)
 # course id accumulator. Flushed each time a sections GET request is made.
 # @type [Array<Number>]
 courses = []
@@ -94,15 +99,6 @@ courses = []
 semesters.each do |semester|
   # Arrays to hold the things we want to insert
   sections = []
-
-  # TODO use this below
-  # @param [Array<String | Number>] courses
-  # @return [String]
-  def make_query courses
-    "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
-  end
-
-
   logger.info(prog_name) {"Searching for sections in term #{semester}"}
 
   # Loop through all courses from that semester's courses table
@@ -112,7 +108,7 @@ semesters.each do |semester|
 
     # Every 200, parse a sections page, reset courses
     if courses.length == 200
-      query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+      query = make_query(semester, courses)
 
       res = parse_sections(query, semester)
       courses = []
@@ -121,7 +117,7 @@ semesters.each do |semester|
   end
 
     # parse the last entries
-    query = "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map{|e| e}.join(',')}"
+    query = make_query(semester, courses)
     res = parse_sections(query, semester)
     sections.concat(res)
     courses = []

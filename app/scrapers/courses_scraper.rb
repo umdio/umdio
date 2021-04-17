@@ -46,15 +46,17 @@ def utf_safe(text)
 end
 
 queries = []
+dept_count = Float(dep_urls.length)
 
 # add the courses from each department to the database
-dep_urls.each do |url|
+dep_urls.each_with_index do |url, i|
   dept_id = url.split('/soc/')[1][7, 10]
   semester = url.split('/soc/')[1][0, 6]
   courses = []
   table_name = 'courses'
 
-  logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester})" }
+  progress = (Float(i) / dept_count * 100.0).round 2
+  logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester}) (#{progress}%)" }
   logger.debug(prog_name) { "fetching #{url}" }
 
   # TODO replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
