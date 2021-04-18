@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 describe 'Professors Endpoint' do
-  url = "v0/professors"
+  url = 'v0/professors'
 
   describe 'get /professors' do
     it_has_behavior 'good status', url + '?semester=201808'

@@ -18,15 +18,15 @@ def get_semesters(args)
 end
 
 # Scrapes the current semester from Testudo
-def scrape_courses sems
+def scrape_courses(sems)
   sh "ruby app/scrapers/courses_scraper.rb #{sems}"
   sh "ruby app/scrapers/sections_scraper.rb #{sems}"
 end
 
 # Imports old semesters from flat files
-def import_courses sems
+def import_courses(sems)
   sems = get_semesters(sems)
-  sems.each {|s| sh "ruby app/scrapers/courses_importer.rb #{s}"}
+  sems.each { |s| sh "ruby app/scrapers/courses_importer.rb #{s}" }
 end
 
 def scrape_bus
@@ -38,7 +38,7 @@ def scrape_majors
   sh 'ruby app/scrapers/majors_scraper.rb'
 end
 
-def scrape_map args=""
+def scrape_map(args = '')
   sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
@@ -47,43 +47,43 @@ end
 ################################################################################
 
 ################################### Imports ####################################
-desc "Import previously scraped data from the umdio-data repo"
-task :import => ['import:courses']
+desc 'Import previously scraped data from the umdio-data repo'
+task import: ['import:courses']
 
 namespace :import do
-  desc "Import a specific semester"
-  task :semester, [:sem] do |task, args|
+  desc 'Import a specific semester'
+  task :semester, [:sem] do |_task, args|
     import_courses([args[:sem]])
   end
 
-  desc "Import map data"
+  desc 'Import map data'
   task :map do
-    scrape_map "./data/umdio-data/umd-building-gis.json"
+    scrape_map './data/umdio-data/umd-building-gis.json'
   end
 end
 
 # TODO: Add export - see https://github.com/umdio/umdio-data/blob/master/courses/download-sem.rb
 
 ################################### Scraping ###################################
-desc "Scrape live data to fill databases"
-task :scrape => ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
+desc 'Scrape live data to fill databases'
+task scrape: ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
 
 # TODO: Move this to an import task, once other datatypes are importable
-desc "Scrapes enough to run the tests"
+desc 'Scrapes enough to run the tests'
 task :test_scrape do
   import_courses(['201808'])
-  scrape_bus()
-  scrape_majors()
-  scrape_map()
+  scrape_bus
+  scrape_majors
+  scrape_map
 end
 
 namespace :scrape do
-  desc "Run bus route scrapers"
+  desc 'Run bus route scrapers'
   task :bus do
-    scrape_bus()
+    scrape_bus
   end
 
-  desc "Run course scrapers"
+  desc 'Run course scrapers'
   task :courses do
     # Testudo updated in September for Spring, Fed for fall
     # if fall is updated, we want to get the next year's courses
@@ -92,35 +92,35 @@ namespace :scrape do
     scrape_courses(years)
   end
 
-  desc "Run course seat updater"
+  desc 'Run course seat updater'
   task :seats do
     semesters = current_and_next_semesters
     sh "ruby app/scrapers/sections_scraper.rb #{semesters.join(' ')}"
   end
 
-  desc "Run building scraper"
+  desc 'Run building scraper'
   task :buildings do
-    scrape_map()
+    scrape_map
   end
 
-  desc "Majors scraper"
+  desc 'Majors scraper'
   task :majors do
-    scrape_majors()
+    scrape_majors
   end
 
-  desc "Scrapes only the current semester courses/sections"
+  desc 'Scrapes only the current semester courses/sections'
   task :current do
     scrape_courses(current_semester)
   end
 
-  desc "Scrape a specific semester"
-  task :semester, [:sem] do |task, args|
+  desc 'Scrape a specific semester'
+  task :semester, [:sem] do |_task, args|
     scrape_courses(args[:sem])
   end
 
-  desc "Import from file"
+  desc 'Import from file'
   task :import_courses do
-    years = ['201708', '201712', '201801', '201805', '201808', '201812', '201901', '201901', '201905', '201908', '201912']
+    years = %w[201708 201712 201801 201805 201808 201812 201901 201901 201905 201908 201912]
     import_courses(years)
   end
 end
@@ -139,42 +139,42 @@ namespace :dev do
 end
 
 #################################### Server ####################################
-desc "Start the web server for dev"
+desc 'Start the web server for dev'
 task :up do
-  system "shotgun -p 3000 -o 0.0.0.0"
+  system 'shotgun -p 3000 -o 0.0.0.0'
 end
-task :server => :up
+task server: :up
 
-desc "Start the web server for prod"
+desc 'Start the web server for prod'
 task :prod do
-  system "puma -p 3000"
+  system 'puma -p 3000'
 end
 
-desc "Sinatra console"
+desc 'Sinatra console'
 task :console do
-  system "bundle exec irb -r ./config.ru"
+  system 'bundle exec irb -r ./config.ru'
 end
-task :c => :console
+task c: :console
 
 ################################### Testing ####################################
-desc "Run tests in /tests that look like *_spec.rb"
+desc 'Run tests in /tests that look like *_spec.rb'
 RSpec::Core::RakeTask.new :test do |task|
   task.pattern = Dir['tests/**/*_spec.rb']
-  task.rspec_opts = "--format documentation" # default to verbose testing, comment for silence
+  task.rspec_opts = '--format documentation' # default to verbose testing, comment for silence
 end
-task :spec => :test
+task spec: :test
 
-desc "Run tests in /tests/v1 that look like *_spec.rb"
+desc 'Run tests in /tests/v1 that look like *_spec.rb'
 RSpec::Core::RakeTask.new :testv1 do |task|
   task.pattern = Dir['tests/v1/*_spec.rb']
-  task.rspec_opts = "--format documentation" # default to verbose testing, comment for silence
+  task.rspec_opts = '--format documentation' # default to verbose testing, comment for silence
 end
 
-desc "Type check and lint codebase"
+desc 'Type check and lint codebase'
 task :validate do
   system 'bundle exec solargraph scan', exception: true
   system 'bundle exec solargraph typecheck', exception: true
   # TODO: run rubocop
 end
 
-task :default => ['up']
+task default: ['up']
