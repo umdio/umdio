@@ -64,13 +64,23 @@ class Course < Sequel::Model
   end
 
   def to_v1
-    ge = gen_ed.gsub(/\s/, '').split('or').map do |s|
-      s.split(',').map do |s2|
-        ret = s2
-        if m = s2.match(/^(.{4})\(iftakenwith(.*)\)$/)
-          ret = "#{m[1]}|#{m[2]}"
-        end
-        ret
+    # gen_ed = "DSHS or DSSP, SCIS"
+    puts gen_ed.class
+    gen_ed = gen_ed.gsub(/\s/, '')
+    ge = []
+    choose_from = []
+    always_given = []
+
+    if gen_ed.include?('or')
+      choose_from = gen_ed.split(',')[0].split('or')
+      always_given = gen_ed.split(',')[1..-1]
+    end
+
+    if choose_from == []
+      ge << always_given
+    else
+      choose_from.each do |ge_chosen|
+        ge << always_given + [ge_chosen]
       end
     end
 
