@@ -1,4 +1,5 @@
 require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
@@ -126,6 +127,16 @@ namespace :scrape do
 end
 
 ##################################### Dev ######################################
+
+# Run with `rake rubocop` or `rake rubocop:auto_correct`
+# @see https://docs.rubocop.org/rubocop/1.12/integration_with_other_tools.html#rake-integration
+desc 'Run RuboCop on codebase'
+RuboCop::RakeTask.new do |task|
+  task.requires << 'rubocop-rake'
+  task.requires << 'rubocop-rspec'
+  task.requires << 'rubocop-sequel'
+end
+
 namespace :dev do
   desc 'Launches the dev environment with docker-compose'
   task :up do
@@ -172,8 +183,12 @@ end
 
 desc "Type check and lint codebase"
 task :validate do
+  puts 'Running static type checking...'
   system 'bundle exec solargraph scan', exception: true
   system 'bundle exec solargraph typecheck', exception: true
+
+  puts 'Running RuboCop...'
+  system 'bundle exec rake rubocop', exception: true
   # TODO: run rubocop
 end
 

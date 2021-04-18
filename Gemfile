@@ -17,6 +17,11 @@ group :development do
   gem 'shotgun'
   gem 'better_errors'
   gem 'solargraph'
+  # RuboCop
+  gem 'rubocop', '~> 1.12', require: false
+  gem 'rubocop-rake', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-sequel', require: false # NOTE(don): should this include 'require: false'?
 end
 
 group :test do
