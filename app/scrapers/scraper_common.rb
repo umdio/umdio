@@ -29,6 +29,15 @@ module ScraperCommon
   # @param [Array<String>] args  a list of years
   # @return [Array<String>] list of semesters for each year
   def get_semesters(args)
+    if args.is_a? Integer
+      raise ArgumentError.new "#{args} is not a valid year" unless args > 1800
+      args = [args.to_s]
+    elsif args.is_a? String
+      raise ArgumentError.new "#{args} is not a valid year" unless /\d{4}/.match? args
+      args = [args]
+    end
+
+    raise ArgumentError.new "#{args} is not a valid year or list of years" unless args.respond_to? :map
     semesters = args.map do |e|
       if e.length == 6
         e

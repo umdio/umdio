@@ -33,6 +33,7 @@ describe 'Helpers' do
 
     describe 'object ids' do
       # ! eq ! is used because of weird oddities in Ruby
+      # TODO(don): elaborate on this? ^
       it 'is_section_id?' do
         {
           'CMSC131' => false,
@@ -48,6 +49,10 @@ describe 'Helpers' do
         {
           'CMSC131' => true,
           'CMSC131A' => true,
+          # TODO(don): this class broke the course_scraper. By definition it is a
+          # valid course, and the rest of the codebase needs to be updated
+          # to accommodate it.
+          # 'MSBB99MB' => true,
           'BMGT' => false,
           'CMSC131-0101' => false
         }.each { |k,v| expect(!is_course_id?(k)).to eq(!v) }
