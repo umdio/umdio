@@ -1,21 +1,23 @@
+# frozen_string_literal: true
+
 source 'https://rubygems.org'
 
 ruby '~> 2.7'
 
-gem 'sinatra', "~> 2.0.8.1"
+gem 'dotenv'
+gem 'pg', '~> 1.2.3'
+gem 'puma', '~> 4.3'
+gem 'rake'
+gem 'sequel', '~> 5.31'
+gem 'sinatra', '~> 2.0.8.1'
 gem 'sinatra-contrib'
 gem 'sinatra-cross_origin', '~> 0.4.0'
 gem 'sinatra-param', '~> 1.6'
-gem 'rake'
-gem 'dotenv'
-gem "pg", "~> 1.2.3"
-gem "sequel", "~> 5.31"
-gem "puma", "~> 4.3"
 
 group :development do
+  gem 'better_errors'
   gem 'rspec'
   gem 'shotgun'
-  gem 'better_errors'
   gem 'solargraph'
   # RuboCop
   gem 'rubocop', '~> 1.12', require: false
@@ -25,8 +27,8 @@ group :development do
 end
 
 group :test do
-  gem 'rack-test', :require => 'rack/test'
-  gem 'simplecov', :require => false
+  gem 'rack-test', require: 'rack/test'
+  gem 'simplecov', require: false
 end
 
 # the gems needed for the courses scraper, and likely for other scrapers

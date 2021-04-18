@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $DB.create_table? :courses do
   primary_key :pid
   String :course_id
@@ -11,9 +13,8 @@ $DB.create_table? :courses do
   String :gen_ed
   column :core, :jsonb
   column :relationships, :jsonb
-  unique [:course_id, :semester]
+  unique %i[course_id semester]
 end
-
 
 $DB.create_table? :sections do
   primary_key :section_id
@@ -24,7 +25,7 @@ $DB.create_table? :sections do
   String :seats
   String :open_seats
   String :waitlist
-  unique [:section_id_str, :course_id, :semester]
+  unique %i[section_id_str course_id semester]
 end
 
 $DB.create_table? :meetings do
@@ -40,25 +41,26 @@ $DB.create_table? :meetings do
   Integer :end_seconds
 end
 
-
 $DB.create_table? :professors do
   primary_key :professor_id
-  String :name, {:unique => true}
+  String :name, { unique: true }
 end
 
-$DB.create_join_table?(:professor_id=>:professors, :section_id=>:sections)
+$DB.create_join_table?(professor_id: :professors, section_id: :sections)
 
 class Course < Sequel::Model
   dataset_module do
     def all_semesters
-      Course.distinct(:semester).map {|c| c[:semester]}.sort
+      Course.distinct(:semester).map { |c| c[:semester] }.sort
     end
 
     def all_depts
-      Course.distinct(:dept_id, :department).map {|c| {dept_id: c[:dept_id], department: c[:department]}}.sort_by! {|d| d[:dept_id]}
+      Course.distinct(:dept_id, :department).map do |c|
+        { dept_id: c[:dept_id], department: c[:department] }
+      end.sort_by! { |d| d[:dept_id] }
     end
 
-    def list_sem semester
+    def list_sem(semester)
       Course.where(semester: semester).order(Sequel.asc(:course_id))
     end
   end
@@ -106,7 +108,7 @@ class Course < Sequel::Model
       credits: credits,
       description: description,
       grading_method: grading_method,
-      gen_ed: gen_ed.gsub(/\s/, '').gsub("iftakenwith","fkwh").split(','),
+      gen_ed: gen_ed.gsub(/\s/, '').gsub('iftakenwith', 'fkwh').split(','),
       core: core,
       relationships: relationships
     }
@@ -150,7 +152,7 @@ class Section < Sequel::Model
   many_to_many :professors
 
   def to_v1
-    profs = professors.map {|p| p[:name]}
+    profs = professors.map { |p| p[:name] }
 
     {
       course: course_id,
@@ -158,7 +160,7 @@ class Section < Sequel::Model
       semester: semester.to_s,
       number: number,
       seats: seats,
-      meetings: meetings.map {|m| m.to_v1},
+      meetings: meetings.map(&:to_v1),
       open_seats: open_seats,
       waitlist: waitlist,
       instructors: profs
@@ -173,7 +175,7 @@ class Section < Sequel::Model
   end
 
   def to_v0
-    profs = professors.map {|p| p[:name]}
+    profs = professors.map { |p| p[:name] }
 
     {
       course: course_id,
@@ -181,7 +183,7 @@ class Section < Sequel::Model
       semester: semester.to_s,
       number: number,
       seats: seats,
-      meetings: meetings.map {|m| m.to_v0},
+      meetings: meetings.map(&:to_v0),
       open_seats: open_seats,
       waitlist: waitlist,
       instructors: profs
@@ -193,18 +195,18 @@ class Professor < Sequel::Model
   many_to_many :sections
 
   def to_v0
-    ss = sections.map{|s| s.to_info}
+    ss = sections.map(&:to_info)
     semesters = []
     courses = []
     depts = []
 
-    ss.each {|s|
-      if s[:course]
-        semesters << s[:semester]
-        courses << s[:course]
-        depts << s[:course][0..3]
-      end
-    }
+    ss.each do |s|
+      next unless s[:course]
+
+      semesters << s[:semester]
+      courses << s[:course]
+      depts << s[:course][0..3]
+    end
 
     {
       name: name,
@@ -215,14 +217,12 @@ class Professor < Sequel::Model
   end
 
   def to_v1
-    ss = sections.map{|s| s.to_info}
+    ss = sections.map(&:to_info)
     taught = []
 
-    ss.each {|s|
-      if s[:course]
-        taught << {course_id: s[:course], semester: s[:semester]}
-      end
-    }
+    ss.each do |s|
+      taught << { course_id: s[:course], semester: s[:semester] } if s[:course]
+    end
 
     {
       name: name,

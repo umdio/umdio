@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $DB.create_table? :majors do
   primary_key :pid
   String :major_id

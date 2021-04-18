@@ -5,3 +5,13 @@ require:
   - rubocop-rake    # https://github.com/rubocop/rubocop-rake
   - rubocop-rspec   # https://github.com/rubocop/rubocop-rspec
   - rubocop-sequel  # https://github.com/rubocop/rubocop-sequel
+
+# Overrides for cops in Metrics namespace
+Metrics/ModuleLength:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false

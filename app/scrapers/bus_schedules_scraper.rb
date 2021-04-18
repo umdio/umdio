@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # version of schedule scraper that makes smaller schedules for route/day/direction
 # gets schedule information for bus routes
 # run every ~month
@@ -5,25 +7,26 @@
 require 'net/http'
 require 'json'
 include JSON
-require_relative 'scraper_common.rb'
+require_relative 'scraper_common'
 include ScraperCommon
 
-require_relative '../models/bus.rb'
+require_relative '../models/bus'
 
-prog_name = "bus_schedules_scraper"
+prog_name = 'bus_schedules_scraper'
 
-logger = ScraperCommon::logger
+logger = ScraperCommon.logger
 
-routes = Route.all.map {|r| r.route_id}
-address = "http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule"
+routes = Route.all.map(&:route_id)
+address = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule'
 routes.each do |route|
   begin
     page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
   rescue JSON::ParserError
-    logger.info(prog_name) { "Retrying..."}
+    logger.info(prog_name) { 'Retrying...' }
     retry
   end
-  next if !(page['route'])
+  next unless page['route']
+
   sch = page['route']
   sch.each do |service|
     days = service['serviceClass']
@@ -33,10 +36,10 @@ routes.each do |route|
     header = service['header']
     if header['stop'].is_a?(Array)
       header['stop'].each do |stop|
-        stops << {stop_id: stop['tag'], name: stop['content']}
+        stops << { stop_id: stop['tag'], name: stop['content'] }
       end
     else
-      stops << {stop_id: header['stop']['tag'], name: header['stop']['content']}
+      stops << { stop_id: header['stop']['tag'], name: header['stop']['content'] }
     end
     trips = []
     trs = service['tr']
@@ -51,18 +54,19 @@ routes.each do |route|
           }
         end
       else
-        stop_times << {stop_id: trip['stop']['tag'], arrival_time: trip['stop']['content'], arrival_time_secs: trip['stop']['epochTime']}
+        stop_times << { stop_id: trip['stop']['tag'], arrival_time: trip['stop']['content'],
+                        arrival_time_secs: trip['stop']['epochTime'] }
       end
       trips << stop_times
     end
-    logger.info(prog_name) {"updating the #{days} schedule for route #{route} in the #{direction} direction"}
+    logger.info(prog_name) { "updating the #{days} schedule for route #{route} in the #{direction} direction" }
     $DB[:schedules].insert_ignore.insert(
-      :route => route,
-      :days => days,
-      :direction => direction,
-      :schedule_class => schedule_class,
-      :stops => Sequel.pg_jsonb_wrap(stops),
-      :trips => Sequel.pg_jsonb_wrap(trips)
+      route: route,
+      days: days,
+      direction: direction,
+      schedule_class: schedule_class,
+      stops: Sequel.pg_jsonb_wrap(stops),
+      trips: Sequel.pg_jsonb_wrap(trips)
     )
   end
 end

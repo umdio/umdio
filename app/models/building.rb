@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 $DB.create_table? :buildings do
   primary_key :pid
   String :name

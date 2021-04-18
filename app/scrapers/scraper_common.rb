@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'open-uri'
 require 'nokogiri'
 require 'logger'
@@ -13,7 +15,7 @@ module ScraperCommon
     if @logger
       @logger
     else
-      @logger = Logger.new(STDOUT)
+      @logger = Logger.new($stdout)
       @logger.level = ENV['LOG_LEVEL'] || Logger::INFO
       @logger.formatter = proc do |severity, datetime, progname, msg|
         date_format = datetime.strftime('%Y-%m-%d %H:%M:%S')
@@ -33,12 +35,11 @@ module ScraperCommon
       if e.length == 6
         e
       else
-        [e + '01', e + '05', e + '08', e + '12']
+        ["#{e}01", "#{e}05", "#{e}08", "#{e}12"]
       end
     end
     semesters.flatten
   end
-
 
   # @param [String] url       location of the page to get
   # @param [string] prog_name the name of the scraper to pass as a label to the logger

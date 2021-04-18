@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # umdio api core application. brings in other dependencies as needed.
 ENV['RACK_ENV'] ||= 'development'
 
@@ -28,7 +30,7 @@ class UMDIO < Sinatra::Base
   # before application/request starts
   before do
     content_type 'application/json'
-    cache_control :public, max_age: 86400
+    cache_control :public, max_age: 86_400
   end
 
   helpers do
@@ -38,9 +40,9 @@ class UMDIO < Sinatra::Base
   end
 
   # load in app helpers & controllers
-  Dir["./app/helpers/*.rb"].each { |file| require file }
-  Dir["./app/controllers/*.rb"].each { |file| require file }
-  Dir["./app/models/*.rb"].each { |file| require file }
+  Dir['./app/helpers/*.rb'].sort.each { |file| require file }
+  Dir['./app/controllers/*.rb'].sort.each { |file| require file }
+  Dir['./app/models/*.rb'].sort.each { |file| require file }
 
   # register the helpers
   helpers Sinatra::UMDIO::Helpers

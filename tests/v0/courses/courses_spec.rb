@@ -1,35 +1,36 @@
+# frozen_string_literal: true
+
 # TODO: implement controller tests and API endpoint tests
 # TODO: make extensive tests, test object structures and behaviors
 
-require_relative '../../spec_helper.rb'
+require_relative '../../spec_helper'
 
-def build_url u
+def build_url(u)
   "/v0/courses#{u}semester=201808"
 end
 
 describe 'Courses Endpoint v0' do
-
   describe 'Listing courses' do
-
     describe 'GET /courses' do
-      before { get (build_url '?') }
+      before { get(build_url('?')) }
+
       it_has_behavior 'good status', (build_url '?')
       it 'returns a list of courses' do
         res = JSON.parse(last_response.body)
-        course_keys = ['course_id', 'name', 'dept_id', 'credits', 'sections']
+        course_keys = %w[course_id name dept_id credits sections]
         keys_len    = course_keys.length
         res.each do |r|
           expect((r.keys & course_keys).length).to be keys_len
         end
       end
     end
-
   end
 
   describe 'GET /courses/<course_id>' do
     # TODO: beware of variable shadowing
-    shared_examples_for "gets enes100 v0" do |url|
-      before { get (build_url url) }
+    shared_examples_for 'gets enes100 v0' do |url|
+      before { get(build_url(url)) }
+
       it 'returns enes100 course object' do
         course = JSON.parse(last_response.body)
         expect(course['course_id']).to eq 'ENES100'
@@ -38,7 +39,7 @@ describe 'Courses Endpoint v0' do
     end
 
     describe 'returns correct object' do
-      it_has_behavior "gets enes100 v0", '/ENES100?'
+      it_has_behavior 'gets enes100 v0', '/ENES100?'
     end
 
     describe 'returns error on misformed urls' do
@@ -48,22 +49,22 @@ describe 'Courses Endpoint v0' do
     end
 
     describe 'Case insensitive' do
-      it_has_behavior "good status", (build_url '/ENES100?')
-      it_has_behavior "good status", (build_url '/enes100?')
-      it_has_behavior "good status", (build_url '/Enes100?')
-      it_has_behavior "bad status", (build_url '/abcd608a?')
+      it_has_behavior 'good status', (build_url '/ENES100?')
+      it_has_behavior 'good status', (build_url '/enes100?')
+      it_has_behavior 'good status', (build_url '/Enes100?')
+      it_has_behavior 'bad status', (build_url '/abcd608a?')
     end
 
     describe 'get multiple courses' do
-      it_has_behavior 'good status', (build_url '/ENES100,ENES102?') #doesn't check return, could very well make a good corner case
+      it_has_behavior 'good status', (build_url '/ENES100,ENES102?') # doesn't check return, could very well make a good corner case
       it_has_behavior 'good status', (build_url '/ENES100,ENES102,bmgt220?')
     end
 
     describe 'expand query argument' do
       it 'can expand section objects' do
-        get (build_url '/ENES100?expand=sections&')
+        get(build_url('/ENES100?expand=sections&'))
         obj = JSON.parse(last_response.body)
-        expect(obj['sections'][0].kind_of?(Hash)).to be(true)
+        expect(obj['sections'][0].is_a?(Hash)).to be(true)
       end
     end
   end
@@ -79,7 +80,6 @@ describe 'Courses Endpoint v0' do
       it_has_behavior 'bad status', (build_url '/ene12/sections?')
       it_has_behavior 'bad status', (build_url '/enes1000/sections?')
     end
-
   end
 
   describe 'GET /courses/<course_id>/sections/<section_id>' do
@@ -96,7 +96,6 @@ describe 'Courses Endpoint v0' do
       it_has_behavior 'bad status', (build_url '/enes100/sections/enes100-0101?')
       it_has_behavior 'bad status', (build_url '/enes100/sections/0101,0102,02?')
     end
-
   end
 
   describe 'GET /courses/sections/<section_id>' do
