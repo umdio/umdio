@@ -1,6 +1,7 @@
 # Takes an existing semester live on umd.io and exports it to JSON
 # TODO: Update to use v1 schema, but only when courses_importer does too
 # TODO: Use logger
+# TODO: Config to target localhost:3000 instead - decide on convention for all exporters to follow
 
 require 'open-uri'
 require 'json'
