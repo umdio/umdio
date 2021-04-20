@@ -10,12 +10,12 @@ include ScraperCommon
 require_relative '../models/courses'
 
 prog_name = 'courses_scraper'
-logger = ScraperCommon::logger
+logger = ScraperCommon.logger
 
 # List semesters in year in testudo's format
 # 2018 -> 201801, 201805, 201808, 201812
 # @type [Array<String>]
-semesters = ScraperCommon::get_semesters(ARGV)
+semesters = ScraperCommon.get_semesters(ARGV)
 
 logger.info(prog_name) { semesters }
 
@@ -26,8 +26,7 @@ semesters.each do |semester|
 
   base_url = "https://app.testudo.umd.edu/soc/#{semester}"
 
-
-  ScraperCommon::get_page(base_url, prog_name).search('span.prefix-abbrev').each do |e|
+  ScraperCommon.get_page(base_url, prog_name).search('span.prefix-abbrev').each do |e|
     dep_urls << "https://app.testudo.umd.edu/soc/#{semester}/#{e.text}"
   end
 
@@ -59,7 +58,7 @@ dep_urls.each_with_index do |url, i|
   logger.info(prog_name) { "Getting courses for #{dept_id} (#{semester}) (#{progress}%)" }
   logger.debug(prog_name) { "fetching #{url}" }
 
-  # TODO replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
+  # TODO: replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
   # options thingy
   begin
     page = Nokogiri::HTML(URI.open(url), nil, 'UTF-8')
@@ -137,7 +136,7 @@ dep_urls.each_with_index do |url, i|
 
       description = (utf_safe approved.css('> div:last-child').text).strip.gsub(/\t|(\r\n)/, '')
       additional_info = additional_info ? additional_info += ' ' + text : text
-      additional_info = additional_info && additional_info.strip.empty? ? nil : additional_info.strip
+      additional_info = additional_info&.strip&.empty? ? nil : additional_info.strip
 
     elsif other.css('> div').length > 0
       description = text.strip.empty? ? nil : text.strip.gsub(/\t|\r|\n/, '')

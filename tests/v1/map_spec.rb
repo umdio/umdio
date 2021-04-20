@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 describe 'Map Endpoints v1' do
-  url = "v1/map"
+  url = 'v1/map'
 
   describe 'get /map' do
     it_has_behavior 'good status', url

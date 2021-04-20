@@ -5,7 +5,6 @@ describe 'Pagination v0' do
   url = '/v0/courses?semester=201808'
 
   describe '/courses' do
-
     describe 'per_page' do
       before { get url }
       it 'should not be > 100' do
@@ -34,7 +33,7 @@ describe 'Pagination v0' do
       # https://developer.github.com/v3/#link-header
       it 'should have a properly formatted Link' do
         expect(last_response.headers.has_key?('Link')).to be true
-        match = last_response.headers['Link'].match(/<https?:\/\/[\S]+>; rel="(next|prev)"/)
+        match = last_response.headers['Link'].match(%r{<https?://[\S]+>; rel="(next|prev)"})
         expect(match.nil?).to eq(false)
       end
 

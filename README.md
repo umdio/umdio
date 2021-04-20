@@ -64,7 +64,9 @@ umd.io runs on Ruby, with various libraries such as [Rack](https://github.com/ra
 [Docker](https://www.docker.com/).
 
 ## Adding new data
+
 If you're interested in adding a new endpoint, here's a rough guide on how to do it. Our data for `majors` is a great, simple example.
+
 1. Create a model in `/app/models`. We use [Sequel](https://github.com/jeremyevans/sequel) on top of Postgres. It should include a `to_v1` method that translates whatever is in your table into the object you want to return.
 2. Create a scraper in `/app/scrapers`. This is to populate the table for the model you just created.
    - If you're scraping a live webpage, `courses_scraper.rb` might be a good resource. We use nokogiri to parse HTML.
