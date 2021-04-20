@@ -34,15 +34,31 @@ servers:
   - url: "https://api.umd.io/v1"
 tags:
   - name: courses
-    description: This set of endpoints lets you get data about university courses and their sections. You can get one course or section at a time, several courses or sections at a time, or a list of all the courses. All the data is scraped from Testudo.
+    description: |
+      This set of endpoints lets you get data about university courses and their
+      sections. You can get one course or section at a time, several courses or
+      sections at a time, or a list of all the courses. All the data is scraped
+      from Testudo.
+
   - name: professors
-    description: This endpoint contains information about university professors and the courses they have taught.
+    description: |
+      This endpoint contains information about university professors and the
+      courses they have taught.
   - name: bus
-    description: This endpoint lets you get data about bus routes, schedules, stops, locations, and predicted arrival times. The data is provided by NextBus, which monitors buses and gives the data to us via their API. We think our API is easier to use, but our data might be behind NextBus by a few seconds. If your app requires to-the-second bus location info, you can go right to the source. All bus data is copyright University of Maryland
+    description: |
+      This endpoint lets you get data about bus routes, schedules, stops,
+      locations, and predicted arrival times. The data is provided by NextBus,
+      which monitors buses and gives the data to us via their API. We think our
+      API is easier to use, but our data might be behind NextBus by a few
+      seconds. If your app requires to-the-second bus location info, you can go
+      right to the source. All bus data is copyright University of Maryland
   - name: map
-    description: Data about things on campus, such as buildings, dining halls, and other facilities.
+    description: |
+      Data about things on campus, such as buildings, dining halls, and other
+      facilities.
   - name: majors
-    description: Data about the various majors offered on campus.
+    description: |
+      Data about the various majors offered on campus.
 paths:
   /courses:
     get:
@@ -642,6 +658,7 @@ paths:
   #              $ref: "#/components/schemas/Error"
 components:
   schemas:
+    # Bus route schema
     Route:
       type: object
       description: Bus route
@@ -709,6 +726,8 @@ components:
           type: number
           format: float
           example: -76.6320545
+
+    # Bus stop schema
     Stop:
       type: object
       description: Bus stop
@@ -731,6 +750,8 @@ components:
           format: float
           description: Longitude
           example: 38.9922185
+
+    # Bus schedule schema
     BusSchedule:
       type: object
       description: Each route has multiple schedules, because buses run differently on different days of the week
@@ -776,6 +797,8 @@ components:
                 arrival_time_secs:
                   type: string
                   description: Time in ms from start of the day
+
+    # Testudo course schema
     Course:
       type: object
       description: Represents a course on Testudo
@@ -892,6 +915,8 @@ components:
               "MATH140-0142",
             ]
           description: The sections of this course.
+
+    # Course section schema
     Section:
       type: object
       description: Represents a single section of a course.
@@ -930,6 +955,8 @@ components:
           description: An array of professor names for the section
           items:
             type: string
+
+    # Section meeting schema
     Meeting:
       type: object
       description: A Meeting for a section of a course
@@ -952,6 +979,8 @@ components:
         end_time:
           type: string
           description: The time the meeting ends, in format (x)y:zw[a|p]m (e.g. 10:45am, or 6:30pm)
+
+    # Professor schema
     Professor:
       type: object
       description: Represents a professor
@@ -972,6 +1001,8 @@ components:
               course:
                 type: string
                 example: ENGL101
+
+    # Major schema
     Major:
       type: object
       description: Represents a major
@@ -992,6 +1023,8 @@ components:
           type: string
           description: Home page for the major.
           example: http://sph.umd.edu/department/bch/
+
+    # On-campus building schema
     Building:
       type: object
       description: Represents a building on campus.
@@ -1016,6 +1049,8 @@ components:
           type: number
           description: Latitude
           example: 38.986699
+
+    # Error response schema
     Error:
       type: object
       description: Represents an HTTP error
@@ -1026,7 +1061,10 @@ components:
           type: string
         docs:
           type: string
+
+  # Parameters
   parameters:
+
     courseIdsParam:
       in: path
       name: course_ids
@@ -1038,6 +1076,7 @@ components:
         description: One or more comma separated course ids, in format DEPTNNN with up to 2 trailing characters.
       explode: true
       example: ["ENGL101", "MATH140", "CMSC388F"]
+
     sectionIdsParam:
       in: path
       name: section_ids
@@ -1049,6 +1088,7 @@ components:
         description: One or more comma separated section ids, of format DEPTNNN-XXXX.
       explode: true
       example: ["ENGL101-0101", "MATH140-0201"]
+
     sortParam:
       in: query
       name: sort
@@ -1056,6 +1096,7 @@ components:
         type: string
       description: a comma-separated list of course properties. Defaults to ASCENDING order, use a - (minus) prefix for DESCENDING order. For example, ?sort=course_id,-credits sorts the results ASCENDING by course_id and DESCENDING by credits.
       example: course_id,-credits
+
     pageParam:
       in: query
       name: page
@@ -1063,6 +1104,7 @@ components:
         type: number
       description: For paginated responses, the page to view. 1-indexed. Defaults to 1 if omitted.
       example: 3
+
     perPageParam:
       in: query
       name: per_page
@@ -1070,6 +1112,7 @@ components:
         type: number
       description: Endpoints that return a large amount of items are paginated to 30 items by default. You can use this parameter to set a page size up to 100.
       example: 3
+
     expandParam:
       in: query
       name: expand
@@ -1077,6 +1120,7 @@ components:
         type: boolean
       description: Expands sections into full objects
       example: 3
+
     semesterParam:
       in: query
       name: semester
@@ -1084,6 +1128,7 @@ components:
         type: string
       description: 6-digit semester ID to search, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
       example: 202008|leq
+
     nameParam:
       in: query
       name: name
@@ -1091,6 +1136,7 @@ components:
         type: string
       description: Professor's name.
       example: "Aaron Bartlett"
+
     courseIdParam:
       in: query
       name: course_id
@@ -1098,6 +1144,7 @@ components:
         type: string
       description: 7 or 8 digit course id. See the course object for more info.
       example: CMSC216
+
     creditsParam:
       in: query
       name: credits
@@ -1105,6 +1152,7 @@ components:
         type: string
       description: The number of credits to watch, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
       example: "3|leq"
+
     deptIdParam:
       in: query
       name: dept_id
@@ -1112,6 +1160,7 @@ components:
         type: string
       description: 4 Letter department code to search.
       example: CMSC
+
     genEdParam:
       in: query
       name: gen_ed
@@ -1119,6 +1168,7 @@ components:
         type: string
       description: Gened requirement to search.
       example: DSNS
+
     seatsParam:
       in: query
       name: seats
@@ -1126,6 +1176,7 @@ components:
         type: string
       description: Number of total seats in a section, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
       example: 200
+
     openSeatsParam:
       in: query
       name: open_seats
@@ -1133,6 +1184,7 @@ components:
         type: string
       description: Number of open seats in a section, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
       example: 5
+
     waitlistParam:
       in: query
       name: waitlist
@@ -1140,6 +1192,7 @@ components:
         type: string
       description: Number of people on the waitlist for a class, with optional comparator, separated by a pipe. Valid comparators are eq, leq, lt, gt, geq, neq.
       example: 10
+
     daysParam:
       in: query
       name: days
@@ -1147,6 +1200,7 @@ components:
         type: string
       description: The days of the week that a course meets. Will be some combination of M, Tu, W, Th, F in that order.
       example: MWF
+
     roomParam:
       in: query
       name: room
@@ -1154,6 +1208,7 @@ components:
         type: string
       description: The room a class meeting is in.
       example: 0120
+
     buildingParam:
       in: query
       name: building
@@ -1161,6 +1216,7 @@ components:
         type: string
       description: The code for the building the class meeting is in.
       example: KEY
+
     classtypeParam:
       in: query
       name: classtype
@@ -1168,6 +1224,7 @@ components:
         type: string
       description: Indicates type of meeting. Could be "Lecture", "Discussion", or "Lab"
       example: Lecture
+
     startTimeParam:
       in: query
       name: start_time
@@ -1175,6 +1232,7 @@ components:
         type: string
       description: Start time of the meeting.
       example: 9:00am
+
     endTimeParam:
       in: query
       name: end_time

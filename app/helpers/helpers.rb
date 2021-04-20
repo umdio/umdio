@@ -95,7 +95,18 @@ module UMDIO
       end
     end
 
-    def parse_delim d
+    # Maps a comparison operation name to its corresponding symbol.
+    # valid delimiters are `eq`, `neq`, `lt`, `gt`, `leq`, and `geq`. if the
+    # given delimiter is invalid, a `400` error is returned.
+    #
+    # @example
+    # ```ruby
+    # parse_delim(:eq) # => '='
+    # ```
+    #
+    # @param [Symbol] d the delimiter to parse.
+    # @return [String] the corresponding symbol for `d`.
+    def parse_delim(d)
       vals = {
         eq: "=",
         neq: "!=",
