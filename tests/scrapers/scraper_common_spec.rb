@@ -1,7 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
-require_relative 'spec_helper'
-require_relative '../app/scrapers/scraper_common'
+require_relative '../spec_helper'
+require_relative '../../app/scrapers/scraper_common'
 
 # FIXME: fails with 'undefined method get_page for ScraperCommon:Module' and I'm not sure why
 
@@ -77,7 +77,7 @@ describe ScraperCommon do
   end
 
   # get_page
-  context '#get_page' do
+  context '#get_page(url, prog_name)' do
     let(:valid_url) { 'https://umd.edu' }
     let(:bad_url_404) { 'https://www.cs.umd.edu/foobarbaz' }
 

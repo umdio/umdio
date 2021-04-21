@@ -6,6 +6,8 @@ include Sinatra::UMDIO::Helpers
 ################################## FUNCTIONS ###################################
 ################################################################################
 
+# @param [Array<String>]
+# @return [Array<String>]
 def get_semesters(args)
   semesters = args.map do |e|
     if e.length == 6
