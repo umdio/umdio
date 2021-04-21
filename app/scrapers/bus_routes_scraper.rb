@@ -36,8 +36,7 @@ route_array&.each do |route|
 
   route_response['stop'].each do |stop|
     logger.info(prog_name) { "inserting #{stop['title']}" }
-    $DB[:stops].insert_ignore.insert(stop_id: stop['tag'], title: stop['title'], long: stop['lon'],
-                                     lat: stop['lat'])
+    $DB[:stops].insert_ignore.insert(stop_id: stop['tag'], title: stop['title'], long: stop['lon'], lat: stop['lat'])
     stops << stop['tag']
   end
 

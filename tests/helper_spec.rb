@@ -7,23 +7,20 @@ include Sinatra::UMDIO::Helpers
 describe 'Helpers' do
   describe 'Courses' do
     describe 'time_to_int' do
-      it '10S -> 36000' do
+      it 'should 10 -> 36000' do
         expect(time_to_int(10)).to be(36_000)
         expect(time_to_int(23)).to be(82_800)
         expect(time_to_int('10')).to be(36_000)
       end
-
-      it '10ams -> 36000' do
+      it 'should 10am -> 36000' do
         expect(time_to_int('10am')).to be(36_000)
         expect(time_to_int('11pm')).to be(82_800)
       end
-
-      it '10:00S -> 36000' do
+      it 'should 10:00 -> 36000' do
         expect(time_to_int('10:00')).to be(36_000)
         expect(time_to_int('23:00')).to be(82_800)
       end
-
-      it '10:00ams -> 36000' do
+      it 'should 10:00am -> 36000' do
         expect(time_to_int('10:00am')).to be(36_000)
         expect(time_to_int('11:00pm')).to be(82_800)
       end

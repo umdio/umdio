@@ -129,12 +129,12 @@ module Sinatra
       def standardize_params
         std_params = {}
 
-        request.params.each_key do |key|
+        request.params.keys.each do |key|
           value = request.params[key]
           key = key.to_s
 
-          if key.include?(('<')) || key.include?(('>'))
-            delim = key.include?('<') ? '<' : '>'
+          if key.include?('<') || key.include?('>')
+            delim = (key.include? '<') ? '<' : '>'
 
             # Check for =
             parts = key.split(delim)
@@ -145,7 +145,7 @@ module Sinatra
               key = parts[0]
               value = parts[1]
             end
-          elsif key.include?('!')
+          elsif key.include? '!'
             key = key.split('!')[0]
             delim = '!='
           elsif !value.nil?

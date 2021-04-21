@@ -42,7 +42,6 @@ majors.each do |major|
 
   major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
   major[:major_id] = major[:name].upcase if major[:major_id].nil?
-  $DB[:majors].insert_ignore.insert(major_id: major[:major_id], name: major[:name], college: major[:college],
-                                    url: major[:url])
+  $DB[:majors].insert_ignore.insert(major_id: major[:major_id], name: major[:name], college: major[:college], url: major[:url])
 end
 logger.info(prog_name) { "Inserted #{majors.length} majors" }

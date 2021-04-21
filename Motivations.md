@@ -1,5 +1,7 @@
 # Why umd.io?
+
 ## what umdio is, why we're building it, our vision for the project
+
 Apr 14, 2015 by Robert Cobb
 
 I’ve been working for the past couple months on umdio. You can check out the site, and if you are interested in the technical details, we’re open source, so check us out on github.

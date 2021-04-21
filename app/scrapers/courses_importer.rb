@@ -84,8 +84,7 @@ j.to_a.each do |course|
       waitlist: section['waitlist']
     )
 
-    s = $DB[:sections].where(section_id_str: section['section_id'], course_id: course['course_id'],
-                             semester: section['semester']).first
+    s = $DB[:sections].where(section_id_str: section['section_id'], course_id: course['course_id'], semester: section['semester']).first
 
     section['meetings'].each do |meeting|
       $DB[:meetings].insert_ignore.insert(

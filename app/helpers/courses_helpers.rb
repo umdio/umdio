@@ -85,8 +85,6 @@ module Sinatra
       end
 
       def find_sections_for_course_v1(semester, course_id, expand)
-        sections = []
-
         if expand
           Section.where(semester: semester, course_id: course_id).map(&:to_v1)
         else
@@ -118,8 +116,6 @@ module Sinatra
       end
 
       def find_sections_for_course(semester, course_id, expand)
-        sections = []
-
         if expand
           Section.where(semester: semester, course_id: course_id).map(&:to_v0)
         else
@@ -129,7 +125,7 @@ module Sinatra
 
       # @param string_time string in format like 10:00am, 10:00, 10am or 10
       def time_to_int(time)
-        time = time.to_s if time.is_a?(Integer)
+        time = time.to_s if time.is_a? Integer
         if time.length == 2
           time += (time.to_i >= 12 ? 'pm' : 'am')
         end

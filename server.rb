@@ -40,9 +40,9 @@ class UMDIO < Sinatra::Base
   end
 
   # load in app helpers & controllers
-  Dir['./app/helpers/*.rb'].sort.each { |file| require file }
-  Dir['./app/controllers/*.rb'].sort.each { |file| require file }
-  Dir['./app/models/*.rb'].sort.each { |file| require file }
+  Dir['./app/helpers/*.rb'].each { |file| require file }
+  Dir['./app/controllers/*.rb'].each { |file| require file }
+  Dir['./app/models/*.rb'].each { |file| require file }
 
   # register the helpers
   helpers Sinatra::UMDIO::Helpers

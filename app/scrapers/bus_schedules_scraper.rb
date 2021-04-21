@@ -54,8 +54,7 @@ routes.each do |route|
           }
         end
       else
-        stop_times << { stop_id: trip['stop']['tag'], arrival_time: trip['stop']['content'],
-                        arrival_time_secs: trip['stop']['epochTime'] }
+        stop_times << { stop_id: trip['stop']['tag'], arrival_time: trip['stop']['content'], arrival_time_secs: trip['stop']['epochTime'] }
       end
       trips << stop_times
     end

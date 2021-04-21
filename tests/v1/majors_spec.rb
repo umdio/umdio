@@ -8,7 +8,6 @@ describe 'Major Endpoint v1' do
   describe 'get /' do
     it_has_behavior 'good status', url
     before { get url }
-
     it 'returns properly formatted data' do
       res = JSON.parse(last_response.body)
       expect(res).not_to be_nil

@@ -34,12 +34,13 @@ module Sinatra
               section_ids = params[:section_id].to_s.upcase.split(',')
 
               section_ids.each do |section_id|
-                unless is_full_section_id? section_id
+                unless is_full_section_id?(section_id)
                   halt 400, bad_url_error("Invalid section_id #{section_id}", course_docs_url)
                 end
               end
 
-              res = (find_sections request.params['semester'], section_ids).map(&:to_v0)
+              # TODO: ensure this change actually worked
+              res = find_sections(request.params['semester'], section_ids).map(&:to_v0)
 
               json res
             end
@@ -51,7 +52,7 @@ module Sinatra
               std_params = parse_query_v1 @section_params
               m_std_params = parse_query_v1 @meeting_params
 
-              if (std_params == []) && (m_std_params == [])
+              if std_params == [] && m_std_params == []
                 res = Section.order(*sorting)
                              .limit(@limit)
                              .offset((@page - 1) * @limit)
@@ -67,12 +68,11 @@ module Sinatra
               x = { meetings: y } if std_params == []
 
               res =
-                Section
-                .where(x)
-                .order(*sorting)
-                .limit(@limit)
-                .offset((@page - 1) * @limit)
-                .map(&:to_v1)
+                Section.where(x)
+                       .order(*sorting)
+                       .limit(@limit)
+                       .offset((@page - 1) * @limit)
+                       .map(&:to_v1)
 
               end_paginate! res
 
@@ -160,8 +160,7 @@ module Sinatra
               end_paginate! res
 
               res.each do |c|
-                c[:sections] =
-                  find_sections_for_course_v1 request.params['semester'], c[:course_id], request.params['expand']
+                c[:sections] = find_sections_for_course_v1 request.params['semester'], c[:course_id], request.params['expand']
               end
 
               return json res
@@ -337,8 +336,7 @@ module Sinatra
             end_paginate! res
 
             res.each do |c|
-              c[:sections] =
-                find_sections_for_course request.params['semester'], c[:course_id], request.params['expand']
+              c[:sections] = find_sections_for_course request.params['semester'], c[:course_id], request.params['expand']
             end
 
             return json res

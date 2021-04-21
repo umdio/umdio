@@ -12,7 +12,7 @@ module Sinatra
             bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
             bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
             bus_docs_url = 'https://docs.umd.io/#tags/bus'
-            apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
+            api_root = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
             require 'net/http'
 
             get do
@@ -57,7 +57,7 @@ module Sinatra
 
               halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
               halt 400, bad_url_error(bad_stop_message, bus_docs_url) unless is_stop_id? stop_id
-              wrapRequest_v1(apiRoot + "&command=predictions&r=#{route_id}&s=#{stop_id}")
+              wrapRequest_v1(api_root + "&command=predictions&r=#{route_id}&s=#{stop_id}")
             end
 
             # locations of buses on route
@@ -68,7 +68,7 @@ module Sinatra
 
               halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
               halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-              wrapRequest_v1(apiRoot + "&command=vehicleLocations&r=#{route_id}")
+              wrapRequest_v1(api_root + "&command=vehicleLocations&r=#{route_id}")
             end
 
             # locations of all buses
@@ -95,7 +95,7 @@ module Sinatra
           bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
           bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
           bus_docs_url = 'https://docs.umd.io/bus'
-          apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
+          api_root = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 
           # root of bus endpoint
@@ -150,7 +150,7 @@ module Sinatra
 
             halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
             halt 400, bad_url_error(bad_stop_message, bus_docs_url) unless is_stop_id? stop_id
-            wrapRequest(apiRoot + "&command=predictions&r=#{route_id}&s=#{stop_id}")
+            wrapRequest(api_root + "&command=predictions&r=#{route_id}&s=#{stop_id}")
           end
 
           # locations of buses on route
@@ -161,7 +161,7 @@ module Sinatra
 
             halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
             halt 400, bad_url_error(bad_route_message) unless is_route_id? route_id
-            wrapRequest(apiRoot + "&command=vehicleLocations&r=#{route_id}")
+            wrapRequest(api_root + "&command=vehicleLocations&r=#{route_id}")
           end
 
           # locations of all buses

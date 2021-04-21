@@ -13,7 +13,6 @@ describe 'Courses Endpoint v0' do
   describe 'Listing courses' do
     describe 'GET /courses' do
       before { get(build_url('?')) }
-
       it_has_behavior 'good status', (build_url '?')
       it 'returns a list of courses' do
         res = JSON.parse(last_response.body)
@@ -30,7 +29,10 @@ describe 'Courses Endpoint v0' do
     # TODO: beware of variable shadowing
     shared_examples_for 'gets enes100 v0' do |url|
       before { get(build_url(url)) }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 67c5b32c78c95394a079a14a22bc6fedd98e18de
       it 'returns enes100 course object' do
         course = JSON.parse(last_response.body)
         expect(course['course_id']).to eq 'ENES100'

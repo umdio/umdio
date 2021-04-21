@@ -34,9 +34,8 @@ def parse_sections(url, semester)
     # for each section of the course
     course_div.search('div.section').each do |section|
       # add section to array to add
-      instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/, '').encode('UTF-8',
-                                                                                               invalid: :replace).split(',').map(&:strip)
-      # NOTE: some courses have weird suffixes (e.g. MSBB99MB, yes thats a real class)
+      instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/, '').encode('UTF-8', invalid: :replace).split(',').map(&:strip)
+      # note: some courses have weird suffixes (e.g. MSBB99MB, yes thats a real class)
       dept = course_id[0, 4]
 
       # add course and department to professor object for each instructor
@@ -150,7 +149,6 @@ semesters.each do |semester|
         start_seconds: meeting[:start_seconds],
         end_seconds: meeting[:end_seconds]
       )
-    end
 
     section[:instructors].each do |prof|
       $DB[:professors].insert_ignore.insert(

@@ -57,9 +57,7 @@ module Sinatra
 
               # If no professors found, 404
               if res == []
-                halt 404,
-                     not_found_error('There were no professors that matched your search.',
-                                     'https://docs.umd.io/#tag/professors')
+                halt 404, not_found_error('There were no professors that matched your search.', 'https://docs.umd.io/#tag/professors')
               end
 
               json res

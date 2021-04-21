@@ -59,6 +59,12 @@ namespace :import do
     import_courses([args[:sem]])
   end
 
+  desc 'Import all past semesters'
+  task :courses do
+    years = %w[201708 201712 201801 201805 201808 201812 201901 201901 201905 201908 201912]
+    import_courses(years)
+  end
+
   desc 'Import map data'
   task :map do
     scrape_map './data/umdio-data/umd-building-gis.json'
@@ -77,7 +83,7 @@ task :test_scrape do
   import_courses(['201808'])
   scrape_bus
   scrape_majors
-  scrape_map
+  scrape_map './data/umdio-data/umd-building-gis.json'
 end
 
 namespace :scrape do
@@ -101,8 +107,8 @@ namespace :scrape do
     sh "ruby app/scrapers/sections_scraper.rb #{semesters.join(' ')}"
   end
 
-  desc 'Run building scraper'
-  task :buildings do
+  desc 'Run map scraper'
+  task :map do
     scrape_map
   end
 
@@ -120,13 +126,6 @@ namespace :scrape do
   task :semester, [:sem] do |_task, args|
     scrape_courses(args[:sem])
   end
-
-  desc 'Import from file'
-  task :import_courses do
-    years = %w[201708 201712 201801 201805 201808 201812 201901 201901 201905 201908
-               201912]
-    import_courses(years)
-  end
 end
 
 ##################################### Dev ######################################
@@ -138,6 +137,7 @@ RuboCop::RakeTask.new do |task|
   task.requires << 'rubocop-rake'
   task.requires << 'rubocop-rspec'
   task.requires << 'rubocop-sequel'
+  task.options << ['--regenerate-todo']
 end
 
 namespace :dev do
@@ -192,7 +192,6 @@ task :validate do
 
   puts 'Running RuboCop...'
   system 'bundle exec rake rubocop', exception: true
-  # TODO: run rubocop
 end
 
 task default: ['up']

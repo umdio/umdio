@@ -34,9 +34,9 @@ describe 'Pagination v1' do
       before { get url }
 
       # https://developer.github.com/v3/#link-header
-      it 'has a properly formatted Link' do
-        expect(last_response.headers.key?('Link')).to be true
-        match = last_response.headers['Link'].match(%r{<https?://\S+>; rel="(next|prev)"})
+      it 'should have a properly formatted Link' do
+        expect(last_response.headers.has_key?('Link')).to be true
+        match = last_response.headers['Link'].match(%r{<https?://[\S]+>; rel="(next|prev)"})
         expect(match.nil?).to eq(false)
       end
 
