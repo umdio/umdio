@@ -74,7 +74,7 @@ end
 
 ################################### Scraping ###################################
 desc 'Scrape live data to fill databases'
-task scrape: ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
+task scrape: ['scrape:courses', 'scrape:bus', 'scrape:map', 'scrape:majors']
 
 # TODO: Move this to an import task, once other datatypes are importable
 desc 'Scrapes enough to run the tests'
