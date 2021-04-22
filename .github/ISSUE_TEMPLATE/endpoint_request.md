@@ -13,7 +13,7 @@ assignees: ''
 - **Is this a breaking change?** 
 - **What endpoint(s) are you looking for?** What new endpoint(s) do you want? Or,
 if this is for an existing endpoint, which one? If you are not sure what endpoints
-apply, describe the type of data being served below.
+apply, describe what type of data you would like umdio to provide below.
 
 ### Description
 
