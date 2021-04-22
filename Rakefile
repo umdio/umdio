@@ -1,10 +1,30 @@
 require 'rspec/core/rake_task'
+require 'net/http'
+require 'json'
 require_relative 'app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 ################################################################################
 ################################## FUNCTIONS ###################################
 ################################################################################
+
+# Checks if openapi.yaml is a valid OpenAPI spec. Throws if the spec is invalid,
+# otherwise returns true.
+def validate_openapi
+  File.open 'openapi.yaml' do |openapi|
+    validator_url = URI("https://validator.swagger.io/validator/debug")
+    headers = { 'Accept' => 'application/json', 'Content-Type' => 'application/yaml' }
+    res = Net::HTTP.post(validator_url, openapi.read, headers)
+    parsed = JSON.parse res.body
+    
+    if parsed['messages'] 
+      messages = parsed['schemaValidationMessages'].map{ |m| m['message'] }.join(', ')
+      raise StandardError.new "Invalid openapi spec: #{messages}"
+    end 
+  end
+
+  return true
+end
 
 def get_semesters(args)
   semesters = args.map do |e|
@@ -173,7 +193,10 @@ end
 desc 'Type check and lint codebase'
 task :validate do
   system 'bundle exec solargraph scan', exception: true
-  system 'bundle exec solargraph typecheck', exception: true
+  system 'bundle exec solargraph typecheck'
+  puts 'validating OpenAPI Spec'
+  validate_openapi
+  puts 'Spec is valid'
   # TODO: run rubocop
 end
 
