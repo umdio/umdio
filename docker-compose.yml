@@ -1,5 +1,6 @@
-version: "2.0"
+version: "3.8"
 services:
+  # PostgreSQL Database
   postgres:
     image: postgres
     environment:
@@ -7,13 +8,16 @@ services:
       - POSTGRES_HOST_AUTH_METHOD=trust
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # UMD.io Server
   umdio:
     build: .
-    links:
-      - postgres
     volumes:
       - ./:/umdio
     ports:
       - 3000:3000
+    depends_on:
+      - postgres
     command: bundle exec rake up
     restart: always

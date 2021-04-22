@@ -17,6 +17,8 @@ group :development do
   gem 'rspec'
   gem 'shotgun'
   gem 'solargraph'
+  gem 'debase'
+  gem 'ruby-debug-ide', require: false
 end
 
 group :test do
