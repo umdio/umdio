@@ -7,22 +7,40 @@ assignees: ''
 
 ---
 
+# Description
+
 **Describe the bug**
+
 A clear and concise description of what the bug is.
 
-**To Reproduce**
+**Provide the Endpoint**
+
+Which endpoint does this bug occur on?
+
+
+**Expected Behavior**
+
+A clear and concise description of what you expected to happen.
+
+**Actual Behavior**
+
+A clear and concise description of what actually happened.
+# Reproduction and Context
+
+**Steps To Reproduce**
+
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
+1. Go to this endpoint...
+2. Use these query parameters...
 3. Scroll down to '....'
 4. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
 **Screenshots**
+
 If applicable, add screenshots to help explain your problem.
 
 
 **Additional context**
-Add any other context about the problem here.
+
+Add any other context about the problem here. The more context and detail you
+provide, the easier it is for us to fix the bug.
