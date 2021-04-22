@@ -36,18 +36,18 @@ servers:
   - url: "https://api.umd.io/v1"
 tags:
   - name: courses
-    description: |
+    description: >-
       This set of endpoints lets you get data about university courses and their
       sections. You can get one course or section at a time, several courses or
       sections at a time, or a list of all the courses. All the data is scraped
       from Testudo.
 
   - name: professors
-    description: |
+    description: >-
       This endpoint contains information about university professors and the
       courses they have taught.
   - name: bus
-    description: |
+    description: >-
       This endpoint lets you get data about bus routes, schedules, stops,
       locations, and predicted arrival times. The data is provided by NextBus,
       which monitors buses and gives the data to us via their API. We think our
@@ -55,11 +55,11 @@ tags:
       seconds. If your app requires to-the-second bus location info, you can go
       right to the source. All bus data is copyright University of Maryland
   - name: map
-    description: |
+    description: >-
       Data about things on campus, such as buildings, dining halls, and other
       facilities.
   - name: majors
-    description: |
+    description: >-
       Data about the various majors offered on campus.
 paths:
   /courses:
@@ -660,7 +660,7 @@ paths:
   #              $ref: "#/components/schemas/Error"
 components:
   schemas:
-    # Bus route schema
+
     Route:
       type: object
       description: Bus route
@@ -729,7 +729,6 @@ components:
           format: float
           example: -76.6320545
 
-    # Bus stop schema
     Stop:
       type: object
       description: Bus stop
@@ -753,7 +752,6 @@ components:
           description: Longitude
           example: 38.9922185
 
-    # Bus schedule schema
     BusSchedule:
       type: object
       description: Each route has multiple schedules, because buses run differently on different days of the week
@@ -800,7 +798,6 @@ components:
                   type: string
                   description: Time in ms from start of the day
 
-    # Testudo course schema
     Course:
       type: object
       description: Represents a course on Testudo
@@ -918,7 +915,6 @@ components:
             ]
           description: The sections of this course.
 
-    # Course section schema
     Section:
       type: object
       description: Represents a single section of a course.
@@ -958,7 +954,6 @@ components:
           items:
             type: string
 
-    # Section meeting schema
     Meeting:
       type: object
       description: A Meeting for a section of a course
@@ -982,7 +977,6 @@ components:
           type: string
           description: The time the meeting ends, in format (x)y:zw[a|p]m (e.g. 10:45am, or 6:30pm)
 
-    # Professor schema
     Professor:
       type: object
       description: Represents a professor
@@ -1004,7 +998,6 @@ components:
                 type: string
                 example: ENGL101
 
-    # Major schema
     Major:
       type: object
       description: Represents a major
@@ -1026,7 +1019,6 @@ components:
           description: Home page for the major.
           example: http://sph.umd.edu/department/bch/
 
-    # On-campus building schema
     Building:
       type: object
       description: Represents a building on campus.
@@ -1052,7 +1044,6 @@ components:
           description: Latitude
           example: 38.986699
 
-    # Error response schema
     Error:
       type: object
       description: Represents an HTTP error
@@ -1064,7 +1055,6 @@ components:
         docs:
           type: string
 
-  # Parameters
   parameters:
 
     courseIdsParam:
