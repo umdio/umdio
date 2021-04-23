@@ -4,7 +4,7 @@ def build_url1(u)
   "/v1/courses#{u}semester=201808"
 end
 
-describe 'Courses Endpoint v1' do
+describe 'Courses Endpoint v1', :endpoint, :courses do
   describe 'Listing courses' do
     describe 'GET /courses' do
       before { get(build_url1('?')) }

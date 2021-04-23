@@ -3,7 +3,7 @@ require 'net/http'
 require_relative '../spec_helper'
 require_relative '../../app/scrapers/majors_scraper'
 
-describe MajorsScraper do
+describe MajorsScraper, :scraper, :majors do
   before :all do
     @scraper = MajorsScraper.new
     @scraper.logger.level = Logger::WARN

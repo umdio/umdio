@@ -5,7 +5,7 @@ require_relative '../../app/scrapers/scraper_common'
 
 # FIXME: fails with 'undefined method get_page for ScraperCommon:Module' and I'm not sure why
 
-describe ScraperCommon do
+describe ScraperCommon, :scraper, :util do
   let(:common) { Class.new { extend ScraperCommon } }
 
   # get_semesters

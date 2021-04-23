@@ -3,7 +3,7 @@ require_relative '../app/helpers/courses_helpers.rb'
 include Sinatra::UMDIO::Helpers
 
 describe 'Helpers' do
-  describe 'Courses' do
+  describe 'Courses', :helper, :courses do
     describe 'time_to_int' do
       it 'should 10 -> 36000' do
         expect(time_to_int(10)).to be(36_000)
