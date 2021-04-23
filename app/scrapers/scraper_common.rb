@@ -26,6 +26,7 @@ module ScraperCommon
   # Takes in a list of years and semesters. It maps years to 4 semesters, and semesters to themselves
   # 2018 -> 201801, 201805, 201808, 201812
   # 201901 -> 201901
+  #
   # @param [Array<String>] args  a list of years
   # @return [Array<String>] list of semesters for each year
   def get_semesters(args)
@@ -48,6 +49,9 @@ module ScraperCommon
     semesters.flatten
   end
 
+  # Creates a Nokogiri Document from a webpage. Throws if the URL or the page
+  # it points to is invalid (i.e. page not found, isnt valid HTML, etc).
+  #
   # @param [String] url       location of the page to get
   # @param [string] prog_name the name of the scraper to pass as a label to the logger
   #

@@ -5,7 +5,6 @@ require_relative 'scraper_common'
 
 require_relative '../models/majors'
 
-# logger = ScraperCommon.logger
 class MajorsScraper
   include ScraperCommon
   attr_accessor :prog_name, :majors_regex
