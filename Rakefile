@@ -1,5 +1,6 @@
 require 'rspec/core/rake_task'
-require_relative 'app/helpers/courses_helpers.rb'
+require 'rubocop/rake_task'
+require_relative 'app/helpers/courses_helpers'
 include Sinatra::UMDIO::Helpers
 
 ################################################################################
@@ -126,6 +127,16 @@ namespace :scrape do
 end
 
 ##################################### Dev ######################################
+
+# run with 'rake rubocop' or 'rake rubocop:auto_correct' to apply safe fixes
+desc 'Run RuboCop'
+RuboCop::RakeTask.new do |task|
+  task.requires << 'rubocop-rake'
+  task.requires << 'rubocop-rspec'
+  task.requires << 'rubocop-sequel'
+end
+task lint: :rubocop
+
 namespace :dev do
   desc 'Launches the dev environment with docker-compose'
   task :up do
@@ -175,6 +186,7 @@ task :validate do
   system 'bundle exec solargraph scan', exception: true
   system 'bundle exec solargraph typecheck', exception: true
   # TODO: run rubocop
+  Rake::Task['rubocop'].execute
 end
 
 task default: ['up']
