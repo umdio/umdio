@@ -19,6 +19,10 @@ group :development do
   gem 'solargraph'
   gem 'debase'
   gem 'ruby-debug-ide', require: false
+  gem 'rubocop', '~> 1.12', require: false
+  gem 'rubocop-rake', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-sequel', require: false
 end
 
 group :test do
