@@ -27,6 +27,9 @@ services:
       - ./:/umdio
     ports:
       - 3000:3000
+      # Used by ruby-debug-ide
+      - 1234:1234
+      - 26162:26162
     depends_on:
       - postgres
     command: bundle exec rake up

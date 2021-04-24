@@ -30,4 +30,5 @@ end
 # the gems needed for the courses scraper, and likely for other scrapers
 group :scrape do
   gem 'nokogiri'
+  gem 'ruby-progressbar'
 end
