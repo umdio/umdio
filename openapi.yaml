@@ -660,7 +660,6 @@ paths:
   #              $ref: "#/components/schemas/Error"
 components:
   schemas:
-
     Route:
       type: object
       description: Bus route

@@ -28,6 +28,7 @@ end
 group :test do
   gem 'rack-test', require: 'rack/test'
   gem 'simplecov', require: false
+  gem 'json-schema'
 end
 
 # the gems needed for the courses scraper, and likely for other scrapers

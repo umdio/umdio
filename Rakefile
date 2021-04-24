@@ -29,6 +29,8 @@ def validate_openapi
   return true
 end
 
+# @param [Array<String>]
+# @return [Array<String>]
 def get_semesters(args)
   semesters = args.map do |e|
     if e.length == 6
@@ -95,7 +97,7 @@ end
 
 ################################### Scraping ###################################
 desc 'Scrape live data to fill databases'
-task scrape: ['scrape:courses', 'scrape:bus', 'scrape:buildings', 'scrape:majors']
+task scrape: ['scrape:courses', 'scrape:bus', 'scrape:map', 'scrape:majors']
 
 # TODO: Move this to an import task, once other datatypes are importable
 desc 'Scrapes enough to run the tests'
@@ -160,14 +162,33 @@ end
 task lint: :rubocop
 
 namespace :dev do
+
+  # docker-compose command with root dev args
+  dc = 'docker-compose -f docker-compose-dev.yml'
+
   desc 'Launches the dev environment with docker-compose'
   task :up do
-    system 'docker-compose -f docker-compose-dev.yml up --build -d'
+    system "#{dc} up --build -d"
   end
 
-  desc 'Brings down the dev environment'
+  desc 'Stop and remove the dev environment (containers, networks, volumes, etc)'
   task :down do
-    system 'docker-compose -f docker-compose-dev.yml down'
+    system "#{dc} down"
+  end
+
+  desc 'Start existing services previously stopped with dev:stop'
+  task :start do
+    system "#{dc} start"
+  end
+
+  desc 'Stop running services without removing them'
+  task :stop do
+    system "#{dc} stop"
+  end
+
+  desc 'Force a complete rebuild of all containers without using cached layers'
+  task :rebuild do
+    system "#{dc} build --no-cache --progress tty"
   end
 end
 

@@ -85,6 +85,17 @@ module Sinatra
         request.update_param(name, request.params[name].upcase) if request.params[name]
       end
 
+      # Maps a comparison operation name to its corresponding symbol.
+      # valid delimiters are `eq`, `neq`, `lt`, `gt`, `leq`, and `geq`. if the
+      # given delimiter is invalid, a `400` error is returned.
+      #
+      # @example
+      # ```ruby
+      # parse_delim(:eq) # => '='
+      # ```
+      #
+      # @param [Symbol] d the delimiter to parse.
+      # @return [String] the corresponding symbol for `d`.
       def parse_delim(d)
         vals = {
           eq: '=',
@@ -177,7 +188,7 @@ module Sinatra
                    end
         end
         conds
-    end
+      end
 
       def parse_query_v1(valid_params)
         conds = []
@@ -190,21 +201,19 @@ module Sinatra
           delim = std_params[key][1]
 
           conds << if key == 'gen_ed'
-                     if delim.include? '!'
-                       Sequel.~(Sequel.lit("#{key} LIKE ?", "%#{value}%"))
-                     else
-                       Sequel.lit("#{key} LIKE ?", "%#{value}%")
-                                end
-                   else
-                     if delim.include? '!'
-                       Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
-                     else
-                       Sequel.lit("#{key} #{delim} ?", value)
-                                end
-                   end
+            if delim.include? '!'
+              Sequel.~(Sequel.lit("#{key} LIKE ?", "%#{value}%"))
+            else
+              Sequel.lit("#{key} LIKE ?", "%#{value}%")
+            end
+          elsif delim.include? '!'
+            Sequel.~(Sequel.lit("#{key} #{delim} ?", value))
+          else
+            Sequel.lit("#{key} #{delim} ?", value)
+          end
         end
         conds
       end
-  end
+    end
   end
 end

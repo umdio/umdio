@@ -2,7 +2,7 @@
 
 require_relative 'spec_helper'
 
-describe 'umdio API' do
+describe 'umdio API', :endpoint do
   url = '/'
 
   describe 'Root' do

@@ -1,7 +1,7 @@
 require_relative '../../spec_helper.rb'
 # TODO: make sorting spec
 
-describe 'Pagination v1' do
+describe 'Pagination v1', :endpoint, :courses do
   url = '/v1/courses?semester=201808'
 
   describe '/courses' do

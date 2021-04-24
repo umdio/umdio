@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe 'Major Endpoint v1' do
+describe 'Major Endpoint v1', :endpoint, :majors do
   url = 'v1/majors'
 
   describe 'get /' do
