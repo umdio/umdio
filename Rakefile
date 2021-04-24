@@ -1,7 +1,10 @@
 require 'rspec/core/rake_task'
+require 'rubocop/rake_task'
 require 'net/http'
 require 'json'
-require_relative 'app/helpers/courses_helpers.rb'
+require_relative 'app/helpers/courses_helpers'
+
+
 include Sinatra::UMDIO::Helpers
 
 ################################################################################
@@ -146,6 +149,16 @@ namespace :scrape do
 end
 
 ##################################### Dev ######################################
+
+# run with 'rake rubocop' or 'rake rubocop:auto_correct' to apply safe fixes
+desc 'Run RuboCop'
+RuboCop::RakeTask.new do |task|
+  task.requires << 'rubocop-rake'
+  task.requires << 'rubocop-rspec'
+  task.requires << 'rubocop-sequel'
+end
+task lint: :rubocop
+
 namespace :dev do
   desc 'Launches the dev environment with docker-compose'
   task :up do
@@ -193,11 +206,11 @@ end
 desc 'Type check and lint codebase'
 task :validate do
   system 'bundle exec solargraph scan', exception: true
-  system 'bundle exec solargraph typecheck'
+  system 'bundle exec solargraph typecheck' # TODO(don): add 'exception: true', right now this breaks
   puts 'validating OpenAPI Spec'
   validate_openapi
   puts 'Spec is valid'
-  # TODO: run rubocop
+  Rake::Task['rubocop'].execute
 end
 
 task default: ['up']
