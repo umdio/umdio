@@ -70,7 +70,6 @@ class MajorsScraper
                                         url: major[:url])
       bar.increment
     end
-    # logger.info { "Inserted #{majors.length} majors" }
     nil
   end
 
@@ -86,3 +85,4 @@ class MajorsScraper
 end
 
 MajorsScraper.new.run_scraper if $PROGRAM_NAME == __FILE__
+

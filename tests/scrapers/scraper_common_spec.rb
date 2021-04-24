@@ -94,7 +94,7 @@ describe ScraperCommon, :scraper, :util do
 
       it 'raises an HTTPError if the URL points to a page that does not exist' do
         expect { actual }.to raise_error(OpenURI::HTTPError)
-
+      end
     end
   end
 

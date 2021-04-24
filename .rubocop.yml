@@ -1,0 +1,19 @@
+inherit_from: .rubocop_todo.yml
+
+# RuboCop configuration docs:
+# https://docs.rubocop.org/rubocop/1.12/configuration.html
+
+require:
+  - rubocop-rake    # https://github.com/rubocop/rubocop-rake
+  - rubocop-rspec   # https://github.com/rubocop/rubocop-rspec
+  - rubocop-sequel  # https://github.com/rubocop/rubocop-sequel
+
+# Overrides for cops in Metrics namespace
+Metrics/ModuleLength:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+Metrics/MethodLength:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false

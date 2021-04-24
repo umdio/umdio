@@ -1,10 +1,33 @@
 require 'rspec/core/rake_task'
-require_relative 'app/helpers/courses_helpers.rb'
+require 'rubocop/rake_task'
+require 'net/http'
+require 'json'
+require_relative 'app/helpers/courses_helpers'
+
+
 include Sinatra::UMDIO::Helpers
 
 ################################################################################
 ################################## FUNCTIONS ###################################
 ################################################################################
+
+# Checks if openapi.yaml is a valid OpenAPI spec. Throws if the spec is invalid,
+# otherwise returns true.
+def validate_openapi
+  File.open 'openapi.yaml' do |openapi|
+    validator_url = URI("https://validator.swagger.io/validator/debug")
+    headers = { 'Accept' => 'application/json', 'Content-Type' => 'application/yaml' }
+    res = Net::HTTP.post(validator_url, openapi.read, headers)
+    parsed = JSON.parse res.body
+    
+    if parsed['messages'] 
+      messages = parsed['schemaValidationMessages'].map{ |m| m['message'] }.join(', ')
+      raise StandardError.new "Invalid openapi spec: #{messages}"
+    end 
+  end
+
+  return true
+end
 
 # @param [Array<String>]
 # @return [Array<String>]
@@ -128,16 +151,29 @@ namespace :scrape do
 end
 
 ##################################### Dev ######################################
+
+# run with 'rake rubocop' or 'rake rubocop:auto_correct' to apply safe fixes
+desc 'Run RuboCop'
+RuboCop::RakeTask.new do |task|
+  task.requires << 'rubocop-rake'
+  task.requires << 'rubocop-rspec'
+  task.requires << 'rubocop-sequel'
+end
+task lint: :rubocop
+
 namespace :dev do
 
   # docker-compose command with root dev args
   dc = 'docker-compose -f docker-compose-dev.yml'
 
+<<<<<<< HEAD
   desc 'Connect to the database with a SQL shell'
   task :db do
     system "#{dc} exec postgres psql umdio postgres"
   end
 
+=======
+>>>>>>> 49710419b4b09f68a4bef8d6273f5cf5f0058c7e
   desc 'Launches the dev environment with docker-compose'
   task :up do
     system "#{dc} up --build -d"
@@ -199,8 +235,11 @@ end
 desc 'Type check and lint codebase'
 task :validate do
   system 'bundle exec solargraph scan', exception: true
-  system 'bundle exec solargraph typecheck', exception: true
-  # TODO: run rubocop
+  system 'bundle exec solargraph typecheck' # TODO(don): add 'exception: true', right now this breaks
+  puts 'validating OpenAPI Spec'
+  validate_openapi
+  puts 'Spec is valid'
+  Rake::Task['rubocop'].execute
 end
 
 task default: ['up']
