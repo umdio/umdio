@@ -1,24 +1,33 @@
-version: "2.0"
+version: "3.8"
 services:
+  # PostgreSQL Database
   postgres:
     image: postgres
     environment:
       - POSTGRES_DB=umdio
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Documentation generated from openapi.yaml
   redoc:
     image: redocly/redoc
     environment:
       - SPEC_URL=http://localhost:3000/v1/spec.yaml
     ports:
       - 8080:80
+    depends_on:
+      - umdio
+    restart: unless-stopped
+
+  # UMD.io Server
   umdio:
     build: .
-    links:
-      - postgres
     volumes:
       - ./:/umdio
     ports:
       - 3000:3000
+    depends_on:
+      - postgres
     command: bundle exec rake up
     restart: always

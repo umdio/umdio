@@ -19,5 +19,5 @@ mime.types
 
 # editor configurations
 .idea/
-
+.vscode/
 imports/

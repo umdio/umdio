@@ -3,7 +3,7 @@ require 'sequel'
 
 $DB.create_table? :routes do
   primary_key :pid
-  String :route_id, {unique: true}
+  String :route_id, { unique: true }
   String :title
   Float :lat_max
   Float :lat_min
@@ -16,7 +16,7 @@ end
 
 $DB.create_table? :stops do
   primary_key :pid
-  String :stop_id, {unique: true}
+  String :stop_id, { unique: true }
   String :title
   Float :long
   Float :lat
@@ -60,7 +60,7 @@ class Route < Sequel::Model
   def to_v1_info
     {
       route_id: route_id,
-      title: title,
+      title: title
     }
   end
 
@@ -81,7 +81,7 @@ class Route < Sequel::Model
   def to_v0_info
     {
       route_id: route_id,
-      title: title,
+      title: title
     }
   end
 end

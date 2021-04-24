@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 describe 'Bus Endpoint' do
-  url = "v0/bus"
+  url = 'v0/bus'
   bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
   bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
 
@@ -28,5 +28,4 @@ describe 'Bus Endpoint' do
     it_has_behavior 'good status', url + '/routes/115/locations'
     it_has_behavior 'bad status', url + '/routes/NOTAROUTE/locations', bad_route_message
   end
-
 end
