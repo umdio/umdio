@@ -28,6 +28,7 @@ end
 group :test do
   gem 'rack-test', require: 'rack/test'
   gem 'simplecov', require: false
+  gem 'codecov', :require => false, :group => :test
   gem 'json-schema'
 end
 
