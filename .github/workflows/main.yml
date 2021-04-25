@@ -18,29 +18,23 @@ jobs:
         with:
           submodules: true
 
-      - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@master
 
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
+      - name: Pull Images
+        run: docker-compose pull
 
-      - name: setup containers
-        run: |
-          docker-compose pull
-          docker-compose build
-          docker-compose up -d
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        name: Docker layer cache
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
+
+      - name: Build images and launch containers
+        run: docker-compose up --build -d
 
       - name: Scrape and import data
-        run: docker-compose exec umdio bundle exec rake test_scrape
+        run: docker-compose exec -T -e CI=${{ env.CI }} umdio bundle exec rake test_scrape
 
       - name: Run tests
-        run: docker-compose exec umdio bundle exec rake test
+        run: docker-compose exec -T -e CI=${{ env.CI }} umdio bundle exec rake test
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
