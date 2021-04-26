@@ -22,10 +22,6 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
       payload = JSON.parse(last_response.body)
       expect(payload).to be_a_kind_of Array
       expect(payload).to all be_a_bus_route
-      # include(
-      #   'route_id' => (a_kind_of String),
-      #   'title' => (a_kind_of String)
-      # )
     end
   end
 

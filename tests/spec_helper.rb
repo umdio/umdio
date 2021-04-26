@@ -70,7 +70,7 @@ RSpec.configure do |config|
   end
 
   shared_examples_for '400' do |url|
-    before { head url }
+    before { get url }
     it 'responds with 400' do
       expect(last_response.status).to be == 400
     end
@@ -99,7 +99,7 @@ RSpec.configure do |config|
   end
 
   shared_examples_for '404' do |url|
-    before { head url }
+    before { get url }
     it 'responds with 404' do
       expect(last_response.status).to eq 404
     end
