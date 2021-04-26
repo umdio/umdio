@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe 'Map Endpoints v1' do
+describe 'Map Endpoints v0' do
   url = 'v0/map'
 
   describe 'get /map' do

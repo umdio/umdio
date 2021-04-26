@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe 'Professors Endpoint' do
+describe 'Professors Endpoint v0' do
   url = 'v0/professors'
 
   describe 'get /professors' do

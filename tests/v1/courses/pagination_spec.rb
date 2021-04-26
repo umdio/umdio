@@ -5,12 +5,20 @@ require_relative 'courses_spec_helper'
 describe 'Pagination v1', :endpoint, :courses do
   describe '/courses' do
     url = '/v1/courses?semester=201808'
+
     describe 'per_page' do
-      before { get url }
-      it 'should not be > 100' do
-        get url + '&per_page=1000'
-        res = JSON.parse(last_response.body)
-        expect(res.length).to be 100
+      describe 'when set to 1000' do
+        before { get url + '&per_page=1000' }
+        let(:res) { last_response }
+        let(:payload) { JSON.parse(last_response.body) }
+
+        it 'still returns successfully' do
+          expect(res.status).to be >= 200 and be < 300
+        end
+
+        it 'should not be > 100' do
+          expect(payload.length).to eq 100
+        end
       end
 
       it 'should always at least return 1 course' do
@@ -41,82 +49,84 @@ describe 'Pagination v1', :endpoint, :courses do
         expect(last_response.headers.has_key?('X-Total-Count')).to be true
       end
     end
+  end
 
-    describe '/courses/sections' do
-      url = '/v1/courses/sections'
+  describe '/courses/sections' do
+    sections_url = '/v1/courses/sections'
 
-      describe 'with no queries' do
-        before do
-          get url
-          @res = JSON.parse(last_response.body)
-        end
-
-        it_has_behavior 'good status', url
-
-        it 'returns an array of courses' do
-          pending
-          expect(@res).to be_a_kind_of Array
-          expect(@res).to all include(
-            semester: (a_kind_of String),
-            number: (a_kind_of String),
-            seats: (a_kind_of String),
-            open_seats: (a_kind_of String),
-            waitlist: (a_kind_of String),
-            instructors: (all a_kind_of String),
-            meetings: (a_kind_of(Array) & (all include(
-              days: (a_kind_of String),
-              room: (a_kind_of String),
-              building: (a_kind_of String),
-              classtype: (a_kind_of String),
-              end_time: (a_kind_of String)
-            )))
-          )
-        end
+    describe 'with no queries' do
+      before do
+        get sections_url
+        @res = JSON.parse(last_response.body)
       end
 
-      describe 'with query params' do
-        context 'per_page' do
-          # TODO(don): Should this return 400?
-          it_has_behavior 'good status', (url + '?per_page=-5')
-          it_has_behavior 'good status', (url + '?per_page=100')
-          it_has_behavior 'good status', (url + '?per_page=200')
+      it_has_behavior 'good status', sections_url
 
-          context 'elements per page' do
-            context 'returns n elements when n <= 100, 100 otherwise' do
-              it 'n = 0' do
-                pending
-                get("#{url}?per_page=0")
-                res = JSON.parse(last_response.body)
-                expect(res.length).to eq 0
-              end
+      it 'returns an array of courses' do
+        pending
+        expect(@res).to be_a_kind_of Array
+        expect(@res).to all include(
+          semester: (a_kind_of String),
+          number: (a_kind_of String),
+          seats: (a_kind_of String),
+          open_seats: (a_kind_of String),
+          waitlist: (a_kind_of String),
+          instructors: (all a_kind_of String),
+          meetings: (a_kind_of(Array) & (all include(
+            days: (a_kind_of String),
+            room: (a_kind_of String),
+            building: (a_kind_of String),
+            classtype: (a_kind_of String),
+            end_time: (a_kind_of String)
+          )))
+        )
+      end
+    end
 
-              it 'n = 1' do
-                get("#{url}?per_page=1")
-                res = JSON.parse(last_response.body)
-                expect(res.length).to eq 1
-              end
+    describe 'with query params' do
+      context 'when per_page is set' do
+        describe 'with a value of 0' do
+          before { get sections_url + '?per_page=0' }
+          let(:res) { last_response }
+          let(:payload) { JSON.parse(last_response.body) }
 
-              it 'n = 50' do
-                pending 'am I doing this wrong'
-                get("#{url}?per_page=50")
-                res = JSON.parse(last_response.body)
-                expect(res.length).to eq 50
-              end
+          it 'returns successfully' do
+            expect(res.status).to be 200
+          end
 
-              it 'n = 100' do
-                pending 'am I doing this wrong'
-                get("#{url}?per_page=100")
-                res = JSON.parse(last_response.body)
-                expect(res.length).to eq 100
-              end
+          it 'returns 1 section' do
+            expect(payload.length).to be 1
+          end
+        end
 
-              it 'n = 200' do
-                pending 'am I doing this wrong'
-                get("#{url}?per_page=200")
-                res = JSON.parse(last_response.body)
-                expect(res.length).to eq 100
-              end
-            end
+        describe 'with a value between 1 and 100' do
+          num = 5
+          before { get sections_url + "?per_page=#{num}" }
+
+          let(:res) { last_response }
+          let(:payload) { JSON.parse(last_response.body) }
+
+          it 'returns that many sections' do
+            pending 'Does not work bc endpoint returns an array of arrays'
+            payload = JSON.parse(last_response.body)
+            puts payload
+            puts payload.length
+            expect(payload.length).to be num
+          end
+        end
+
+        describe 'with a value over 100' do
+          before { get sections_url + '?per_page=1000' }
+          let(:res) { last_response }
+          let(:payload) { JSON.parse(last_response.body) }
+
+          it 'still returns successfully' do
+            expect(res.status).to be 200
+          end
+
+          it 'only returns 100 elements' do
+            pending 'Does not work bc endpoint returns an array of arrays'
+            expect(payload.length).to be 100
           end
         end
       end

@@ -6,12 +6,11 @@ ENV['RACK_ENV'] = 'test'
 
 require_relative File.join('..', 'server')
 
-
 module BusMatchers
   extend RSpec::Matchers::DSL
 
   matcher :be_a_bus_route do
-    match {|actual| actual.is_a?(Hash) and actual['route_id'].is_a?(String) and actual['title'].is_a?(String) }
+    match { |actual| actual.is_a?(Hash) and actual['route_id'].is_a?(String) and actual['title'].is_a?(String) }
   end
 end
 
@@ -30,7 +29,7 @@ RSpec.configure do |config|
     end
 
     it 'sets the "Content-Type" header to "application/json"' do
-      expect(last_response.headers['Content-Type']).to match /^application\/json/
+      expect(last_response.headers['Content-Type']).to match(%r{^application/json})
     end
   end
 
@@ -41,13 +40,13 @@ RSpec.configure do |config|
     end
 
     it 'sets the "Content-Type" header to "application/json"' do
-      expect(last_response.headers['Content-Type']).to match /^application\/json/
+      expect(last_response.headers['Content-Type']).to match(%r{^application/json})
     end
 
     describe 'with a response payload' do
       let(:res) { JSON.parse(last_response.body) }
 
-      it 'sets the error_code payload' do
+      it 'sets the error_code field to the same value as the HTTP status code' do
         expect(res['error_code']).to eq last_response.status
       end
 
@@ -77,7 +76,7 @@ RSpec.configure do |config|
     end
 
     it 'sets the "Content-Type" header to "application/json"' do
-      expect(last_response.headers['Content-Type']).to match /^application\/json/
+      expect(last_response.headers['Content-Type']).to match(%r{^application/json})
     end
 
     describe 'with a response payload' do
@@ -102,11 +101,11 @@ RSpec.configure do |config|
   shared_examples_for '404' do |url|
     before { head url }
     it 'responds with 404' do
-      expect(last_response.status).to be == 404
+      expect(last_response.status).to eq 404
     end
 
     it 'sets the "Content-Type" header to "application/json"' do
-      expect(last_response.headers['Content-Type']).to match /^application\/json/
+      expect(last_response.headers['Content-Type']).to match(%r{^application/json})
     end
 
     describe 'with a response payload' do
@@ -118,12 +117,12 @@ RSpec.configure do |config|
 
       it 'provides a message string' do
         expect(res['message']).to be_a_kind_of String
-        expect(res['message'].length).to.positive?
+        expect(res['message'].length).to be > 0
       end
 
       it 'provides a link to the relevant documentation' do
         expect(res['docs']).to be_a_kind_of String
-        expect(res['docs'].length).to.positive?
+        expect(res['docs'].length).to be > 0
       end
     end
   end
