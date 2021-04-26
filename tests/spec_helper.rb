@@ -6,6 +6,17 @@ ENV['RACK_ENV'] = 'test'
 
 require_relative File.join('..', 'server')
 
+ # parallel specs
+if ENV['TEST_ENV_NUMBER']
+  # Wait until all threads finish to collect coverage report
+  SimpleCov.at_exit do
+    result = SimpleCov.result
+    result.format! if ParallelTests.number_of_running_processes <= 1
+  end
+
+  # mute noise for parallel tests
+  config.silence_filter_announcements = true
+end
 module BusMatchers
   extend RSpec::Matchers::DSL
 

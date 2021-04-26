@@ -19,11 +19,11 @@ def validate_openapi
     headers = { 'Accept' => 'application/json', 'Content-Type' => 'application/yaml' }
     res = Net::HTTP.post(validator_url, openapi.read, headers)
     parsed = JSON.parse res.body
-    
-    if parsed['messages'] 
+
+    if parsed['messages']
       messages = parsed['schemaValidationMessages'].map{ |m| m['message'] }.join(', ')
       raise StandardError.new "Invalid openapi spec: #{messages}"
-    end 
+    end
   end
 
   return true
@@ -218,10 +218,17 @@ RSpec::Core::RakeTask.new :test do |task|
 end
 task spec: :test
 
-desc 'Run tests in /tests/v1 that look like *_spec.rb'
-RSpec::Core::RakeTask.new :testv1 do |task|
-  task.pattern = Dir['tests/v1/*_spec.rb']
-  task.rspec_opts = '--format documentation' # default to verbose testing, comment for silence
+namespace :test do
+  desc 'Run tests in /tests/v1 that look like *_spec.rb'
+  RSpec::Core::RakeTask.new :v1 do |task|
+    task.pattern = Dir['tests/v1/*_spec.rb']
+    task.rspec_opts = '--format documentation' # default to verbose testing, comment for silence
+  end
+
+  desc 'Run all tests in /tests in parallel'
+  task :parallel do
+    system 'parallel_rspec --type rspec -n 4 -- -f documentation -- tests/**/*_spec.rb'
+  end
 end
 
 desc 'Type check and lint codebase'
