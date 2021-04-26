@@ -1,12 +1,40 @@
 require_relative '../spec_helper'
 
+
 describe 'Bus Endpoint v1', :endpoint, :buses do
+  include BusMatchers
+
+  # Bus matchers and examples
+
+  shared_examples_for 'successful bus route list payload' do |url|
+    before { get url }
+
+    it 'has a good response' do
+      expect(last_response.status).to be == 200
+      expect(last_response.body.length).to be > 1
+    end
+
+    it 'sets the content-type header to application/json' do
+      expect(last_response.headers['Content-Type']).to match_regex(%r{^application/json})
+    end
+
+    it 'has a payload containing a list of bus routes' do
+      payload = JSON.parse(last_response.body)
+      expect(payload).to be_a_kind_of Array
+      expect(payload).to all be_a_bus_route
+      # include(
+      #   'route_id' => (a_kind_of String),
+      #   'title' => (a_kind_of String)
+      # )
+    end
+  end
+
   url = 'v1/bus'
   bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
   bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
 
   describe 'get /routes' do
-    it_has_behavior 'good status', url + '/routes'
+    it_has_behavior 'successful bus route list payload', url + '/routes'
   end
 
   describe 'get /routes/:route_id' do
