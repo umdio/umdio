@@ -62,7 +62,7 @@ describe 'Pagination v1', :endpoint, :courses do
         @res = JSON.parse(last_response.body)
       end
 
-      it_has_behavior 'good status', sections_url
+      it_has_behavior 'good status', '/v1/courses/sections?semester=201808'
 
       it 'returns an array of sections' do
         pending
