@@ -52,7 +52,9 @@ describe 'Pagination v1', :endpoint, :courses do
   end
 
   describe '/courses/sections' do
-    sections_url = '/v1/courses/sections'
+    def sections_url(queries = '')
+      "/v1/courses/sections?semester=201808#{queries}"
+    end
 
     describe 'with no queries' do
       before do
@@ -88,7 +90,7 @@ describe 'Pagination v1', :endpoint, :courses do
     describe 'with query params' do
       context 'when per_page is set' do
         describe 'with a value of 0' do
-          before { get sections_url + '?per_page=0' }
+          before { get sections_url('&per_page=0') }
           let(:res) { last_response }
           let(:payload) { JSON.parse(last_response.body) }
 
@@ -103,7 +105,7 @@ describe 'Pagination v1', :endpoint, :courses do
 
         describe 'with a value between 1 and 100' do
           num = 5
-          before { get sections_url + "?per_page=#{num}" }
+          before { get sections_url("&per_page=#{num}") }
 
           let(:res) { last_response }
           let(:payload) { JSON.parse(last_response.body) }
@@ -114,7 +116,7 @@ describe 'Pagination v1', :endpoint, :courses do
         end
 
         describe 'with a value over 100' do
-          before { get sections_url + '?per_page=1000' }
+          before { get sections_url('&per_page=1000') }
           let(:res) { last_response }
           let(:payload) { JSON.parse(last_response.body) }
 

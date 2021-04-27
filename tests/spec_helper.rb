@@ -19,9 +19,6 @@ if ENV['TEST_ENV_NUMBER']
     result = SimpleCov.result
     result.format! if ParallelTests.number_of_running_processes <= 1
   end
-
-  # mute noise for parallel tests
-  config.silence_filter_announcements = true
 end
 module BusMatchers
   extend RSpec::Matchers::DSL
@@ -37,6 +34,11 @@ RSpec.configure do |config|
 
   config.alias_it_should_behave_like_to :it_has_behavior, 'has behavior:'
   config.color = true
+
+  # mute noise for parallel tests
+  if ENV['TEST_ENV_NUMBER']
+    config.silence_filter_announcements = true
+  end
 
   shared_examples_for 'good status' do |url|
     before { get url }

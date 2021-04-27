@@ -227,7 +227,7 @@ namespace :test do
 
   desc 'Run all tests in /tests in parallel'
   task :parallel do
-    system 'parallel_rspec --type rspec -n 4 -- -f documentation -- tests/**/*_spec.rb'
+    system 'parallel_rspec --type rspec -- -f documentation -- tests/**/*_spec.rb'
   end
 end
 
