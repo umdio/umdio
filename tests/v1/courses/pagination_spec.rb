@@ -62,11 +62,12 @@ describe 'Pagination v1', :endpoint, :courses do
 
       it_has_behavior 'good status', sections_url
 
-      it 'returns an array of courses' do
+      it 'returns an array of sections' do
         pending
         expect(@res).to be_a_kind_of Array
         expect(@res).to all include(
           semester: (a_kind_of String),
+          course: be_a_course_id,
           number: (a_kind_of String),
           seats: (a_kind_of String),
           open_seats: (a_kind_of String),
@@ -77,6 +78,7 @@ describe 'Pagination v1', :endpoint, :courses do
             room: (a_kind_of String),
             building: (a_kind_of String),
             classtype: (a_kind_of String),
+            start_time: (a_kind_of String),
             end_time: (a_kind_of String)
           )))
         )
@@ -107,10 +109,6 @@ describe 'Pagination v1', :endpoint, :courses do
           let(:payload) { JSON.parse(last_response.body) }
 
           it 'returns that many sections' do
-            pending 'Does not work bc endpoint returns an array of arrays'
-            payload = JSON.parse(last_response.body)
-            puts payload
-            puts payload.length
             expect(payload.length).to be num
           end
         end
@@ -125,7 +123,6 @@ describe 'Pagination v1', :endpoint, :courses do
           end
 
           it 'only returns 100 elements' do
-            pending 'Does not work bc endpoint returns an array of arrays'
             expect(payload.length).to be 100
           end
         end
