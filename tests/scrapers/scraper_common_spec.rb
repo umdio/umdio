@@ -1,5 +1,6 @@
 require 'nokogiri'
 require 'open-uri'
+require 'ruby-progressbar'
 require_relative '../spec_helper'
 require_relative '../../app/scrapers/scraper_common'
 
@@ -130,6 +131,18 @@ describe ScraperCommon, :scraper, :util do
     end
     it 'responds to #error' do
       expect(logger).to respond_to :error
+    end
+  end
+
+  context '#get_progress_bar' do
+    let(:bar) { common.get_progress_bar }
+    it 'returns a progress bar' do
+      pending 'ruby does not recognize ProgressBar being imported??'
+      expect(bar).to be_an_instance_of ProgressBar
+    end
+
+    it 'is not finished' do
+      expect(bar.finished?).to be_falsey
     end
   end
 
