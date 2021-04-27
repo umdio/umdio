@@ -29,6 +29,9 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
   bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
   bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
 
+  describe 'get /bus' do
+    it_has_behavior 'good status', url
+  end
   describe 'get /routes' do
     it_has_behavior 'successful bus route list payload', url + '/routes'
   end
