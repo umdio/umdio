@@ -25,7 +25,7 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
     end
   end
 
-  url = 'v1/bus'
+  url = '/v1/bus'
   bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
   bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
 

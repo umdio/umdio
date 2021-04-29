@@ -17,7 +17,6 @@ describe 'Courses Endpoint v1', :endpoint, :courses do
       it_has_behavior 'good status', (build_url1 '?')
 
       it 'returns a list of courses' do
-        # res = JSON.parse(last_response.body)
         course_keys = %w[course_id name dept_id credits sections]
         keys_len    = course_keys.length
         res.each do |r|
