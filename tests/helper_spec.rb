@@ -53,9 +53,49 @@ describe 'Helpers' do
           # to accommodate it.
           # 'MSBB99MB' => true,
           'BMGT' => false,
+          'BMTG289N' => true,
           'CMSC131-0101' => false
         }.each { |k, v| expect(!is_course_id?(k)).to eq(!v) }
       end
+
+      describe 'is_full_section_id?' do
+        {
+          'CMSC131' => false,
+          'CMSC131A' => false,
+          'CMSC131-0101' => true,
+          'ENGL389B-0101' => true,
+          'BMGT' => false,
+          'BMTG289N' => false,
+        }.each do |k, v|
+          it "#{k} #{v ? 'is' : 'is not'} valid" do
+            expect(!!is_full_section_id?(k)).to be v
+          end
+        end
+      end
+
+      describe 'validate_section_ids' do
+        [
+          {
+            section_ids: ['CMSC435-0101', 'ENGL389N-0204', 'BMGT289B-0102'],
+            do_halt: false,
+            expected: true
+          },
+          {
+            section_ids: ['CMSC435-0101', 'ENGL389N', 'BMGT289B-0102'],
+            do_halt: false,
+            expected: false
+          }
+        ].each do |test_case|
+          section_ids = test_case[:section_ids]
+          do_halt = test_case[:do_halt]
+          expected = test_case[:expected]
+
+          it "validate_section_ids([#{section_ids.join(', ')}], #{do_halt}) => #{expected}" do
+            expect(validate_section_ids(section_ids, do_halt)).to be expected
+          end
+        end
+      end
     end
+
   end
 end

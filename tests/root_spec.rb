@@ -19,8 +19,13 @@ describe 'umdio API', :endpoint do
   end
 
   describe 'v1' do
-    it_has_behavior 'good status', (url + 'v0')
+    it_has_behavior 'good status', (url + 'v1')
+
+    describe 'spec.yaml' do
+      it_has_behavior 'good status', (url + 'v1/spec.yaml')
+    end
   end
+
 
   describe 'Bad route' do
     it_has_behavior 'bad status', (url + 'zzzz')

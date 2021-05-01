@@ -1,6 +1,7 @@
 Gemfile.lock
 bower_components
 tmp
+/bin
 
 # exclude database
 /data/postgres

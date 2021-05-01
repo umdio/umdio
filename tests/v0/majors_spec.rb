@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 describe 'Major Endpoint v0' do
-  url = 'v0/majors'
+  url = '/v0/majors'
 
   describe 'get /' do
     it_has_behavior 'good status', url
