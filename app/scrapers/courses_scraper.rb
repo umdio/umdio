@@ -37,7 +37,6 @@ class CoursesScraper
     bar = get_progress_bar title: "#{self.class} - Scraping Dept URLs", total: semesters.length
     semesters.each do |semester|
       log(bar, :debug) { "Searching for courses in term #{semester}" }
-      # logger.info(prog_name) { "Searching for courses in term #{semester}" }
 
       base_url = "https://app.testudo.umd.edu/soc/#{semester}"
 
@@ -46,7 +45,6 @@ class CoursesScraper
       end
 
       log(bar, :debug) { "#{dept_urls.length} department/semesters so far" }
-      # logger.info(prog_name) { "#{dept_urls.length} department/semesters so far" }
       bar.increment
     end
 
@@ -67,8 +65,6 @@ class CoursesScraper
       table_name = 'courses'
 
       log(bar, :debug) { "Getting courses for #{dept_id} (#{semester})" }
-      # log(bar,)
-      # logger.debug(prog_name) { "fetching #{url}" }
 
       # TODO: replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
       # options thingy

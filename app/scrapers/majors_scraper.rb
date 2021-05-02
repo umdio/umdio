@@ -62,7 +62,6 @@ class MajorsScraper
     $DB[:majors].delete
     majors.each do |major|
       log(bar, :debug) { "inserting #{major[:name]}" }
-      # logger.debug { "inserting #{major[:name]}" }
 
       major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
       major[:major_id] = major[:name].upcase if major[:major_id].nil?
@@ -77,7 +76,6 @@ class MajorsScraper
   # @return [void]
   def scrape
     url = 'https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically'
-    # page = ScraperCommon.get_page url, prog_name
     page = get_page url, prog_name
     majors = scrape_page page
     update_db(majors)
@@ -85,4 +83,3 @@ class MajorsScraper
 end
 
 MajorsScraper.new.run_scraper if $PROGRAM_NAME == __FILE__
-
