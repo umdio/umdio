@@ -166,6 +166,11 @@ namespace :dev do
   # docker-compose command with root dev args
   dc = 'docker-compose -f docker-compose-dev.yml'
 
+  desc 'Connect to the database with a SQL shell'
+  task :db do
+    system "#{dc} exec postgres psql umdio postgres"
+  end
+
   desc 'Launches the dev environment with docker-compose'
   task :up do
     system "#{dc} up --build -d"

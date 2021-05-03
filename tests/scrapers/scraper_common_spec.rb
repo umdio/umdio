@@ -1,16 +1,23 @@
 require 'nokogiri'
 require 'open-uri'
+require 'ruby-progressbar'
 require_relative '../spec_helper'
 require_relative '../../app/scrapers/scraper_common'
 
 # FIXME: fails with 'undefined method get_page for ScraperCommon:Module' and I'm not sure why
+class FakeScraper
+  include ScraperCommon
+
+  def scrape(*args)
+    args
+  end
+end
 
 describe ScraperCommon, :scraper, :util do
   let(:common) { Class.new { extend ScraperCommon } }
 
   # get_semesters
   context '#get_semesters' do
-
     context '#get_semesters(["2018"])' do
       let(:actual) { common.get_semesters(['2018']) }
 
@@ -37,7 +44,7 @@ describe ScraperCommon, :scraper, :util do
     end
 
     context 'when passed a single year instead of an array of years' do
-      let(:actual) { common.get_semesters('2020')}
+      let(:actual) { common.get_semesters('2020') }
       it 'behaves the same as if a similar one-element array was passed' do
         expect(common.get_semesters('2020')).to eq(common.get_semesters(['2020']))
         expect(common.get_semesters('2018')).to eq(common.get_semesters(['2018']))
@@ -50,10 +57,10 @@ describe ScraperCommon, :scraper, :util do
 
     context 'bad input raises an ArgumentError' do
       it 'get_semesters()' do
-        expect{ common.get_semesters() }.to raise_error ArgumentError
+        expect { common.get_semesters }.to raise_error ArgumentError
       end
       it 'get_semesters(false)' do
-        expect{ common.get_semesters(false) }.to raise_error ArgumentError
+        expect { common.get_semesters(false) }.to raise_error ArgumentError
       end
       it 'get_semesters(-1)' do
         expect { common.get_semesters(-1) }.to raise_error ArgumentError
@@ -95,10 +102,6 @@ describe ScraperCommon, :scraper, :util do
       it 'raises an HTTPError if the URL points to a page that does not exist' do
         expect { actual }.to raise_error(OpenURI::HTTPError)
       end
-
-      it 'requires a program name for error logging' do
-        expect { common.get_page(valid_url) }.to raise_error ArgumentError
-      end
     end
   end
 
@@ -130,6 +133,54 @@ describe ScraperCommon, :scraper, :util do
       expect(logger).to respond_to :error
     end
   end
+
+  context '#get_progress_bar' do
+    let(:bar) { common.get_progress_bar }
+    it 'returns a progress bar' do
+      pending 'ruby does not recognize ProgressBar being imported??'
+      expect(bar).to be_an_instance_of ProgressBar
+    end
+
+    it 'is not finished' do
+      expect(bar.finished?).to be_falsey
+    end
+  end
+
+  context '#run_scraper' do
+
+    # let(:mock_scraper) { instance_double(FakeScraper) }
+    before(:each) do
+      @mock_scraper = FakeScraper.new
+      @mock_scraper.logger.level = :warn
+    end
+
+    it 'is an instance method' do
+      expect(common).to respond_to :run_scraper
+    end
+
+    it 'throws if #scrape is not defined' do
+      expect { common.run_scraper }.to raise_error StandardError
+    end
+
+    it 'returns the scrape duration in seconds' do
+      expect(@mock_scraper.run_scraper).to be_a_kind_of Float
+    end
+
+    it 'forwards arguments to #scrape' do
+      @mock_scraper.stub(:scrape) { |arg| arg }
+      @mock_scraper.run_scraper('some args')
+      expect(@mock_scraper).to have_received(:scrape).with('some args')
+    end
+
+    it 'takes any number of arguments' do
+      # @mock_scraper.stub(:scrape) { |arg| arg }
+      @mock_scraper.logger.level = :error
+      expect { @mock_scraper.run_scraper() }.to_not raise_error
+      expect { @mock_scraper.run_scraper(5) }.to_not raise_error
+      expect { @mock_scraper.run_scraper(:foo, 'bar') }.to_not raise_error
+      expect { @mock_scraper.run_scraper([1, 2, 3]) }.to_not raise_error
+      expect { @mock_scraper.run_scraper(foo: 'foo', bar: :baz)}.to_not raise_error
+    end
+
+  end
 end
-# describe 'ScraperCommon' do
-# end

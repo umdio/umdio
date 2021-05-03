@@ -146,6 +146,34 @@ RSpec.configure do |config|
     end
   end
 
+  shared_examples_for 'a scraper' do
+    let(:instance) { described_class.new }
+
+    it 'implements ScraperCommon' do
+      expect(described_class).to be < ScraperCommon
+    end
+
+    it 'defines a scrape method' do
+      expect(instance).to respond_to :scrape
+    end
+
+    context '#run_scraper' do
+      it 'is present' do
+        expect(instance).to respond_to :run_scraper
+      end
+
+      it 'is not overwritten by scraper implementation' do
+        expect(instance.method(:run_scraper).owner).to eq ScraperCommon
+      end
+
+      it 'forwards arguments to #scrape' do
+        instance.stub(:scrape) { |arg| arg }
+        instance.run_scraper('some args')
+        expect(instance).to have_received(:scrape).with('some args')
+      end
+    end
+  end
+
   def app
     UMDIO
   end

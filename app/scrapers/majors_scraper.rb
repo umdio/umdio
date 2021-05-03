@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'nokogiri'
+require 'ruby-progressbar'
 
 require_relative 'scraper_common'
 
@@ -28,6 +29,7 @@ class MajorsScraper
   def scrape_page(page)
     major_divs = page.css('.page--inner-content a')
     majors = []
+    bar = get_progress_bar(title: "#{self.class} - Scraping Majors", total: major_divs.length)
     major_divs.each do |link|
       # parse the name to grab the major's name and its college
 
@@ -41,6 +43,7 @@ class MajorsScraper
       # 0th match is full string, 1st and 2nd elements are the two matches
       major_name, major_college = major_parts[1, 3].map(&:strip)
 
+      bar.increment
       majors << {
         name: major_name,
         college: major_college,
@@ -48,22 +51,24 @@ class MajorsScraper
       }
     end
 
+    bar.finish
     majors
   end
 
   # @param [Array<Major>]
   # @return [void]
   def update_db(majors)
+    bar = get_progress_bar(title: "#{self.class} - Loading Majors", total: majors.length)
     $DB[:majors].delete
     majors.each do |major|
-      logger.info { "inserting #{major[:name]}" }
+      log(bar, :debug) { "inserting #{major[:name]}" }
 
       major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
       major[:major_id] = major[:name].upcase if major[:major_id].nil?
       $DB[:majors].insert_ignore.insert(major_id: major[:major_id], name: major[:name], college: major[:college],
                                         url: major[:url])
+      bar.increment
     end
-    logger.info { "Inserted #{majors.length} majors" }
     nil
   end
 
@@ -71,11 +76,10 @@ class MajorsScraper
   # @return [void]
   def scrape
     url = 'https://admissions.umd.edu/explore/colleges-and-schools/majors/majors-alphabetically'
-    # page = ScraperCommon.get_page url, prog_name
     page = get_page url, prog_name
     majors = scrape_page page
     update_db(majors)
   end
 end
 
-MajorsScraper.new.scrape if $PROGRAM_NAME == __FILE__
+MajorsScraper.new.run_scraper if $PROGRAM_NAME == __FILE__
