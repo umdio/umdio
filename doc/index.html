@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1 id="umdiohttpumdio-middot-license-mithttpsimgshieldsiogithublicensemashapeapistatussvglicense-prs-welcomehttpsimgshieldsiobadgeprs-welcome-brightgreensvgreadmemddevelopment-cihttpsgithubcomumdioumdioactionsworkflowsmainymlbadgesvghttpsgithubcomumdioumdioactionsworkflowsmainyml"><a href="http://umd.io/">UMD.io</a> · <a href="./LICENSE"><img src="https://img.shields.io/github/license/mashape/apistatus.svg" alt="license MIT" /></a> <a href="README.md#Development"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a> <a href="https://github.com/umdio/umdio/actions/workflows/main.yml"><img src="https://github.com/umdio/umdio/actions/workflows/main.yml/badge.svg" alt="CI" /></a></h1>
+
+<p>UMD.io is an open API for the University of Maryland. The main purpose is to
+give developers easy access to data to build great applications. In turn,
+developers can improve the University of Maryland with the things they build.</p>
+
+<h2 id="features">Features</h2>
+
+<p>Easy API access to</p>
+
+<ul>
+  <li>Three years of course data</li>
+  <li>Live Bus data, through NextBus</li>
+  <li>Campus Building names and locations</li>
+  <li>Basic info about all Majors</li>
+</ul>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>To use the api, please refer to <a href="https://beta.umd.io">our documentation</a>.</p>
+
+<h1 id="development">Development</h1>
+
+<p>To work on umd.io, or to run your own instance, start by forking and cloning this repo.</p>
+
+<h2 id="setting-up-your-environment-with-docker">Setting Up Your Environment With Docker</h2>
+
+<ol>
+  <li><a href="https://docs.docker.com/engine/installation/">Install docker</a></li>
+  <li><a href="https://docs.docker.com/compose/install/">Install docker-compose</a></li>
+  <li>Run <code>docker-compose up</code>
+    <ul>
+      <li>You might need to run docker-related commands with <code>sudo</code> if you’re a linux user</li>
+    </ul>
+  </li>
+  <li>Run the scrapers <code>./umdio.sh scrape</code>
+    <ul>
+      <li>You might need to <code>chmod +x umdio.sh</code></li>
+    </ul>
+  </li>
+  <li>Clone the umdio-data submodule <code>git submodule update --init</code></li>
+</ol>
+
+<p>This will take some time, so in the meantime, review the rest of the guide.</p>
+
+<h2 id="documentation">Documentation</h2>
+
+<p>Within the codebase, comments and <a href="https://rubystyle.guide/">good practices</a> are
+encouraged, and will later be enforced.</p>
+
+<p>For the public-facing API, we use <a href="https://swagger.io/docs/specification/about/">OpenAPI v3</a>
+to document everything. You can view our spec
+<a href="https://github.com/umdio/umdio/blob/master/openapi.yaml">here</a>. The docs are
+served with <a href="https://github.com/Redocly/redoc">ReDoc</a> and are automatically built
+on every tagged commit.</p>
+
+<p>If you’re actively working on the documentation, use the <code>docker-compose-dev.yml</code>
+file to view your changes live in ReDoc, on <code>http://localhost:8080</code>.</p>
+
+<p><code>sh
+rake dev:up
+# If rake throws a LoadError (e.g. "LoadError: cannot load such file -- rspec/core/rake_task"),
+# try running the task below instead. You may need to run `bundle install` beforehand.
+sudo -E rake dev:up
+</code></p>
+
+<p>All <a href="https://ruby.github.io/rake/">rake</a> tasks should have descriptions. To list all rake tasks, run <code>bundle exec rake -T</code>.
+## Tech Stack</p>
+
+<p>umd.io runs on Ruby, with various libraries such as <a href="https://github.com/rack/rack">Rack</a>,
+<a href="http://sinatrarb.com/">Sinatra</a>, <a href="https://puma.io/">Puma</a>, and
+<a href="https://github.com/jeremyevans/sequel">Sequel</a>. We use
+<a href="https://www.postgresql.org/">PostgreSQL</a> as the database. Everything runs in
+<a href="https://www.docker.com/">Docker</a>.</p>
+
+<h2 id="adding-new-data">Adding new data</h2>
+
+<p>If you’re interested in adding a new endpoint, here’s a rough guide on how to do it. Our data for <code>majors</code> is a great, simple example.</p>
+
+<ol>
+  <li>Create a model in <code>/app/models</code>. We use <a href="https://github.com/jeremyevans/sequel">Sequel</a> on top of Postgres. It should include a <code>to_v1</code> method that translates whatever is in your table into the object you want to return.</li>
+  <li>Create a scraper in <code>/app/scrapers</code>. This is to populate the table for the model you just created.
+    <ul>
+      <li>If you’re scraping a live webpage, <code>courses_scraper.rb</code> might be a good resource. We use nokogiri to parse HTML.</li>
+      <li>If you’re parsing a JSON file, consider adding it to <a href="https://github.com/umdio/umdio-data">umdio-data</a>, and creating an importer, such as <code>map_scraper.rb</code>. (NOTE: umdio-data is now included as a submodule; so this scraper should be updated)</li>
+    </ul>
+  </li>
+  <li>Create a controller in <code>/app/controllers</code>. Add endpoints as you see fit.</li>
+  <li>Register the controller in <code>server.rb</code>.</li>
+  <li>Write documentation in <code>openapi.yaml</code></li>
+</ol>
+
+<h2 id="logging">Logging</h2>
+
+<p>We use Ruby’s built-in logger to output messages to standard output. Learn more
+about <a href="https://ruby-doc.org/stdlib-2.1.0/libdoc/logger/rdoc/Logger.html">Ruby’s logging module</a></p>
+
+<p>Here’s an example of output from the courses scraper:</p>
+
+<p><code>
+[2018-10-18 01:35:01] INFO  (courses_scraper): Searching for courses in term 201801
+[2018-10-18 01:35:02] INFO  (courses_scraper): 178 department/semesters so far
+[2018-10-18 01:35:02] INFO  (courses_scraper): Searching for courses in term 201805
+[2018-10-18 01:35:03] INFO  (courses_scraper): 301 department/semesters so far
+</code></p>
+
+<p>The formatting for outputted messages is as follows:<code>[DATE TIME] LOG_LEVEL (PROGRAM_NAME): {MESSAGE}</code></p>
+
+<p>An example of a log call in ruby:
+<code>ruby
+logger.info(prog_name) {"MESSAGE"}
+</code></p>
+
+<p>You should use Ruby’s built-in log-levels where appropriate, when displaying
+errors you should use logger.error, when displaying information you should use
+<code>logger.info</code>, and so on.</p>
+
+<p>Our logger implementation is located at the <code>scraper_common.rb</code> file located at
+<code>$app/scrapers/scraper_common.rb</code></p>
+
+<h2 id="testing">Testing</h2>
+
+<p>We use <a href="https://rspec.info/">RSpec</a> to test. You can find the tests in the
+<code>tests</code> directory. Run tests with <code>./umdio.sh test</code>. Make sure that the database
+is populated with <code>./umdio test_scrape</code>.</p>
+
+<h2 id="credits">Credits</h2>
+
+<p>See <a href="https://github.com/umdio/umdio/graphs/contributors">contributors</a></p>
+
+<h2 id="license">License</h2>
+
+<p>We use the <a href="./LICENSE">MIT License</a>.</p>
+</div></div>
+
+      <div id="footer">
+  Generated on Sun May  2 12:33:21 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.7.2).
+</div>
+
+    </div>
+  </body>
+</html>

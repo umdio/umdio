@@ -88,21 +88,40 @@ describe ScraperCommon, :scraper, :util do
     let(:valid_url) { 'https://umd.edu' }
     let(:bad_url_404) { 'https://www.cs.umd.edu/foobarbaz' }
 
-    context 'normal behavior' do
-      let(:doc) { common.get_page(valid_url, 'foo_scraper') }
+    context 'when given a valid page url' do
+      context 'to a page which exists' do
+        let(:doc) do
+          common.logger.level = :fatal
+          common.get_page(valid_url, 'foo_scraper')
+        end
 
-      it 'returns a document' do
-        expect(doc.class).to be Nokogiri::HTML::Document
+        it 'returns a document' do
+          expect(doc.class).to be Nokogiri::HTML::Document
+        end
+      end
+
+      context 'to a page which does not exist' do
+        let(:actual) do
+          common.logger.level = :fatal
+          common.get_page(bad_url_404, 'foo_scraper')
+        end
+
+        it 'raises an HTTPError' do
+          expect { actual }.to raise_error(OpenURI::HTTPError)
+        end
+
+        it 'specifies the correct error code' do
+          begin
+            actual
+            fail 'An HTTPError should have been raised'
+          rescue OpenURI::HTTPError => e
+            expect(e).to respond_to :io
+            expect(e.io.status).to eq ["404", "Not Found"]
+          end
+        end
       end
     end
 
-    context 'Invalid input' do
-      let(:actual) { common.get_page(bad_url_404, 'foo_scraper') }
-
-      it 'raises an HTTPError if the URL points to a page that does not exist' do
-        expect { actual }.to raise_error(OpenURI::HTTPError)
-      end
-    end
   end
 
   # logger
@@ -129,8 +148,78 @@ describe ScraperCommon, :scraper, :util do
     it 'responds to #warn' do
       expect(logger).to respond_to :warn
     end
+
     it 'responds to #error' do
       expect(logger).to respond_to :error
+    end
+
+    it 'responds to #fatal' do
+      expect(logger).to respond_to :fatal
+    end
+
+    it 'responds to #unknown' do
+      expect(logger).to respond_to :fatal
+    end
+  end
+
+  context '#log' do
+    let(:bar) { common.get_progress_bar }
+
+    it 'raises an ArgumentError when not provided a block' do
+      expect { common.log(bar, :info) }.to raise_error ArgumentError
+    end
+
+    context 'when no log level is provided' do
+      let(:actual) { common.logger.level = :fatal; common.log(bar) { 'some message' } }
+
+      it 'returns nil' do
+        expect(actual).to be_nil
+      end
+
+      it 'defaults to info' do
+        # TODO how would you check it uses info?
+        expect(actual).to be_nil
+      end
+    end
+
+    context 'when a log level is provided' do
+      it 'returns nil' do
+        expect(common.log(bar, :debug) { 'message' }).to be_nil
+      end
+
+      it 'may be a string or a symbol' do
+        common.logger.level = :fatal
+        expect(common.log(bar, :debug) { 'message' }).to be_nil
+        expect(common.log(bar, 'debug') { 'message' }).to be_nil
+      end
+
+      context 'with an invalid log level' do
+        it 'raises an ArgumentError' do
+          expect { common.log(bar, :foobarbaz) { 'msg' }}.to raise_error ArgumentError
+          expect { common.log(bar, :verbose) { 'msg' }}.to raise_error ArgumentError
+          expect { common.log(bar, false) { 'msg' }}.to raise_error ArgumentError
+        end
+      end
+
+      context 'with a valid log level' do
+        [:debug, :info, :warn, :error, :fatal, :unknown].each do |lvl|
+          context "with log level #{lvl.to_s}" do
+            let(:actual) do
+              common.logger.level = :fatal
+              common.log(bar, lvl) { 'some msg' }
+            end
+
+            it 'does not throw' do
+              # expect { common.log(bar, lvl) { 'some msg' }}.not_to raise_error
+              expect { actual }.not_to raise_error
+            end
+
+            it 'returns nil' do
+              expect(actual).to be_nil
+            end
+          end
+        end
+      end # !valid log level
     end
   end
 

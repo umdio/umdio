@@ -4,7 +4,13 @@ require 'logger'
 require 'sequel'
 require 'ruby-progressbar'
 
-MAX_RETRIES = 1
+MAX_RETRIES = 2
+
+# Base duration for delay between request retries. Measured in seconds
+DELAY_BASE = 0.2
+# Additional seconds to delay between each delay
+DELAY_DELTA = 0.1
+
 module ScraperCommon
   # TODO: Load config from memory
   $DB = Sequel.connect('postgres://postgres@postgres:5432/umdio')
@@ -32,12 +38,12 @@ module ScraperCommon
   # @param [Symbol] level the log level to use. Defaults to `Logger::INFO`
   #
   # @return [void]
-  def log(bar, level = Logger::INFO, &block)
-    raise 'No block provided' unless block_given?
-    raise "Invalid level '#{level}'" unless logger.respond_to? level
+  def log(bar, level = :info, &block)
+    raise ArgumentError, 'No block provided' unless block_given?
+    raise ArgumentError, "Invalid level '#{level}'" unless logger.respond_to? level.to_s
 
     bar.clear
-    @logger.public_send(level, self.class, &block)
+    @logger.public_send(level.to_s, self.class, &block)
     bar.refresh(force: true) unless bar.stopped?
     nil
   end
@@ -94,13 +100,27 @@ module ScraperCommon
       retries ||= 0
       page = Nokogiri::HTML(URI.open(url))
     rescue OpenURI::HTTPError => e
-      retry if (retries += 1) < MAX_RETRIES
+      if retries < MAX_RETRIES
+        code, message = e.io.status || []
+        logger.warn(prog_name) { "Failed to load #{url}: Page responded with #{code || 'an unknown status'}. Retrying..." }
+        sleep DELAY_BASE + (DELAY_DELTA * retries)
+        retries += 1
+        retry
+      end
+
       logger.error(prog_name) { "Could not load page '#{url}': #{e.message}" }
       raise $!
     end
     page
   end
 
+  # Runs the scraper, passing all arguments along to `#scrape()`.
+  #
+  # Scrapers, which `include` this module, must provide a `#scrape()` method.
+  # This method invokes it, measures how long it takes, and exposes that info
+  # by printing it to `stdout` and returning the scrape duration.
+  #
+  # @return [Float] how long scraping took, in seconds.
   def run_scraper(...)
     unless respond_to? :scrape
       raise StandardError, "Failed to run scraper #{self.class}: scrape method not implemented."
@@ -109,9 +129,11 @@ module ScraperCommon
     start = Time.now
     scrape(...)
     stop = Time.now
+
     duration = stop - start
     sec = (duration % 60).truncate 2
     min = (duration / 60).floor
+
     logger.info(self.class) { "Finished in #{min}m #{sec}s" }
     duration
   end

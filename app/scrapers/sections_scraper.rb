@@ -15,17 +15,19 @@ require_relative '../models/courses'
 class SectionsScraper
   include ScraperCommon
 
-  # Parses a given section page
-  # Returns [sections, professors]
+  ##
+  # Parses a given section page.
+  #
   # TODO: Remove semester param, infer from url
   #
   # @param [String] url
   # @param [String] semester
+  #
   # @yieldparam section [Hash] a hash of section data extracted from the page
+  #
   def parse_sections(url, semester)
-    prog_name = 'sections_scraper'
     # Parse with Nokogiri
-    page = get_page url, prog_name
+    page = get_page url
 
     course_divs = page.search('div.course-sections')
 
@@ -35,8 +37,12 @@ class SectionsScraper
       # for each section of the course
       course_div.search('div.section').each do |section|
         # add section to array to add
-        instructors = section.search('span.section-instructors').text.gsub(/\t|\r\n/, '').encode('UTF-8',
-                                                                                                 invalid: :replace).split(',').map(&:strip)
+        instructors = section.search('span.section-instructors')
+                             .text
+                             .gsub(/\t|\r\n/, '')
+                             .encode('UTF-8', invalid: :replace)
+                             .split(',')
+                             .map(&:strip)
         # NOTE: some courses have weird suffixes (e.g. MSBB99MB, yes thats a real class)
         dept = course_id[0, 4]
 
@@ -91,6 +97,9 @@ class SectionsScraper
   #
   # @return [String] the URL to pass to `parse_sections`
   def make_query(semester, courses)
+    raise ArgumentError, 'bad semester argument' if semester.nil? or !semester.respond_to? :to_s
+    raise ArgumentError, 'courses must be a list' unless courses.respond_to? :join
+
     "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map { |e| e }.join(',')}"
   end
 
