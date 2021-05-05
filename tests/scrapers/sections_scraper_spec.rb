@@ -67,7 +67,7 @@ describe SectionsScraper do
 
         expect(sections).to all include(
           section_id: (a_kind_of String),
-          course_id: (a_kind_of String),
+          course_id: a_course_id,
           number: (a_kind_of String),
           instructors: (a_kind_of Array) & (all a_kind_of String),
           seats: (a_kind_of String),

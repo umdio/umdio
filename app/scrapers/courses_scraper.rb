@@ -136,20 +136,29 @@ class CoursesScraper
     }]
   end
 
-  def scrape_department_page(url)
+  def scrape_department_page(url, bar = nil)
       raise ArgumentError, 'no block' unless block_given?
 
       dept_id = url.split('/soc/')[1][7, 10]
       semester = url.split('/soc/')[1][0, 6]
 
-      log(bar, :debug) { "Getting courses for #{dept_id} (#{semester})" }
+      if bar
+        log(bar, :debug) { "Getting courses for #{dept_id} (#{semester})" }
+      else
+        logger.debug { "Getting courses for #{dept_id} (#{semester})" }
+      end
 
       # TODO: replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
       # options thingy
       begin
         page = Nokogiri::HTML(URI.open(url), nil, 'UTF-8')
       rescue OpenURI::HTTPError => e
-        log(bar, :error) { "Failed to get department page at '#{url}': #{e.message}" }
+        if bar
+          log(bar, :error) { "Failed to get department page at '#{url}': #{e.message}" }
+        else
+          logger.error { "Failed to get department page at '#{url}': #{e.message}" }
+        end
+
         raise $!
       end
 
@@ -189,7 +198,7 @@ class CoursesScraper
 
     # add the courses from each department to the database
     dept_urls.each do |url|
-      scrape_department_page(url) do |course|
+      scrape_department_page(url, bar) do |course|
         $DB[:courses].insert_ignore.insert(
           course_id: course[:course_id],
           semester: course[:semester],

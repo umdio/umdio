@@ -58,12 +58,12 @@ describe CoursesScraper do
     end
   end
 
-  describe '#get_dept_urls' do
+  describe '#get_department_urls' do
 
     let :urls do
       allow(@scraper).to receive(:semesters) { ['201801'] }
       allow(@scraper).to receive(:get_progress_bar) { double('progress bar').as_null_object }
-      @scraper.get_dept_urls
+      @scraper.get_department_urls
     end
 
 

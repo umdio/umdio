@@ -1,5 +1,4 @@
 require_relative '../../spec_helper'
-require_relative 'courses_spec_helper'
 # TODO: make sorting spec
 
 describe 'Pagination v1', :endpoint, :courses do

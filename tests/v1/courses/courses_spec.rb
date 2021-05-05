@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../../spec_helper'
-require_relative 'courses_spec_helper'
 
 def build_url1(u)
   "/v1/courses#{u}semester=201808"
