@@ -10,6 +10,7 @@ require_relative '../models/courses'
 class CoursesScraper
   include ScraperCommon
 
+  ##
   # List of semesters being parsed
   #
   # @return [Array<String>]
@@ -18,16 +19,19 @@ class CoursesScraper
   end
 
   ##
-  # safely formats to UTF-8
+  # Sanitizes a string guaranteeing it has a valid encoding and removing invalid
+  # characters.
   #
-  # @param [String] text
-  # @return [String]
+  # @param [String] text the string to sanitize
+  #
+  # @return [String] the sanitized string
   #
   def utf_safe(text)
     text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '') unless text.valid_encoding?
     text
   end
 
+  ##
   # Get the urls for all the department pages
   #
   # @return [Array<String>]
@@ -135,6 +139,15 @@ class CoursesScraper
     }]
   end
 
+  ##
+  # Scrapes courses from department pages. Each course found is yielded as a
+  # hash.
+  #
+  # @param [String] url the URL of the department page being scraped
+  # @param [ProgressBar, Nil] bar the progress bar currently in use, if applicable
+  #
+  # @yieldparam [Hash] course a course hash scraped from the department page
+  #
   def scrape_department_page(url, bar = nil)
     raise ArgumentError, 'no block' unless block_given?
 

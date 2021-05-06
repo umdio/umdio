@@ -20,8 +20,8 @@ class SectionsScraper
   #
   # TODO: Remove semester param, infer from url
   #
-  # @param [String] url
-  # @param [String] semester
+  # @param [String] url       URL of the section page
+  # @param [String] semester  The semester the sections occur during.
   #
   # @yieldparam section [Hash] a hash of section data extracted from the page
   #
@@ -54,6 +54,10 @@ class SectionsScraper
             professor_name = x.squeeze(' ')
             profs << professor_name
           end
+        end
+
+        if !profs[0].nil? && profs[0].length > 40
+          log(@bar, :warn) { "Found suspect prof name: #{profs[0]}" }
         end
 
         meetings = []
@@ -94,12 +98,14 @@ class SectionsScraper
     end # !each course div
   end
 
+  ##
   # Makes a URL for getting sections for courses
   #
   # @param [String] semester the semester of the courses being queried
   # @param [Array<String | Number>] courses the courses to get (e.g. CMSC351)
   #
   # @return [String] the URL to pass to `parse_sections`
+  #
   def make_query(semester, courses)
     raise ArgumentError, 'bad semester argument' if semester.nil? or !semester.respond_to? :to_s
     raise ArgumentError, 'courses must be a list' unless courses.respond_to? :join
@@ -107,8 +113,13 @@ class SectionsScraper
     "https://app.testudo.umd.edu/soc/#{semester}/sections?courseIds=#{courses.map { |e| e }.join(',')}"
   end
 
-  # @param [Array<String>] semesters
+  ##
+  # Gets section data for known courses.
+  #
+  # @param [Array<String>] semesters the semesters to get section information for
+  #
   # @yieldparam section [Hash] a hash of section data extracted from the page
+  #
   def get_sections(semesters, &block)
     raise 'No block provided for get_sections' unless block_given?
 
