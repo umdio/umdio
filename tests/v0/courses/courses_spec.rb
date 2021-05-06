@@ -221,14 +221,57 @@ describe 'Courses Endpoint v0' do
     let(:res) { JSON.parse(last_response.body) }
 
     pending 'broken'
-    include_examples 'good status', (build_url '/courses/list?')
+    include_examples 'good status', (build_url '/list?')
 
     it 'returns a list of minified courses' do
       expect(res).to be_a Array
       expect(res).to all include(
-        course_id: be_a_course_id,
-        name: (a_kind_of String)
+        'course_id' => be_a_course_id,
+        'name' => (a_kind_of String)
       )
+    end
+  end
+
+  describe 'GET /courses/semesters' do
+    let(:res) { JSON.parse(last_response.body) }
+
+    include_examples 'good status', '/v0/courses/semesters'
+
+    it 'returns a list of semester numbers' do
+      pending 'OpenAPI spec says this returns a list of strings, but this actually returns a list of integers'
+      expect(res).to be_an Array
+      expect(res).not_to be_empty
+      expect(res).to all be a_string_matching(/\d{6}/)
+    end
+  end
+
+  describe 'GET /courses/departments' do
+    let(:res) { JSON.parse(last_response.body) }
+
+    include_examples 'good status', '/v0/courses/departments'
+
+    it 'returns a list of department objects' do
+      expect(res).to be_an Array
+      expect(res).not_to be_empty
+      expect(res).to all include(
+        'dept_id' => a_string_matching(/[A-Z]{4}/),
+        'department' => (a_kind_of String)
+      )
+    end
+
+    [
+      ['GVPT', 'Government and Politics'],
+      ['ENEE', 'Electrical & Computer Engineering'],
+      ['ARTH', 'Art History & Archaeology']
+    ].each do |test_case|
+      dept_id, dept_name = test_case
+
+      it "includes #{dept_id}: #{dept_name}" do
+        expect(res).to include(
+          'dept_id' => (a_string_matching dept_id),
+          'department' => (a_string_matching dept_name)
+        )
+      end
     end
   end
 end

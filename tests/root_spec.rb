@@ -23,7 +23,18 @@ describe 'umdio API', :endpoint do
     it_has_behavior 'good status', (url + 'v1')
 
     describe 'spec.yaml' do
-      include_examples 'good status', (url + 'v1/spec.yaml')
+      
+      before { get (url + 'v1/spec.yaml') }
+
+      it 'has a good response' do
+        expect(last_response.status).to be == 200
+        expect(last_response.body.length).to be > 1
+      end
+
+
+      it 'sets the "Content-Type" header to "application/yaml"' do
+        expect(last_response.headers['Content-Type']).to match(%r{^application/yaml})
+      end
 
       it 'is a valid OpenAPI spec' do
         expect(valid_openapi?(last_response.body)).to be_truthy
