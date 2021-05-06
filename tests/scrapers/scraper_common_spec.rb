@@ -38,6 +38,7 @@ describe ScraperCommon, :scraper, :util do
                                 201901 201905 201908 201912
                                 202001 202005 202008 202012])
       end
+
       it 'contains only strings' do
         expect(actual).to all be_a String
       end

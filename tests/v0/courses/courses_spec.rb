@@ -10,14 +10,120 @@ end
 describe 'Courses Endpoint v0' do
   describe 'Listing courses' do
     describe 'GET /courses' do
-      before { get(build_url('?')) }
-      it_has_behavior 'good status', (build_url '?')
+      let(:res) { JSON.parse(last_response.body) }
+
+      include_examples 'good status', (build_url '?')
+
       it 'returns a list of courses' do
-        res = JSON.parse(last_response.body)
         course_keys = %w[course_id name dept_id credits sections]
         keys_len    = course_keys.length
         res.each do |r|
           expect((r.keys & course_keys).length).to be keys_len
+        end
+      end
+
+      context 'returns a payload' do
+        it 'which is an array' do
+          expect(res).to be_a_kind_of Array
+        end
+
+        context 'where each course element contains the field' do
+          context 'course_id which' do
+            it 'is a string and a course id' do
+              expect(res).to all include('course_id' => (a_kind_of String) & (be_a_course_id))
+            end
+          end
+
+          context 'core which' do
+            it 'is a string array' do
+              expect(res).to all include('core' => (all a_kind_of String))
+            end
+          end
+
+          context 'semester which' do
+            it 'is an integer' do
+              pending 'Schema says this is a number, but a string is returned'
+              expect(res).to all include('semester' => (a_kind_of Integer))
+            end
+
+            it 'is in YYYYMM format' do
+              res.each do |course|
+                expect(course['semester'].to_s).to match_regex(/^[0-9]{6}$/)
+              end
+            end
+          end
+
+          context 'name which' do
+            it 'is a string' do
+              expect(res).to all include('name' => (a_kind_of String))
+            end
+          end
+
+          context 'dept_id which' do
+            it 'is a string' do
+              expect(res).to all include('dept_id' => (a_kind_of String))
+            end
+          end
+
+          context 'department which' do
+            it 'is a string' do
+              expect(res).to all include('department' => (a_kind_of String))
+            end
+          end
+
+          context 'credits which' do
+            it 'is a string' do
+              expect(res).to all include('credits' => (a_kind_of String))
+            end
+          end
+
+          context 'description which' do
+            it 'is a string' do
+              pending 'Some responses dont have descriptions, but this is not reflected in the OpenAPI spec'
+              expect(res).to all include('description' => (a_kind_of String))
+            end
+          end
+
+          context 'grading_method which' do
+            it 'is an array containing "Regular", "Pass-Fail", "Audit", or "Sat-Fail"' do
+              expect(res).to all include(
+                'grading_method' => (a_kind_of Array) & (all(
+                  (a_string_matching 'Regular') |
+                  (a_string_matching 'Pass-Fail') |
+                  (a_string_matching 'Audit') |
+                  (a_string_matching 'Sat-Fail')
+                ))
+              )
+            end
+          end
+
+          context 'gen_ed which' do
+            it 'is a string array' do
+              expect(res).to all include(
+                'gen_ed' => (a_kind_of Array) & (all a_kind_of String)
+              )
+            end
+          end
+
+          context 'core which' do
+            it 'is an array of core requirement strings fufilled by the course' do
+              expect(res).to all include('core' => (a_kind_of Array) & (all a_kind_of String))
+            end
+          end
+
+          context 'relationships which' do
+            it 'exists' do
+              expect(res).to all include('relationships' => a_truthy_value)
+            end
+          end
+
+          context 'sections which' do
+            it 'is an array of full section ids' do
+              expect(res).to all include(
+                'sections' => (all be_a_full_section_id)
+              )
+            end
+          end
         end
       end
     end
@@ -108,6 +214,21 @@ describe 'Courses Endpoint v0' do
       it_has_behavior 'bad status', (build_url '/sections/enes10-0101?')
       it_has_behavior 'bad status', (build_url '/sections/ene100-0101?')
       it_has_behavior 'bad status', (build_url '/sections/enes100-0101,enes102-010?')
+    end
+  end
+
+  describe 'GET /courses/list' do
+    let(:res) { JSON.parse(last_response.body) }
+
+    pending 'broken'
+    include_examples 'good status', (build_url '/courses/list?')
+
+    it 'returns a list of minified courses' do
+      expect(res).to be_a Array
+      expect(res).to all include(
+        course_id: be_a_course_id,
+        name: (a_kind_of String)
+      )
     end
   end
 end

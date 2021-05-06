@@ -37,6 +37,7 @@ class SectionsScraper
       # for each section of the course
       course_div.search('div.section').each do |section|
         # add section to array to add
+        # @type [Array<String>]
         instructors = section.search('span.section-instructors')
                              .text
                              .gsub(/\t|\r\n/, '')
@@ -71,9 +72,12 @@ class SectionsScraper
             classtype: meeting.search('span.class-type').text || 'Lecture'
           }
         end
+
         number = section.search('span.section-id').text.gsub(/\s/, '')
         open_seats = section.search('span.open-seats-count').text
         waitlist = section.search('span.waitlist-count').text
+
+        log(@bar, :debug) { "Adding #{course_id}-#{number} in #{semester} taught by #{profs.join(', ')}" }
         section_data = {
           section_id: "#{course_id}-#{number}",
           course_id: course_id,
@@ -86,8 +90,8 @@ class SectionsScraper
           waitlist: waitlist
         }
         yield section_data
-      end
-    end
+      end # !each course section
+    end # !each course div
   end
 
   # Makes a URL for getting sections for courses
@@ -147,7 +151,7 @@ class SectionsScraper
                                semester: section[:semester]).first
 
       section[:meetings].each do |meeting|
-        log(@bar, :debug) { "Inserting meeting: #{meeting}"}
+        log(@bar, :debug) { "Inserting meeting: #{meeting}" }
         $DB[:meetings].insert_ignore.insert(
           section_key: s[:section_id],
           days: meeting[:days],
@@ -162,7 +166,7 @@ class SectionsScraper
       end
 
       section[:instructors].each do |prof|
-        log(@bar, :debug) { "Inserting instructor #{prof}"}
+        log(@bar, :debug) { "Inserting instructor #{prof}" }
         $DB[:professors].insert_ignore.insert(
           name: prof
         )

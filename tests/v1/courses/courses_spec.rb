@@ -9,11 +9,9 @@ end
 describe 'Courses Endpoint v1', :endpoint, :courses do
   describe 'Listing courses' do
     describe 'GET /courses' do
-      before { get(build_url1('?')) }
-
       let(:res) { JSON.parse(last_response.body) }
 
-      it_has_behavior 'good status', (build_url1 '?')
+      include_examples 'good status', (build_url1 '?')
 
       it 'returns a list of courses' do
         course_keys = %w[course_id name dept_id credits sections]
@@ -142,6 +140,7 @@ describe 'Courses Endpoint v1', :endpoint, :courses do
     # TODO: beware of variable shadowing
     shared_examples_for 'gets enes100' do |_url|
       before { get(build_url1('/ENES100?')) }
+
       it 'returns enes100 course object' do
         course = JSON.parse(last_response.body)
         expect(course[0]['course_id']).to eq 'ENES100'
@@ -223,6 +222,21 @@ describe 'Courses Endpoint v1', :endpoint, :courses do
       it_has_behavior 'bad status', (build_url1 '/sections/enes10-0101?')
       it_has_behavior 'bad status', (build_url1 '/sections/ene100-0101?')
       it_has_behavior 'bad status', (build_url1 '/sections/enes100-0101,enes102-010?')
+    end
+  end
+
+  describe 'GET /courses/list' do
+    let(:res) { JSON.parse(last_response.body) }
+    pending 'broken'
+
+    include_examples 'good status', (build_url1 '/courses/list?')
+
+    it 'returns a list of minified courses' do
+      expect(res).to be_a Array
+      expect(res).to all include(
+        course_id: be_a_course_id,
+        name: (a_kind_of String)
+      )
     end
   end
 end

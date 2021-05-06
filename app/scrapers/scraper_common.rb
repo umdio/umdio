@@ -31,20 +31,31 @@ module ScraperCommon
     end
   end
 
+  ##
   # For logging messages while a `ProgressBar` is in use. Bar is cleared and
   # reset to prevent the logged message from breaking the bar.
   #
-  # @param [ProgressBar] bar the progress bar in progress
-  # @param [Symbol] level the log level to use. Defaults to `Logger::INFO`
+  # @param [ProgressBar]    bar     the progress bar in progress
+  # @param [String, Symbol] level   the log level to use. Defaults to `Logger::INFO`
+  # @param [Hash]           opts    options hash
+  #
+  # @option opts [ProgressBar]    :bar        alternative to `bar` parameter. Not used if `bar` is already provided.
+  # @option opts [String, Symbol] :level      alternative to `level` parameter. Not used if `level` is already provided.
+  # @option opts [#to_s]          :progname   specify program name label. Defaults to the current class
   #
   # @return [void]
-  def log(bar, level = :info, &block)
+  #
+  def log(bar = nil, level = :info, opts = {}, & block)
     raise ArgumentError, 'No block provided' unless block_given?
     raise ArgumentError, "Invalid level '#{level}'" unless logger.respond_to? level.to_s
 
-    bar.clear
-    @logger.public_send(level.to_s, self.class, &block)
-    bar.refresh(force: true) unless bar.stopped?
+    bar ||= opts[:bar]
+    level ||= opts[:level]
+    progname = opts[:progname] || self.class
+
+    bar&.clear
+    @logger.public_send(level.to_s, progname, &block)
+    bar.refresh(force: true) unless bar.nil? || bar.stopped?
     nil
   end
 
@@ -100,6 +111,8 @@ module ScraperCommon
       retries ||= 0
       page = Nokogiri::HTML(URI.open(url))
     rescue OpenURI::HTTPError => e
+
+      # Attempt to get page again, but wait a little bit between retries
       if retries < MAX_RETRIES
         code, message = e.io.status || []
         logger.warn(prog_name) { "Failed to load #{url}: Page responded with #{code || 'an unknown status'}. Retrying..." }
@@ -122,9 +135,7 @@ module ScraperCommon
   #
   # @return [Float] how long scraping took, in seconds.
   def run_scraper(...)
-    unless respond_to? :scrape
-      raise StandardError, "Failed to run scraper #{self.class}: scrape method not implemented."
-    end
+    raise StandardError, "Failed to run scraper #{self.class}: scrape method not implemented." unless respond_to? :scrape
 
     start = Time.now
     scrape(...)

@@ -73,16 +73,15 @@ class CoursesScraper
   # @return [Array(String, {Symbol => String, nil})] An Array containing the courses `description` and `relationship` info hash.
   #
   def scrape_relationships(course)
-
     approved = course.search('div.approved-course-texts-container')
     other = course.search('div.course-texts-container')
 
     # get all relationship text
     text = if approved.css('> div').length > 1
-              approved.css('> div:first-child').text.strip + other.css('> div').text.strip
-            else
-              other.css('> div').text.strip
-            end
+             approved.css('> div:first-child').text.strip + other.css('> div').text.strip
+           else
+             other.css('> div').text.strip
+           end
 
     text = utf_safe text
 
@@ -137,57 +136,50 @@ class CoursesScraper
   end
 
   def scrape_department_page(url, bar = nil)
-      raise ArgumentError, 'no block' unless block_given?
+    raise ArgumentError, 'no block' unless block_given?
 
-      dept_id = url.split('/soc/')[1][7, 10]
-      semester = url.split('/soc/')[1][0, 6]
+    dept_id = url.split('/soc/')[1][7, 10]
+    semester = url.split('/soc/')[1][0, 6]
 
-      if bar
-        log(bar, :debug) { "Getting courses for #{dept_id} (#{semester})" }
-      else
-        logger.debug { "Getting courses for #{dept_id} (#{semester})" }
-      end
+    log(bar, :debug) { "Getting courses for #{dept_id} (#{semester})" }
 
-      # TODO: replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
-      # options thingy
-      begin
-        page = Nokogiri::HTML(URI.open(url), nil, 'UTF-8')
-      rescue OpenURI::HTTPError => e
-        if bar
-          log(bar, :error) { "Failed to get department page at '#{url}': #{e.message}" }
-        else
-          logger.error { "Failed to get department page at '#{url}': #{e.message}" }
-        end
+    # TODO: replace this with ScraperCommon::get_page if we don't need the 'UTF-8'
+    # options thingy
+    begin
+      page = Nokogiri::HTML(URI.open(url), nil, 'UTF-8')
+    rescue OpenURI::HTTPError => e
+      log(bar, :error) { "Failed to get department page at '#{url}': #{e.message}" }
 
-        raise $!
-      end
+      raise $!
+    end
 
-      department = page.search('span.course-prefix-name').text.strip
+    department = page.search('span.course-prefix-name').text.strip
 
-      page.search('div.course').each do |course|
-        course_id = course.search('div.course-id').text
+    page.search('div.course').each do |course|
+      course_id = course.search('div.course-id').text
 
-        # Rejects course ids that are longer than expected
-        next if course_id.length > 8
+      # Rejects course ids that are longer than expected
+      next if course_id.length > 8
 
-        course_title = course.search('span.course-title').text
-        credits = course.search('span.course-min-credits').text
-        description, relationships = scrape_relationships course
+      course_title = course.search('span.course-title').text
+      credits = course.search('span.course-min-credits').text
+      description, relationships = scrape_relationships course
 
-        yield ({
-          course_id: course_id,
-          name: course_title,
-          dept_id: dept_id,
-          department: department,
-          semester: semester,
-          credits: course.css('span.course-min-credits').first.content,
-          grading_method: course.at_css('span.grading-method abbr') ? course.at_css('span.grading-method abbr').attr('title').split(', ') : [],
-          core: utf_safe(course.css('div.core-codes-group').text).gsub(/\s/, '').delete('CORE:').split(','),
-          gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).delete('General Education:'),
-          description: description,
-          relationships: relationships
-        })
-      end
+      log(bar, :debug) { "Scraped #{course_id}: #{course_title} (#{semester})"}
+      yield ({
+        course_id: course_id,
+        name: course_title,
+        dept_id: dept_id,
+        department: department,
+        semester: semester,
+        credits: course.css('span.course-min-credits').first.content,
+        grading_method: course.at_css('span.grading-method abbr') ? course.at_css('span.grading-method abbr').attr('title').split(', ') : [],
+        core: utf_safe(course.css('div.core-codes-group').text).gsub(/\s/, '').delete('CORE:').split(','),
+        gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).delete('General Education:'),
+        description: description,
+        relationships: relationships
+      })
+    end
   end
 
   def scrape
