@@ -36,29 +36,16 @@ class SectionsScraper
       course_id = course_div.attr('id')
       # for each section of the course
       course_div.search('div.section').each do |section|
-        # add section to array to add
-        # @type [Array<String>]
-        instructors = section.search('span.section-instructors')
-                             .text
-                             .gsub(/\t|\r\n/, '')
-                             .encode('UTF-8', invalid: :replace)
-                             .split(',')
-                             .map(&:strip)
         # NOTE: some courses have weird suffixes (e.g. MSBB99MB, yes thats a real class)
         dept = course_id[0, 4]
 
-        # add course and department to professor object for each instructor
-        profs = []
-        instructors.each do |x|
-          if x != 'Instructor: TBA'
-            professor_name = x.squeeze(' ')
-            profs << professor_name
-          end
-        end
-
-        if !profs[0].nil? && profs[0].length > 40
-          log(@bar, :warn) { "Found suspect prof name: #{profs[0]}" }
-        end
+        # Get list of professors teaching the course
+        # @type [Array<String>]
+        profs = section.search('span.section-instructors .section-instructor')
+                       .map { |prof| utf_safe(prof.text).strip }
+                       .filter { |prof| prof != 'Instructor: TBA' }
+                       .map { |prof| prof.gsub(/\t|\r\n/, '').squeeze(' ') }
+                       .uniq
 
         meetings = []
         section.search('div.class-days-container div.row').each do |meeting|
@@ -123,6 +110,11 @@ class SectionsScraper
   def get_sections(semesters, &block)
     raise 'No block provided for get_sections' unless block_given?
 
+    # Total number of sections being processed
+    # @type [Integer]
+    total_sections = $DB[:courses].where(semester: semesters).count
+    @bar = get_progress_bar total: total_sections
+
     semesters.each do |semester|
       $DB[:courses].select(:course_id).where(semester: semester).each_page(200) do |page|
         # @type [Array<String>]
@@ -135,14 +127,7 @@ class SectionsScraper
   end
 
   def scrape
-    # course id accumulator. Flushed each time a sections GET request is made.
-    # @type [Array<Number>]
-    courses = []
     semesters = get_semesters(ARGV)
-    # Total number of sections being processed
-    # @type [Integer]
-    total_sections = $DB[:courses].where(semester: semesters).count
-    @bar = get_progress_bar total: total_sections
 
     # Now, insert all our stuff to the db
     get_sections(semesters) do |section|

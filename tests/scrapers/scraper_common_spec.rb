@@ -224,8 +224,56 @@ describe ScraperCommon, :scraper, :util do
     end
   end
 
+  describe '#utf_safe(text)' do
+    before :all do
+      @text = 'hi, mom!'
+    end
+
+    # let(:actual) { scraper.utf_safe text }
+
+    context 'when given a UTF-8 encoded string' do
+      it 'has no effect' do
+        expect(@text.encoding).to be Encoding::UTF_8
+        expect(common.utf_safe(@text)).to be @text
+      end
+    end
+
+    context 'when given a non-UTF-8 encoded string' do
+      context 'when the encoding is valid' do
+        let(:actual) { common.utf_safe(@text.encode(Encoding::ISO_8859_1)) }
+
+        it 'has no effect' do
+          expect(actual.encoding).to be Encoding::ISO_8859_1
+          expect(actual).to eq @text
+        end
+      end
+
+      context 'when the encoding is not valid' do
+        before :all do
+          @text = "\xc2".force_encoding('UTF-8')
+          expect(@text).not_to be_valid_encoding
+        end
+
+        let(:actual) { common.utf_safe @text }
+
+        it 'result is encoded with UTF-8' do
+          expect(actual.encoding).to be Encoding::UTF_8
+        end
+
+        it 'result has a valid encoding' do
+          expect(actual).to be_valid_encoding
+        end
+
+        it 'replaces invalid characters with the empty string' do
+          expect(actual).to eq ''
+        end
+      end
+    end
+  end
+
   context '#get_progress_bar' do
     let(:bar) { common.get_progress_bar }
+
     it 'returns a progress bar' do
       pending 'ruby does not recognize ProgressBar being imported??'
       expect(bar).to be_an_instance_of ProgressBar

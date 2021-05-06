@@ -53,7 +53,6 @@ describe CoursesScraper do
         it 'replaces invalid characters with the empty string' do
           expect(actual).to eq ''
         end
-
       end
     end
   end
