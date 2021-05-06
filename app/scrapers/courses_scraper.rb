@@ -19,19 +19,6 @@ class CoursesScraper
   end
 
   ##
-  # Sanitizes a string guaranteeing it has a valid encoding and removing invalid
-  # characters.
-  #
-  # @param [String] text the string to sanitize
-  #
-  # @return [String] the sanitized string
-  #
-  def utf_safe(text)
-    text = text.encode('UTF-8', 'binary', invalid: :replace, undef: :replace, replace: '') unless text.valid_encoding?
-    text
-  end
-
-  ##
   # Get the urls for all the department pages
   #
   # @return [Array<String>]
