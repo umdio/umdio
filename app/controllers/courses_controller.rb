@@ -92,7 +92,7 @@ module Sinatra
             end
 
             get '/list' do
-              json(Course.list_sem(request.params['semester'])).map { |c| c.to_v1_info }
+              json(Course.list_sem(request.params['semester']).map { |c| c.to_v1_info })
             end
 
             # Returns section info about particular sections of a course, comma separated
@@ -256,7 +256,7 @@ module Sinatra
           end
 
           app.get '/v0/courses/list' do
-            json(Course.list_sem(request.params['semester'])).map { |c| c.to_v0_info }
+            json(Course.list_sem(request.params['semester']).map { |c| c.to_v0_info })
           end
 
           # Returns section info about particular sections of a course, comma separated
