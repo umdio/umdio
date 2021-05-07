@@ -239,21 +239,22 @@ describe 'Courses Endpoint v1', :endpoint, :courses do
     end
   end
 
-  describe 'GET /courses/semesters' do
-    let(:res) { JSON.parse(last_response.body) }
-
-    include_examples 'good status', '/v1/courses/semesters'
-
-    it 'returns a list of semester numbers' do
-      pending 'OpenAPI spec says this returns a list of strings, but this actually returns a list of integers'
-      expect(res).to be_an Array
-      expect(res).not_to be_empty
-      expect(res).to all be a_string_matching(/\d{6}/)
-    end
-  end
-
   # TODO these tests don't work with test_scrape but do with scrape
 
+  # describe 'GET /courses/semesters' do
+  #   let(:res) { JSON.parse(last_response.body) }
+  #
+  #   include_examples 'good status', '/v1/courses/semesters'
+  #
+  #   it 'returns a list of semester numbers' do
+  #     pending 'OpenAPI spec says this returns a list of strings, but this actually returns a list of integers'
+  #     expect(res).to be_an Array
+  #     expect(res).not_to be_empty
+  #     expect(res).to all be a_string_matching(/\d{6}/)
+  #   end
+  # end
+  #
+  #
   # describe 'GET /courses/departments' do
   #   let(:res) { JSON.parse(last_response.body) }
 
