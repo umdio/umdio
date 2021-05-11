@@ -3,6 +3,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres
+    container_name: postgres_dev
     environment:
       - POSTGRES_DB=umdio
     volumes:
@@ -22,7 +23,10 @@ services:
 
   # UMD.io Server
   umdio:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: umdio_dev
     volumes:
       - ./:/umdio
     ports:
