@@ -4,9 +4,9 @@
 
 require 'open-uri'
 require 'net/http'
+require 'csv'
 
 require_relative 'scraper_common'
-
 require_relative '../models/building'
 
 # Number of buildings to query at a time from Facilities ArcGIS database
@@ -15,17 +15,15 @@ BLDG_QUERY_SIZE = 100
 class MapScraper
   include ScraperCommon
 
-  def url
-    'https://raw.githubusercontent.com/umdio/umdio-data/master/umd-building-gis.json'
-  end
-
   ##
   #
   # @param [String, Integer, Array<String>, Array<Integer>] object_ids
+  #
   # @return [Array<Hash>] list of buildings
   #
   # @see ArcGIS Layer Query Docs:https://developers.arcgis.com/rest/services-reference/enterprise/query-map-service-layer-.htm
   # @see Table HTML view: https://maps.umd.edu/arcgis/rest/services/Layers/CampusMapDefault/MapServer/9
+  #
   def facilities_location_data(object_ids)
     object_ids = object_ids.join(',') if object_ids.is_a? Array
 
@@ -77,13 +75,19 @@ class MapScraper
     }
   end
 
-  def write_map_array(data)
-    bar = get_progress_bar total: data.length
-    data.each do |e|
-      $DB[:buildings].insert_ignore.insert(name: e[:name], code: e[:code], id: e[:number].upcase, long: e[:lng], lat: e[:lat])
-      log(bar, :debug) { "inserted #{e[:name]}" }
-      bar.increment
+  ##
+  # Parses a full Facilities Report CSV
+  def parse_report
+    quote_chars = %w[" | ~ ^ & *]
+    report_csv = './data/umdio-data/facilities/FacilitiesReport-533.csv'
+
+    begin
+      report = CSV.read(report_csv, headers: :first_row, quote_char: quote_chars.shift)
+    rescue CSV::MalformedCSVError
+      quote_chars.empty? ? raise : retry
     end
+
+    report
   end
 
   def scrape
@@ -93,20 +97,25 @@ class MapScraper
     idx = 0
     done = false
     bldg_data = []
+    bar = get_progress_bar total: nil, format: '%t: |%B| (%c - %a)'
 
     until done
-      buildings = facilities_location_data((idx..(idx + BLDG_QUERY_SIZE)).to_a)
+      buildings = facilities_location_data (idx..(idx + BLDG_QUERY_SIZE)).to_a
       done = buildings.empty?
 
       next if done
 
+      log(bar, :debug) { `Inserting building #{bldg}` }
       buildings.each do |bldg|
         $DB[:buildings].insert_ignore.insert(**bldg)
+        bar.increment
       end
 
       idx += BLDG_QUERY_SIZE
 
     end
+
+    bar.finish
   end
 end
 
