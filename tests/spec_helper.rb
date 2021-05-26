@@ -11,8 +11,10 @@ require 'json'
 ENV['RACK_ENV'] = 'test'
 
 require_relative File.join('..', 'server')
+require_relative 'matchers/bus_matcher'
+require_relative 'matchers/helper_matcher'
 
- # parallel specs
+# parallel specs
 if ENV['TEST_ENV_NUMBER']
   # Wait until all threads finish to collect coverage report
   SimpleCov.at_exit do
@@ -20,25 +22,17 @@ if ENV['TEST_ENV_NUMBER']
     result.format! if ParallelTests.number_of_running_processes <= 1
   end
 end
-module BusMatchers
-  extend RSpec::Matchers::DSL
-
-  matcher :be_a_bus_route do
-    match { |actual| actual.is_a?(Hash) and actual['route_id'].is_a?(String) and actual['title'].is_a?(String) }
-  end
-end
 
 RSpec.configure do |config|
   include Rack::Test::Methods
   include BusMatchers
+  include HelperMatchers
 
   config.alias_it_should_behave_like_to :it_has_behavior, 'has behavior:'
   config.color = true
 
   # mute noise for parallel tests
-  if ENV['TEST_ENV_NUMBER']
-    config.silence_filter_announcements = true
-  end
+  config.silence_filter_announcements = true if ENV['TEST_ENV_NUMBER']
 
   shared_examples_for 'good status' do |url|
     before { get url }

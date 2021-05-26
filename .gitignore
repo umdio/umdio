@@ -17,6 +17,7 @@ mime.types
 .DS_Store
 .vagrant
 *.log
+.yardoc
 
 # editor configurations
 .idea/
