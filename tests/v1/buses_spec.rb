@@ -66,8 +66,30 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
 
   describe 'get /routes/:route_id/arrivals/:stop_id' do
     context 'when both the route and stop are valid' do
-      # FIXME(don): endpoint is broken, returns 'Bus Service Unavailable'
-      # it_has_behavior 'good status', url + "/routes/#{route_id}/arrivals/#{first_stop}"
+      let(:res) { JSON.parse(last_response.body) }
+
+      include_examples 'good status', url + "/routes/#{route_id}/arrivals/#{first_stop}"
+
+      it 'returns a hash' do
+        expect(res).to be_a Hash
+      end
+
+      it 'matches the correct shape' do
+        expect(res).to include(
+          'copyright' => (a_kind_of String),
+          'predictions' => include(
+            'routeTag' => route_id,
+            'stopTag' => first_stop,
+            'routeTitle' => (a_kind_of String),
+            'agencyTitle' => (a_kind_of String),
+            'dirTitleBecauseNoPredictions' => (a_kind_of String),
+            'message' => (a_kind_of Array).and(all(include(
+                                                     'text' => (a_kind_of String),
+                                                     'priority' => (a_kind_of String)
+                                                   )))
+          )
+        )
+      end
     end
 
     context 'when either the route and/or stop are malformed or invalid' do
@@ -79,12 +101,25 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
   end
 
   describe 'get /routes/:route_id/locations' do
-    it_has_behavior 'error status', url + "/routes/#{route_id}/locations"
+    it_has_behavior 'good status', url + "/routes/#{route_id}/locations"
     it_has_behavior 'bad status', url + '/routes/NOTAROUTE/locations'
   end
 
   describe 'get /locations' do
-    it_has_behavior 'error status', url + '/locations'
+    let(:res) { JSON.parse(last_response.body) }
+
+    include_examples 'good status', url + '/locations'
+
+    it 'returns a Hash' do
+      expect(res).to be_a Hash
+    end
+
+    it 'matches the expected shape' do
+      expect(res).to include(
+        'lastTime' => (a_kind_of Hash).and(include 'time' => match(/^\d+$/)),
+        'copyright' => (a_kind_of String)
+      )
+    end
   end
 
   describe 'get /stops' do
@@ -94,7 +129,7 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
 
     it 'returns a non-empty list' do
       expect(res).to be_an Array
-      expect(res).to_not be_empty
+      expect(res).not_to be_empty
     end
 
     it 'stop data matches the expected shape' do
