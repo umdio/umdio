@@ -65,11 +65,17 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
   end
 
   describe 'get /routes/:route_id/arrivals/:stop_id' do
-    # TODO: Change to good
-    it_has_behavior 'bad status', url + "/routes/#{route_id}/#{first_stop}"
-    it_has_behavior 'bad status', url + "/routes/#{route_id}/arrivals"
-    it_has_behavior 'bad status', url + "/routes/#{route_id}/arrivals/NOTASTOP"
-    it_has_behavior 'bad status', url + '/routes/NOTAROUTE/arrivals/NOTASTOP'
+    context 'when both the route and stop are valid' do
+      # FIXME(don): endpoint is broken, returns 'Bus Service Unavailable'
+      # it_has_behavior 'good status', url + "/routes/#{route_id}/arrivals/#{first_stop}"
+    end
+
+    context 'when either the route and/or stop are malformed or invalid' do
+      it_has_behavior 'bad status', url + "/routes/#{route_id}/#{first_stop}"
+      it_has_behavior 'bad status', url + "/routes/#{route_id}/arrivals"
+      it_has_behavior 'bad status', url + "/routes/#{route_id}/arrivals/NOTASTOP"
+      it_has_behavior 'bad status', url + '/routes/NOTAROUTE/arrivals/NOTASTOP'
+    end
   end
 
   describe 'get /routes/:route_id/locations' do
