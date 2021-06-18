@@ -34,6 +34,7 @@ RSpec.configure do |config|
   # mute noise for parallel tests
   config.silence_filter_announcements = true if ENV['TEST_ENV_NUMBER']
 
+  # https://relishapp.com/rspec/rspec-core/docs/example-groups/shared-examples
   shared_examples_for 'good status' do |url|
     before { get url }
     it 'has a good response' do
