@@ -79,12 +79,12 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
   end
 
   describe 'get /routes/:route_id/locations' do
-    it_has_behavior 'error status', url + "/routes/#{route_id}/locations"
+    it_has_behavior 'good status', url + "/routes/#{route_id}/locations"
     it_has_behavior 'bad status', url + '/routes/NOTAROUTE/locations'
   end
 
   describe 'get /locations' do
-    it_has_behavior 'error status', url + '/locations'
+    it_has_behavior 'good status', url + '/locations'
   end
 
   describe 'get /stops' do
