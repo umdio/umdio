@@ -67,6 +67,10 @@ def scrape_map(args = '')
   sh "ruby app/scrapers/map_scraper.rb #{args}"
 end
 
+def export_courses(args)
+  sh "ruby app/export/courses.rb #{args}"
+end
+
 ################################################################################
 #################################### TASKS #####################################
 ################################################################################
@@ -93,7 +97,13 @@ namespace :import do
   end
 end
 
-# TODO: Add export - see https://github.com/umdio/umdio-data/blob/master/courses/download-sem.rb
+################################### Exports ####################################
+namespace :export do
+  desc 'Export specified semesters'
+  task :semester, [:sem] do |_task, args|
+    export_courses([args[:sem]])
+  end
+end
 
 ################################### Scraping ###################################
 desc 'Scrape live data to fill databases'

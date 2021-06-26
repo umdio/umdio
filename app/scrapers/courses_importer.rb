@@ -1,4 +1,5 @@
 # Imports course data from a JSON file
+# TODO: Update to use V1 schema
 
 require 'json'
 require_relative 'scraper_common.rb'
