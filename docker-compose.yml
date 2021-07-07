@@ -13,11 +13,14 @@ services:
   # UMD.io Server
   umdio:
     build: .
+    environment:
+      APP_ENV: production
+      RACK_ENV: production
     volumes:
       - ./:/umdio
     ports:
       - 3000:3000
     depends_on:
       - postgres
-    command: bundle exec rake up
+    command: bundle exec rake prod
     restart: always

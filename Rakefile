@@ -200,13 +200,14 @@ end
 #################################### Server ####################################
 desc 'Start the web server for dev'
 task :up do
-  system 'shotgun -p 3000 -o 0.0.0.0'
+  # system 'shotgun -p 3000 -o 0.0.0.0'
+  system 'rerun --background -- rackup --port 3000 -o 0.0.0.0 config.ru'
 end
 task server: :up
 
 desc 'Start the web server for prod'
 task :prod do
-  system 'puma -p 3000'
+  system 'puma -p 3000 config.ru'
 end
 
 desc 'Sinatra console'

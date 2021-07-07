@@ -25,6 +25,14 @@ class UMDIO < Sinatra::Base
     enable :cross_origin
   end
 
+  configure :development do
+    use BetterErrors::Middleware
+    BetterErrors.application_root = __dir__
+    BetterErrors::Middleware.allow_ip! '172.0.0.0/8'
+    BetterErrors::Middleware.allow_ip! '192.168.0.0/16'
+    # BetterErrors::Middleware.allow_ip! '172.28.0.1'
+  end
+
   # before application/request starts
   before do
     content_type 'application/json'

@@ -15,7 +15,7 @@ gem 'sinatra-param', '~> 1.6'
 group :development do
   gem 'better_errors'
   gem 'rspec'
-  gem 'shotgun'
+  gem 'rerun', '~> 0.13.1'
   gem 'solargraph'
   gem 'debase'
   gem 'ruby-debug-ide', require: false
