@@ -41,7 +41,7 @@ describe SectionsScraper do
     },
     {
       courses: %w[MATH403 BMGT289B],
-      semester: '202001'
+      semester: '202201'
     }
   ].each do |test|
     semester = test[:semester]
