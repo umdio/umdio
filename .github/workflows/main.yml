@@ -46,6 +46,6 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           verbose: true
-          # directory: ./coverage/
+          directory: ./coverage/
           name: codecov-umbrella
           fail_ci_if_error: false
