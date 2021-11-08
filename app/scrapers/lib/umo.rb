@@ -41,6 +41,7 @@ module UMO
       route['lonMin'] = route['lonMin'].to_f
       route['lonMax'] = route['lonMax'].to_f
 
+      # Clean up stop list
       route['stop'].each do |stop|
         stop['lat'] = stop['lat'].to_f
         stop['lon'] = stop['lon'].to_f
@@ -48,26 +49,56 @@ module UMO
         stop['stopId'] = stop['stopId'].to_i
       end
 
+      # Clean up direction list
       route['direction'] = [route['direction']] unless route['direction'].is_a? Array
-      route['direction'].each do |_direction|
-        next if route['stop'].is_a? Array
+      route['direction'].each do |direction|
+        next if direction['stop'].is_a? Array
 
-        route['stop'] = if route['stop'].nil?
-                          []
-                        else [route['stop']]
-                        end
+        direction['stop'] = if direction['stop'].nil?
+                              []
+                            else [direction['stop']]
+                            end
+
         # route['stop'] = [route] unless
+      end
+
+      # Clean up path list
+      route['path'] ||= []
+      route['path'].each do |path|
+        path['point'].each do |point|
+          point['lat'] = point['lat'].to_f
+          point['lon'] = point['lon'].to_f
+        end
       end
     end
   end
 
   def self.get_schedule(route)
-    raise 'No bus route provided' if route.is_nil?
+    raise ArgumentError, 'No bus route provided' if route.nil?
 
     route = route.to_s if route.is_a? Integer
-    raise 'Invalid bus route' unless route.is_a? String
+    raise ArgumentError, 'Invalid bus route' unless route.is_a? String
 
-    res = api :get, command: 'schedule', r: route
+    res = api command: 'schedule', r: route
+    routes = res['route']
+
+    routes.each do |route|
+      stop = route['header']['stop']
+      route['header']['stop'] = [stop] unless stop.is_a? Array
+
+
+      route['tr'].each do |block|
+        block['blockID'] = block['blockID'].to_i
+
+        block['stop'] = [block['stop']] unless block['stop'].is_a? Array
+        block['stop'].each do |block_stop|
+          raise "Block stop #{block_stop} is not a hash"  unless block_stop.is_a? Hash
+          block_stop['epochTime'] = block_stop['epochTime'].to_i
+        end
+      end
+    end
+
+    routes
   end
 
   ##

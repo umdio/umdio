@@ -16,18 +16,20 @@ class BusRoutesScraper
     # address = apiRoot + '&command=routeList&t=0'
     # response_hash = JSON.parse(Net::HTTP.get(URI(address)).to_s)
     # route_array = response_hash['route'].map { |e| { route_id: e['tag'], title: e['title'] } }
-    # bar = get_progress_bar total: route_array.length
+    # bar = get_progress_bar title: "#{self.class} - Scraping Courses", total: dept_count
 
     # @type [Array<Hash>]
-    route_array = UMO.get_routes.map { |e| { route_id: e['tag'], title: e['title'], shortTitle: e['shortTitle'] } } 
+    route_array = UMO.get_routes.map { |e| { route_id: e['tag'], title: e['title'], shortTitle: e['shortTitle'] } }
+    bar = get_progress_bar total: route_array.length
 
     route_array&.each do |route|
       log(bar, :debug) { "getting #{route[:route_id]}" }
-      address = apiRoot + "&command=routeConfig&r=#{route[:route_id]}"
+      # address = apiRoot + "&command=routeConfig&r=#{route[:route_id]}"
       begin
-        route_response = JSON.parse(Net::HTTP.get(URI(address)).to_s)['route']
+        # route_response = JSON.parse(Net::HTTP.get(URI(address)).to_s)['route']
+        route_response = UMO.get_route_config(route[:route_id])
       rescue JSON::ParserError
-        log(bar, :warn) { 'Failed to parse JSON. Retrying...'}
+        log(bar, :warn) { 'Failed to parse JSON. Retrying...' }
         retry
       end
       stops = []

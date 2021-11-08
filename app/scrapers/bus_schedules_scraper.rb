@@ -7,18 +7,20 @@ require 'json'
 
 require_relative 'scraper_common'
 require_relative '../models/bus'
+require_relative 'lib/umo'
 
 class BusSchedulesScraper
   include ScraperCommon
 
   def scrape
     routes = Route.all.map { |r| r.route_id }
-    address = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule'
+    # address = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd&command=schedule'
     bar = get_progress_bar total: routes.length
 
     routes.each do |route|
       begin
-        page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
+        # page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
+        page = UMO.get_schedule route
       rescue JSON::ParserError
         log(bar, :warn) { 'Failed to parse JSON. Retrying...'}
         retry
