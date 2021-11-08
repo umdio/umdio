@@ -37,7 +37,7 @@ jobs:
         run: docker-compose exec -T -e CI=true umdio bundle exec rake test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
 
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
