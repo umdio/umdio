@@ -36,11 +36,12 @@ jobs:
       - name: Run tests
         run: docker-compose exec -T -e CI=true umdio bundle exec rake test
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v2
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v2
 
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-          # directory: ./coverage/
-          name: codecov-umbrella
+      #   with:
+      #     token: ${{ secrets.CODECOV_TOKEN }}
+      #     verbose: true
+      #     # directory: ./coverage/
+      #     name: codecov-umbrella
+      #     fail_ci_if_error: false
