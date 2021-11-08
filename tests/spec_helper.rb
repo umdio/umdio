@@ -1,10 +1,12 @@
 require 'simplecov'
+require 'simplecov-cobertura'
 SimpleCov.start
+SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 
-if ENV['CI'] == 'true'
-  require 'codecov'
-  SimpleCov.formatter = SimpleCov::Formatter::Codecov
-end
+# if ENV['CI'] == 'true'
+  # require 'codecov'
+  # SimpleCov.formatter = SimpleCov::Formatter::Codecov
+# end
 
 require 'json'
 

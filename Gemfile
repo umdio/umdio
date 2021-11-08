@@ -28,7 +28,6 @@ end
 group :test do
   gem 'rack-test', require: 'rack/test'
   gem 'simplecov', require: false
-  gem 'codecov', :require => false, :group => :test
 end
 
 group :development, :test do
@@ -41,3 +40,5 @@ group :scrape do
   gem 'nokogiri'
   gem 'ruby-progressbar'
 end
+
+gem "simplecov-cobertura", "~> 1.4", :group => :test
