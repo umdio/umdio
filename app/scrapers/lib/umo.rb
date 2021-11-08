@@ -29,10 +29,12 @@ module UMO
     end
   end
 
-  def self.get_route_config(route = nil)
-    query_params = { command: 'routeConfig', a: @agency }
-    query_params[:route] = route if route
-    res = api query_params
+  ##
+  # @return [Array<Hash>] a list of bus route configs.
+  def self.list_route_configs()
+    # query_params = { command: 'routeConfig', a: @agency }
+    # query_params[:r] = route if route
+    res = api command: 'routeConfig', a: @agency
     routes = res['route']
     routes.each do |route|
       route['shortTitle'] = nil unless route.key? 'shortTitle'
@@ -73,6 +75,57 @@ module UMO
     end
   end
 
+  ##
+  # @return [Hash] a bus route config for a single route
+  def self.get_route_config(route)
+    raise TypeError, 'route cannot be nil' if route.nil?
+    route = route.to_s if route.is_a? Symbol or route.is_a? Integer
+    raise TypeError, "route #{route} is not a valid route" unless route.is_a? String
+
+    res = api command: 'routeConfig', a: @agency, r: route
+    route = res['route']
+
+    route['shortTitle'] = nil unless route.key? 'shortTitle'
+    route['latMin'] = route['latMin'].to_f
+    route['latMax'] = route['latMax'].to_f
+    route['lonMin'] = route['lonMin'].to_f
+    route['lonMax'] = route['lonMax'].to_f
+
+    # Clean up stop list
+    route['stop'].each do |stop|
+      stop['lat'] = stop['lat'].to_f
+      stop['lon'] = stop['lon'].to_f
+      stop['shortTitle'] = nil unless stop.key? 'shortTitle'
+      stop['stopId'] = stop['stopId'].to_i
+    end
+
+    # Clean up direction list
+    route['direction'] = [route['direction']] unless route['direction'].is_a? Array
+    route['direction'].each do |direction|
+      next if direction['stop'].is_a? Array
+
+      direction['stop'] = if direction['stop'].nil?
+                            []
+                          else [direction['stop']]
+                          end
+
+      # route['stop'] = [route] unless
+    end
+
+    # Clean up path list
+    route['path'] ||= []
+    route['path'].each do |path|
+      path['point'].each do |point|
+        point['lat'] = point['lat'].to_f
+        point['lon'] = point['lon'].to_f
+      end
+    end
+
+    route
+  end
+
+  ##
+  # @return [Array<Hash>] a list of bus schedules.
   def self.get_schedule(route)
     raise ArgumentError, 'No bus route provided' if route.nil?
 
@@ -129,7 +182,6 @@ module UMO
   def self.api(query_params = {})
     # raise NoMethodError, "Invalid HTTP method #{method}" unless Net::HTTP.respond_to?(method)
     _url = url(query_params)
-    puts _url
 
     # @type [Net::HTTPResponse]
     res = Net::HTTP.get_response(_url)

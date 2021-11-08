@@ -22,13 +22,14 @@ class BusSchedulesScraper
         # page = JSON.parse(Net::HTTP.get(URI(address + "&r=#{route}")))
         page = UMO.get_schedule route
       rescue JSON::ParserError
-        log(bar, :warn) { 'Failed to parse JSON. Retrying...'}
+        log(bar, :warn) { 'Failed to parse JSON. Retrying...' }
         retry
       end
-      next unless page['route']
+      raise TypeError, "Schedule page #{page} is not an array" unless page.is_a? Array
 
-      sch = page['route']
-      sch.each do |service|
+      page.each do |service|
+        raise TypeError, "Service #{service} is not a hash" unless service.is_a? Hash
+
         days = service['serviceClass']
         direction = service['direction']
         schedule_class = service['scheduleClass']
@@ -36,6 +37,8 @@ class BusSchedulesScraper
         header = service['header']
         if header['stop'].is_a?(Array)
           header['stop'].each do |stop|
+            raise "Stop #{stop} should be a hash" unless stop.is_a? Hash
+
             stops << { stop_id: stop['tag'], name: stop['content'] }
           end
         else

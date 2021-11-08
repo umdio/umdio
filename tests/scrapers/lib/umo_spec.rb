@@ -21,86 +21,35 @@ describe UMO do
     end
   end
 
-  describe 'get_route_config()' do
+  describe 'list_route_configs()' do
     subject { routes }
 
-    let(:routes) { UMO.get_route_config }
+    let(:routes) { UMO.list_route_configs }
 
     it { is_expected.to be_an Array }
     it { is_expected.not_to be_empty }
+    it { is_expected.to all be_a_kind_of Hash }
 
-    context 'each returned route config' do
-      it 'includes a tag' do
-        expect(subject).to all include('tag' => (a_kind_of(String).and match(/^[0-9a-z]+$/)))
-      end
+    context 'each route config' do
+      UMO.list_route_configs.each do |route|
+        subject { route }
 
-      it 'includes a min/max value for lat/lon specifying the route extent' do
-        expect(routes).to all include(
-          'latMin' => a_kind_of(Float),
-          'latMax' => a_kind_of(Float),
-          'lonMin' => a_kind_of(Float),
-          'lonMax' => a_kind_of(Float)
-        )
-      end
-
-      it 'includes a title and an optional shortTitle' do
-        expect(routes).to all include(
-          'title' => (a_kind_of String),
-          'shortTitle' => (a_kind_of(String).or be_nil)
-        )
-      end
-
-      it 'includes a color and oppositeColor' do
-        expect(routes).to all include(
-          'color' => (a_kind_of(String).and match(/^[0-9a-f]{6}$/)),
-          'oppositeColor' => (a_kind_of(String).and match(/^[0-9a-f]{6}$/))
-        )
-      end
-
-      it 'includes a list of stops' do
-        expect(routes).to all include(
-          'stop' => (a_kind_of(Array).and all include(
-            'tag' => a_kind_of(String),
-            'title' => a_kind_of(String),
-            'shortTitle' => (a_kind_of(String).or be_nil),
-            'lat' => a_kind_of(Float),
-            'lon' => a_kind_of(Float),
-            'stopId' => a_kind_of(Integer)
-          ))
-        )
-      end
-
-      it 'includes a list of directions' do
-        expect(routes).to all include(
-          'direction' => (a_kind_of(Array)).and(
-            all(include(
-                  'tag' => a_kind_of(String),
-                  'title' => a_kind_of(String),
-                  'name' => a_kind_of(String),
-                  'stop' => (a_kind_of(Array).and all include(
-                    'tag' => a_kind_of(String)
-                  ))
-                ))
-          )
-        )
-      end
-
-      it 'includes a list of paths' do
-        routes.each do |route|
-          path = route['path']
-          expect(path).to be_an Array
-          expect(path).not_to be_empty
-          expect(path).to all include(
-            'point' => (a_kind_of(Array).and all include(
-              'lat' => a_kind_of(Float),
-              'lon' => a_kind_of(Float)
-            )
-                       )
-          )
-        end
+        it_has_behavior 'a valid bus route config'
       end
     end
-  end # get_route_config()
+  end # list_route_configs()
+
+  describe 'get_route_config(route)' do
+    subject { route }
+
+    let(:route) { UMO.get_route_config('104') }
+
+    include_examples 'a valid bus route config'
+
+    it { is_expected.to include('tag' => '104') }
+    it { is_expected.to include('title' => '104 College Park Metro') }
+    it { is_expected.to include('shortTitle' => '104 CP Metro') }
+  end
 
   describe 'get_schedule()' do
     subject { routes }
