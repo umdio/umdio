@@ -35,9 +35,9 @@ jobs:
 
       - name: Run tests
         run: docker-compose exec -T -e CI=true
-          -e CODECOV_TOKEN ${{ secrets.CODECOV_TOKEN }}
-          -e GITHUB_ACTIONS true
-          -e CODECOV_SLUG ${{ env.GITHUB_REPOSITORY }}
+          -e CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
+          -e GITHUB_ACTIONS=true
+          -e CODECOV_SLUG=${{ env.GITHUB_REPOSITORY }}
           umdio bundle exec rake test
 
       - name: Upload coverage to Codecov
