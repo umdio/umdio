@@ -176,7 +176,7 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
               be_a_kind_of(Hash).and include(
                 'stop_id' => (a_kind_of String),
                 'arrival_time' => (a_kind_of String),
-                'arrival_time_secs' => (a_kind_of String)
+                'arrival_time_secs' => (a_kind_of Integer)
               )
             )
           end
