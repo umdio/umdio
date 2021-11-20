@@ -88,6 +88,7 @@ module Sinatra
 
           app.get '/v1/spec.yaml' do
             headers['Access-Control-Allow-Origin'] = '*'
+            content_type 'application/yaml'
             File.read('openapi.yaml')
           end
 

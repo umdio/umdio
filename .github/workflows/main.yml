@@ -34,11 +34,18 @@ jobs:
         run: docker-compose exec -T -e CI=true umdio bundle exec rake test_scrape
 
       - name: Run tests
-        run: docker-compose exec -T -e CI=true umdio bundle exec rake test
+        run: docker-compose exec -T -e CI=true
+          -e CODECOV_TOKEN=${{ secrets.CODECOV_TOKEN }}
+          -e GITHUB_ACTIONS=true
+          -e CODECOV_SLUG=${{ github.repository }}
+          umdio bundle exec rake test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
 
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
           directory: ./coverage/
           name: codecov-umbrella
+          fail_ci_if_error: false

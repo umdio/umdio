@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../../spec_helper'
-require_relative 'courses_spec_helper'
 
 def build_url1(u)
   "/v1/courses#{u}semester=201808"
@@ -10,11 +9,9 @@ end
 describe 'Courses Endpoint v1', :endpoint, :courses do
   describe 'Listing courses' do
     describe 'GET /courses' do
-      before { get(build_url1('?')) }
-
       let(:res) { JSON.parse(last_response.body) }
 
-      it_has_behavior 'good status', (build_url1 '?')
+      include_examples 'good status', (build_url1 '?')
 
       it 'returns a list of courses' do
         course_keys = %w[course_id name dept_id credits sections]
@@ -143,6 +140,7 @@ describe 'Courses Endpoint v1', :endpoint, :courses do
     # TODO: beware of variable shadowing
     shared_examples_for 'gets enes100' do |_url|
       before { get(build_url1('/ENES100?')) }
+
       it 'returns enes100 course object' do
         course = JSON.parse(last_response.body)
         expect(course[0]['course_id']).to eq 'ENES100'
@@ -226,4 +224,64 @@ describe 'Courses Endpoint v1', :endpoint, :courses do
       it_has_behavior 'bad status', (build_url1 '/sections/enes100-0101,enes102-010?')
     end
   end
+
+  describe 'GET /courses/list' do
+    let(:res) { JSON.parse(last_response.body) }
+
+    include_examples 'good status', (build_url1 '/list?')
+
+    it 'returns a list of minified courses' do
+      expect(res).to be_a Array
+      expect(res).to all include(
+        'course_id' => be_a_course_id,
+        'name' => (a_kind_of String)
+      )
+    end
+  end
+
+  # TODO these tests don't work with test_scrape but do with scrape
+
+  # describe 'GET /courses/semesters' do
+  #   let(:res) { JSON.parse(last_response.body) }
+  #
+  #   include_examples 'good status', '/v1/courses/semesters'
+  #
+  #   it 'returns a list of semester numbers' do
+  #     pending 'OpenAPI spec says this returns a list of strings, but this actually returns a list of integers'
+  #     expect(res).to be_an Array
+  #     expect(res).not_to be_empty
+  #     expect(res).to all be a_string_matching(/\d{6}/)
+  #   end
+  # end
+  #
+  #
+  # describe 'GET /courses/departments' do
+  #   let(:res) { JSON.parse(last_response.body) }
+
+  #   include_examples 'good status', '/v1/courses/departments'
+
+  #   it 'returns a list of department objects' do
+  #     expect(res).to be_an Array
+  #     expect(res).not_to be_empty
+  #     expect(res).to all include(
+  #       'dept_id' => a_string_matching(/[A-Z]{4}/),
+  #       'department' => (a_kind_of String)
+  #     )
+  #   end
+
+  #   [
+  #     ['GVPT', 'Government and Politics'],
+  #     ['ENEE', 'Electrical & Computer Engineering'],
+  #     ['ARTH', 'Art History & Archaeology']
+  #   ].each do |test_case|
+  #     dept_id, dept_name = test_case
+
+  #     it "includes #{dept_id}: #{dept_name}" do
+  #       expect(res).to include(
+  #         'dept_id' => (a_string_matching dept_id),
+  #         'department' => (a_string_matching dept_name)
+  #       )
+  #     end
+  #   end
+  # end
 end
