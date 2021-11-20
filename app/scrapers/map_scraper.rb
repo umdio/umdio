@@ -105,8 +105,8 @@ class MapScraper
 
       next if done
 
-      log(bar, :debug) { `Inserting building #{bldg}` }
       buildings.each do |bldg|
+        log(bar, :debug) { `Inserting building #{bldg}` }
         $DB[:buildings].insert_ignore.insert(**bldg)
         bar.increment
       end
