@@ -63,8 +63,7 @@ class MajorsScraper
     bar = get_progress_bar(title: "#{self.class} - Loading Majors", total: majors.length)
     $DB[:majors].delete
     majors.each do |major|
-      log(bar, :info) { "inserting #{major[:name]}" }
-      p major
+      log(bar, :debug) { "inserting #{major[:name]}" }
 
       major[:major_id] = major[:name].upcase.gsub!(/[^0-9A-Za-z]/, '')
       major[:major_id] = major[:name].upcase if major[:major_id].nil?
