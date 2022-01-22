@@ -28,10 +28,17 @@ end
 group :test do
   gem 'rack-test', require: 'rack/test'
   gem 'simplecov', require: false
-  gem 'json-schema'
+end
+
+group :development, :test do
+  gem 'parallel_tests'
+  gem 'rack-mini-profiler', require: false
 end
 
 # the gems needed for the courses scraper, and likely for other scrapers
 group :scrape do
   gem 'nokogiri'
+  gem 'ruby-progressbar'
 end
+
+gem "simplecov-cobertura", "~> 1.4", :group => :test

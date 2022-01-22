@@ -59,11 +59,17 @@ module Sinatra
                 return json res
               end
 
-              y = Meeting.where { Sequel.&(*m_std_params) } unless m_std_params == []
-              y = Meeting.all if m_std_params == []
+              y = if m_std_params.empty?
+                    Meeting.where { Sequel.&(*m_std_params) } unless m_std_params == []
+                  else
+                    nil
+                  end
 
-              x = Sequel.&(*std_params, meetings: y) unless std_params == []
-              x = { meetings: y } if std_params == []
+              x = if std_params.empty?
+                    if y.nil? then {} else { meetings: y } end
+                  else
+                    if y.nil? then Sequel.&(*std_params) else Sequel.&(*std_params, meetings: y) end
+                  end
 
               res =
                 Section.where(x)
@@ -74,7 +80,7 @@ module Sinatra
 
               end_paginate! res
 
-              return json [res]
+              return json res
             end
 
             get '/semesters' do
@@ -86,7 +92,7 @@ module Sinatra
             end
 
             get '/list' do
-              json(Course.list_sem(request.params['semester'])).map { |c| c.to_v1_info }
+              json(Course.list_sem(request.params['semester']).map { |c| c.to_v1_info })
             end
 
             # Returns section info about particular sections of a course, comma separated
@@ -250,7 +256,7 @@ module Sinatra
           end
 
           app.get '/v0/courses/list' do
-            json(Course.list_sem(request.params['semester'])).map { |c| c.to_v0_info }
+            json(Course.list_sem(request.params['semester']).map { |c| c.to_v0_info })
           end
 
           # Returns section info about particular sections of a course, comma separated

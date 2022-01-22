@@ -1,6 +1,7 @@
 Gemfile.lock
 bower_components
 tmp
+/bin
 
 # exclude database
 /data/postgres
@@ -16,6 +17,7 @@ mime.types
 .DS_Store
 .vagrant
 *.log
+.yardoc
 
 # editor configurations
 .idea/

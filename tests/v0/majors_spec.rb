@@ -1,22 +1,25 @@
 require_relative '../spec_helper'
 
 describe 'Major Endpoint v0' do
-  url = 'v0/majors'
+  url = '/v0/majors'
 
   describe 'get /' do
-    it_has_behavior 'good status', url
+    let(:res) { JSON.parse(last_response.body) }
 
-    before { get url }
-    it 'returns properly formatted data' do
-      res = JSON.parse(last_response.body)
+    include_examples 'good status', url
+
+    it 'returns a non-empty array' do
+      expect(res).to be_an Array
       expect(res).not_to be_empty
+    end
 
-      res.each do |major|
-        expect(major['major_id']).not_to be_nil
-        expect(major['name']).not_to be_nil
-        expect(major['college']).not_to be_nil
-        expect(major['url']).not_to be_nil
-      end
+    it 'returns a list of majors' do
+      expect(res).to all include(
+        'major_id' => (a_kind_of String),
+        'name' => (a_kind_of String),
+        'url' => (a_string_matching URI::DEFAULT_PARSER.make_regexp),
+        'college' => (a_kind_of String)
+      )
     end
   end
 end

@@ -9,6 +9,8 @@ describe MajorsScraper, :scraper, :majors do
     @scraper.logger.level = Logger::WARN
   end
 
+  it_behaves_like 'a scraper'
+
   # prog_name
   describe '#prog_name' do
     it 'is a string' do
