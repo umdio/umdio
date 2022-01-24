@@ -41,7 +41,9 @@ class MajorsScraper
       next if major_parts.nil?
 
       # 0th match is full string, 1st and 2nd elements are the two matches
-      major_name, major_college = major_parts[1, 3].map(&:strip)
+      # use [[:space:]] here to get rid of leading and trailing nonbreaking spaces, which are present in the major
+      # name and college. A regular .strip is insufficient.
+      major_name, major_college = major_parts[1, 3].map { |str| str.gsub(/^[[:space:]]*(.*?)[[:space:]]*$/, '\1') }
 
       bar.increment
       majors << {
