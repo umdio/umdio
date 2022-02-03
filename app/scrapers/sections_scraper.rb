@@ -159,9 +159,12 @@ class SectionsScraper
       s = $DB[:sections].where(section_id_str: section[:section_id], course_id: section[:course_id],
                                semester: section[:semester]).first
 
+      # reset our meetings list every time, whatever is on testudo right now is ground truth
+      $DB[:meetings].where(section_key: s[:section_id]).delete
+
       section[:meetings].each do |meeting|
         log(@bar, :debug) { "Inserting meeting: #{meeting}" }
-        $DB[:meetings].insert_ignore.insert(
+        $DB[:meetings].insert(
           section_key: s[:section_id],
           days: meeting[:days],
           room: meeting[:room],

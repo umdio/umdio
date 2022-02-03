@@ -7,29 +7,37 @@ require 'set'
 
 require_relative 'scraper_common'
 require_relative '../models/bus'
+require_relative 'lib/umo'
 
 class BusRoutesScraper
   include ScraperCommon
   def scrape
-    apiRoot = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
-    address = apiRoot + '&command=routeList&t=0'
-    response_hash = JSON.parse(Net::HTTP.get(URI(address)).to_s)
-    route_array = response_hash['route'].map { |e| { route_id: e['tag'], title: e['title'] } }
+
+    # @type [Array<Hash>]
+    route_array = UMO.get_routes.map { |e| { route_id: e['tag'], title: e['title'], shortTitle: e['shortTitle'] } }
     bar = get_progress_bar total: route_array.length
 
     route_array&.each do |route|
       log(bar, :debug) { "getting #{route[:route_id]}" }
-      address = apiRoot + "&command=routeConfig&r=#{route[:route_id]}"
+      # address = apiRoot + "&command=routeConfig&r=#{route[:route_id]}"
       begin
-        route_response = JSON.parse(Net::HTTP.get(URI(address)).to_s)['route']
+        # route_response = JSON.parse(Net::HTTP.get(URI(address)).to_s)['route']
+        route_response = UMO.get_route_config(route[:route_id])
       rescue JSON::ParserError
-        log(bar, :warn) { 'Failed to parse JSON. Retrying...'}
+        log(bar, :warn) { 'Failed to parse JSON. Retrying...' }
         retry
       end
       stops = []
       next if route_response.nil?
+      raise TypeError, "route_response is not a hash. Got a #{route_response.class}" unless route_response.is_a? Hash
 
-      route_response['stop'].each do |stop|
+      route_stops = route_response['stop']
+      raise TypeError, "Expected stops to be an array, got #{route_stops}" unless stops.is_a? Array
+      puts route_stops
+
+      route_stops.each do |stop|
+        raise TypeError, "Stop #{stop} is not a hash" unless stop.is_a? Hash
+
         log(bar, :debug) { "inserting #{stop['title']}" }
         $DB[:stops].insert_ignore.insert(stop_id: stop['tag'], title: stop['title'], long: stop['lon'],
                                          lat: stop['lat'])

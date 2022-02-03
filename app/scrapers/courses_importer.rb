@@ -105,8 +105,8 @@ j.to_a.each do |course|
 
       pr = $DB[:professors].where(name: prof).first
 
-      puts s
-      puts pr
+      # puts s
+      # puts pr
 
       $DB[:professors_sections].insert_ignore.insert(
         section_id: s[:section_id],
