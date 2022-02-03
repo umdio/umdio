@@ -10,7 +10,7 @@ module Sinatra
             bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
             bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
             bus_docs_url = 'https://docs.umd.io/#tags/bus'
-            api_root = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
+            api_root = 'https://retro.umoiq.com/service/publicJSONFeed?a=umd'
             require 'net/http'
 
             get do
@@ -93,7 +93,7 @@ module Sinatra
           bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v0/bus/routes"
           bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v0/bus/routes"
           bus_docs_url = 'https://docs.umd.io/bus'
-          api_root = 'http://webservices.nextbus.com/service/publicJSONFeed?a=umd'
+          api_root = 'https://retro.umoiq.com/service/publicJSONFeed?a=umd'
           require 'net/http'
 
           # root of bus endpoint
