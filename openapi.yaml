@@ -547,47 +547,58 @@ paths:
   #          application/json:
   #            schema:
   #              $ref: "#/components/schemas/"
-  #/bus/routes/{route_id}/locations:
-  #  get:
-  #    tags:
-  #      - bus
-  #    summary: Current bus locations by route
-  #    description: Get bus locations for a route
-  #    operationId: getLocations
-  #    parameters:
-  #      - in: path
-  #        name: route_id
-  #        required: true
-  #        schema:
-  #          type: string
-  #        description: Route id
-  #        explode: true
-  #    responses:
-  #      "200":
-  #        description: Successful Operation
-  #        content:
-  #          application/json:
-  #            schema:
-  #              type: string
-  #      "400":
-  #        description: Malformed route code
-  #        content:
-  #          application/json:
-  #            schema:
-  #              $ref: "#/components/schemas/Error"
-  #      "404":
-  #        description: Unknown route code
-  #        content:
-  #          application/json:
-  #            schema:
-  #              $ref: "#/components/schemas/Error"
+  /bus/routes/{route_id}/locations:
+    get:
+      tags:
+        - bus
+      summary: Current bus locations by route
+      description: Get bus locations for a route
+      operationId: getLocations
+      parameters:
+        - in: path
+          name: route_id
+          required: true
+          schema:
+            type: string
+          description: Route id
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Bus location object
+                properties:
+                  lastTime:
+                    type: object
+                    properties:
+                      time:
+                        type: string
+                        description: A unix timestamp
+                        example: "1624045272049"
+                  copyright:
+                    type: string
+        "400":
+          description: Malformed route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /bus/routes/{route_id}/schedules:
     get:
       tags:
         - bus
       summary: Bus schedules
       description: Get bus schedules for a route
-      operationId: getLocations
+      operationId: getSchedules
       parameters:
         - in: path
           name: route_id
@@ -617,47 +628,83 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  #/bus/routes/{route_id}/arrivals/{stop_id}:
-  #  get:
-  #    tags:
-  #      - bus
-  #    summary: Get arrivals for a stop for a route
-  #    description: Get arrivals for a stop for a route
-  #    operationId: getLocations
-  #    parameters:
-  #      - in: path
-  #        name: route_id
-  #        required: true
-  #        schema:
-  #          type: string
-  #        description: Route id
-  #        explode: true
-  #      - in: path
-  #        name: stop_id
-  #        required: true
-  #        schema:
-  #          type: string
-  #        description: Stop id
-  #        explode: true
-  #    responses:
-  #      "200":
-  #        description: Successful Operation
-  #        content:
-  #          application/json:
-  #            schema:
-  #              type: string
-  #      "400":
-  #        description: Malformed route id or stop id
-  #        content:
-  #          application/json:
-  #            schema:
-  #              $ref: "#/components/schemas/Error"
-  #      "404":
-  #        description: Unknown route id or stop id
-  #        content:
-  #          application/json:
-  #            schema:
-  #              $ref: "#/components/schemas/Error"
+  /bus/routes/{route_id}/arrivals/{stop_id}:
+    get:
+      tags:
+        - bus
+      summary: Get arrivals for a stop for a route
+      description: Get arrivals for a stop for a route
+      operationId: getArrival
+      parameters:
+        - in: path
+          name: route_id
+          required: true
+          schema:
+            type: string
+          description: Route id
+          explode: true
+        - in: path
+          name: stop_id
+          required: true
+          schema:
+            type: string
+          description: Stop id
+          explode: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+
+                  copyright:
+                    type: string
+                    example: All data copyright University of Maryland 2021.
+
+                  # TODO(don): This is not the correct schema - fix it; move it to schema object at bottom; reference it with $ref
+                  predictions:
+                    type: object
+                    properties:
+                      routeTag:
+                        type: string
+                        example: "104"
+                      stopTag:
+                        type: string
+                        example: regdrgar_d
+                      routeTitle:
+                        type: string
+                        example: 104 College Park Metro
+                      agencyTitle:
+                        type: string
+                        example: University of Maryland
+                      dirTitleBecauseNoPredictions:
+                        type: string
+                        example: College Park Metro
+                      message:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            text:
+                              type: string
+                            priority:
+                              type: string
+                              example: Normal
+
+        "400":
+          description: Malformed route id or stop id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Unknown route id or stop id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
 components:
   schemas:
     Route:
@@ -1055,7 +1102,6 @@ components:
           type: string
 
   parameters:
-
     courseIdsParam:
       in: path
       name: course_ids

@@ -25,26 +25,22 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
 
   raise "Bad route shape, got id '#{route_id}' and stop '#{first_stop}'" unless !route_id&.empty? && !first_stop&.empty?
 
-  # Bus matchers and examples
+  describe 'get /bus' do
+    it_has_behavior 'good status', url
+  end
 
-  shared_examples_for 'successful bus route list payload' do |url|
-    before { get url }
+  describe 'get /routes' do
+    # it_has_behavior 'successful bus route list payload', url + '/routes'
+    let(:res) { JSON.parse(last_response.body) }
 
-    let(:payload) { JSON.parse(last_response.body) }
+    include_examples 'good status', url + '/routes'
 
-    it 'has a good response' do
-      expect(last_response.status).to be == 200
-      expect(last_response.body.length).to be > 1
+    it 'returns a non-empty list of bus routes' do
+      expect(res).to be_an Array
+      expect(res).not_to be_empty
+      expect(res).to all be_a_bus_route
     end
 
-    it 'sets the content-type header to application/json' do
-      expect(last_response.headers['Content-Type']).to match_regex(%r{^application/json})
-    end
-
-    it 'has a payload containing a list of bus routes' do
-      expect(payload).to be_a_kind_of Array
-      expect(payload).to all be_a_bus_route
-    end
   end
 
   describe 'get /bus' do
@@ -187,8 +183,68 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
 
   describe 'get /routes/:route_id/arrivals/:stop_id' do
     context 'when both the route and stop are valid' do
-      it_has_behavior 'good status', url + "/routes/#{route_id}/arrivals/#{first_stop}"
-      it_has_behavior 'bad status', url + '/routes/NOTAROUTE/arrivals/YOOO', bad_route_message
+      let(:res) { JSON.parse(last_response.body) }
+      let(:preds) { res['predictions'] }
+
+      include_examples 'good status', url + "/routes/#{route_id}/arrivals/#{first_stop}"
+
+      it 'returns a hash with a copyright string and predictions object' do
+        expect(res).to be_a Hash
+        expect(res['copyright']).to be_a String
+        expect(preds).to be_a Hash
+      end
+
+      context "the response's predictions object" do
+        let(:direction) { preds['direction'] }
+
+        it 'specifies UMD as the agency' do
+          expect(preds['agencyTitle']).to eq 'University of Maryland'
+        end
+
+        it 'specifies route/stop tag and route/stop title data' do
+          expect(preds).to include(
+            'routeTag' => route_id,
+            'stopTag' => first_stop,
+            'routeTitle' => (a_kind_of String),
+            'stopTitle' => (a_kind_of String)
+          )
+        end
+
+        it 'has an optionl message property that is either a message object or a list of message objects' do
+          msg = preds['msg']
+          msg_shape = { 'text' => (a_kind_of String), 'priority' => (a_kind_of String) }
+          expect(msg).to be_nil.or include(msg_shape).or(be_a_kind_of(Array).and(all(include(msg_shape))))
+        end
+
+        it 'has an explanation if no predictions are available' do
+          expect(preds['dirTitleBecauseNoPredictions']).to be_a String if direction.nil? || direction['prediction'].nil?
+        end
+
+        it 'if available, directions object has a tit string and prediction list' do
+          if direction
+            expect(direction).to be_a Hash
+            expect(direction).to include 'title' => (a_kind_of String), 'prediction' => (a_kind_of Array)
+          end
+        end
+
+        it 'if available, prediction list contains objects of the expected shape' do
+          if direction
+            expect(direction['prediction']).to be_an Array
+            expect(direction['prediction']).to all include(
+              'affectedByLayover' => a_string_encoded_boolean,
+              'seconds' => a_string_encoded_positive_int,
+              'tripTag' => a_string_encoded_positive_int,
+              'minutes' => a_string_encoded_positive_int,
+              'isDeparture' => a_string_encoded_boolean,
+              'block' => a_string_encoded_positive_int,
+              'dirTag' => (a_kind_of String),
+              'epochTime' => a_string_encoded_positive_int,
+              'vehicle' => a_string_encoded_positive_int
+            )
+          end
+        end
+        # !context "the response's predictions object"
+      end
     end
 
     context 'when either the route and/or stop are malformed or invalid' do
@@ -197,6 +253,7 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
       it_has_behavior 'bad status', url + "/routes/#{route_id}/arrivals/NOTASTOP"
       it_has_behavior 'bad status', url + '/routes/NOTAROUTE/arrivals/NOTASTOP'
     end
+    # !describe 'get /routes/:route_id/arrivals/:stop_id'
   end
 
   describe 'get /routes/:route_id/locations' do
@@ -205,7 +262,21 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
   end
 
   describe 'get /locations' do
-    it_has_behavior 'good status', url + '/locations'
+    let(:res) { JSON.parse(last_response.body) }
+
+    include_examples 'good status', url + '/locations'
+
+    specify { expect(res).to be_a Hash }
+    # it 'returns a Hash' do
+    #   expect(res).to be_a Hash
+    # end
+
+    it 'matches the expected shape' do
+      expect(res).to include(
+        'lastTime' => (a_kind_of Hash).and(include 'time' => a_string_encoded_positive_int),
+        'copyright' => String
+      )
+    end
   end
 
   describe 'get /stops' do
@@ -234,7 +305,7 @@ describe 'Bus Endpoint v1', :endpoint, :buses do
 
       it 'returns a hash' do
         pending 'Stop object is wrapped in a list for some reason'
-        expect(res).to be_a hash
+        expect(res).to be_a Hash
       end
 
       it 'returns a stop object' do
