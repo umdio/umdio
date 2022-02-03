@@ -14,6 +14,26 @@ module BusMatchers
   end
   alias_matcher :a_bus_route, :be_a_bus_route
 
+  shared_examples_for 'successful bus route list payload' do |url|
+    before { get url }
+
+    let(:payload) { JSON.parse(last_response.body) }
+
+    it 'has a good response' do
+      expect(last_response.status).to be == 200
+      expect(last_response.body.length).to be > 1
+    end
+
+    it 'sets the content-type header to application/json' do
+      expect(last_response.headers['Content-Type']).to match_regex(%r{^application/json})
+    end
+
+    it 'has a payload containing a list of bus routes' do
+      expect(payload).to be_a_kind_of Array
+      expect(payload).to all be_a_bus_route
+    end
+  end
+
   # matches strings with values that are positive integers
   matcher :be_a_string_encoded_positive_int do
     match { |actual| actual.is_a? String and actual.match STR_INT_POS_REGEX }
