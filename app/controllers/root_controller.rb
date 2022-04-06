@@ -9,7 +9,7 @@ module Sinatra
             resp = {
               message: 'This is the umd.io JSON API.',
               status: 'working, most of the time',
-              docs: 'https://docs.umd.io/',
+              docs: 'https://beta.umd.io/',
               current_version: 'v0',
               versions: [
                 {
@@ -33,27 +33,27 @@ module Sinatra
                 {
                   name: 'Courses',
                   url: 'https://api.umd.io/v1/courses',
-                  docs: 'https://docs.umd.io/#tag/courses'
+                  docs: 'https://beta.umd.io/#tag/courses'
                 },
                 {
                   name: 'Professors',
                   url: 'https://api.umd.io/v1/professors',
-                  docs: 'https://docs.umd.io/#tag/professors'
+                  docs: 'https://beta.umd.io/#tag/professors'
                 },
                 {
                   name: 'Bus',
                   url: 'https://api.umd.io/v1/bus',
-                  docs: 'https://docs.umd.io/#tag/bus'
+                  docs: 'https://beta.umd.io/#tag/bus'
                 },
                 {
                   name: 'Map',
                   url: 'https://api.umd.io/v1/map',
-                  docs: 'https://docs.umd.io/#tag/map'
+                  docs: 'https://beta.umd.io/#tag/map'
                 },
                 {
                   name: 'Majors',
                   url: 'https://api.umd.io/v1/majors',
-                  docs: 'https://docs.umd.io/#tag/majors'
+                  docs: 'https://beta.umd.io/#tag/majors'
                 }
               ]
             }
@@ -96,7 +96,7 @@ module Sinatra
             resp = {
               error_code: 404,
               message: "We couldn't find what you're looking for. Please see the docs for more information.",
-              docs: 'https://docs.umd.io/'
+              docs: 'https://beta.umd.io/'
             }
             status 404
             json resp

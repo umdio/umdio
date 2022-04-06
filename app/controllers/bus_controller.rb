@@ -9,14 +9,14 @@ module Sinatra
             # this should probably be a more specific error message where we error out!
             bad_route_message = "umd.io doesn't know the bus route in your url. Full list at https://api.umd.io/v1/bus/routes"
             bad_stop_message = "umd.io doesn't know the stop in your url. Full list at https://api.umd.io/v1/bus/routes"
-            bus_docs_url = 'https://docs.umd.io/#tags/bus'
+            bus_docs_url = 'https://beta.umd.io/#tags/bus'
             api_root = 'https://retro.umoiq.com/service/publicJSONFeed?a=umd'
             require 'net/http'
 
             get do
               resp = {
                 message: 'This is the bus endpoint.',
-                docs: 'https://docs.umd.io/#tags/bus/'
+                docs: 'https://beta.umd.io/#tags/bus/'
               }
               json resp
             end
@@ -32,7 +32,7 @@ module Sinatra
               end
               routes = Route.where(route_id: route_ids).map(&:to_v1)
 
-              halt 404, not_found_error('No routes found.', 'https://docs.umd.io/#tags/bus/') if routes == []
+              halt 404, not_found_error('No routes found.', 'https://beta.umd.io/#tags/bus/') if routes == []
               json routes
             end
 
@@ -41,7 +41,7 @@ module Sinatra
               halt 400, bad_url_error(bad_route_message, bus_docs_url) unless is_route_id? route_id
               res = Schedule.where(route: route_id).map(&:to_v1)
 
-              halt 404, not_found_error('No routes found.', 'https://docs.umd.io/#tags/bus/') if res == []
+              halt 404, not_found_error('No routes found.', 'https://beta.umd.io/#tags/bus/') if res == []
               json res
             end
 
