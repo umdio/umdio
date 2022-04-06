@@ -66,7 +66,7 @@ class SectionsScraper
 
         number = section.search('span.section-id').text.gsub(/\s/, '')
         open_seats = section.search('span.open-seats-count').text
-        waitlist = section.search('span.waitlist-count').text
+        waitlist = section.search('span.waitlist-count').first.text
 
         log(@bar, :debug) { "Adding #{course_id}-#{number} in #{semester} taught by #{profs.join(', ')}" }
         section_data = {
