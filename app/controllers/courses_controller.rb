@@ -8,7 +8,7 @@ module Sinatra
           app.register Sinatra::Namespace
 
           app.namespace '/v1/courses' do
-            course_docs_url = 'https://docs.umd.io/courses/'
+            course_docs_url = 'https://beta.umd.io/courses/'
 
             before do
               @course_params = %w[semester credits dept_id grading_method core gen_ed]

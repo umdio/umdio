@@ -5,7 +5,7 @@ module Sinatra
     module Helpers
       def get_buildings_by_id(id)
         bad_id_message = 'Check the building id in the url.'
-        doc_url = 'https://docs.umd.io/map'
+        doc_url = 'https://beta.umd.io/map'
 
         building_ids = id.upcase.split(',')
         building_ids.each do |building_id|
@@ -20,7 +20,7 @@ module Sinatra
             error_code: 404,
             message: "Building number #{params[:building_id]} isn't in our database, and probably doesn't exist.",
             available_buildings: 'https://api.umd.io/v0/map/buildings',
-            docs: 'https://docs.umd.io/map'
+            docs: 'https://beta.umd.io/map'
           }.to_json
         end
 
