@@ -25,7 +25,7 @@ module Sinatra
             error_code: 404,
             message: "Section with section_id #{section_ids[0]} not found.",
             available_sections: 'https://api.umd.io/v0/courses/sections',
-            docs: 'https://beta.umd.io/courses'
+            docs: 'https://beta.umd.io/#tag/courses'
           }.to_json
         end
 
@@ -38,7 +38,7 @@ module Sinatra
           next if is_full_section_id? id
           return false unless do_halt
 
-          halt 400, bad_url_error("Invalid section_id #{id}.", 'https://beta.umd.io/courses/')
+          halt 400, bad_url_error("Invalid section_id #{id}.", 'https://beta.umd.io/#tag/courses')
         end
 
         true
@@ -53,7 +53,7 @@ module Sinatra
           next if is_course_id? id
           return false unless do_halt
 
-          halt 400, bad_url_error("Invalid course_id #{id}.", 'https://beta.umd.io/courses/')
+          halt 400, bad_url_error("Invalid course_id #{id}.", 'https://beta.umd.io/#tag/courses')
         end
 
         true
@@ -74,7 +74,7 @@ module Sinatra
             error_code: 404,
             message: "Course#{s} with course_id#{s} #{course_ids.join(',')} not found!",
             available_courses: 'https://api.umd.io/v0/courses',
-            docs: 'https://beta.umd.io/courses/'
+            docs: 'https://beta.umd.io/#tag/courses'
           }.to_json
         end
 
@@ -107,7 +107,7 @@ module Sinatra
             error_code: 404,
             message: "Course#{s} with course_id#{s} #{course_ids.join(',')} not found!",
             available_courses: 'https://api.umd.io/v0/courses',
-            docs: 'https://beta.umd.io/courses/'
+            docs: 'https://beta.umd.io/#tag/courses'
           }.to_json
         end
 

@@ -10,7 +10,7 @@ module Sinatra
               resp = {
                 message: 'This is the majors endpoint.',
                 version: '1.0.0',
-                docs: 'https://beta.umd.io/majors',
+                docs: 'https://beta.umd.io/#tag/majors',
                 endpoints: ['/list']
               }
               json resp
