@@ -175,7 +175,7 @@ class CoursesScraper
         credits: course.css('span.course-min-credits').first.content,
         grading_method: course.at_css('span.grading-method abbr') ? course.at_css('span.grading-method abbr').attr('title').split(', ') : [],
         core: utf_safe(course.css('div.core-codes-group').text).gsub(/\s/, '').delete('CORE:').split(','),
-        gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).delete('General Education:'),
+        gen_ed: utf_safe(course.css('div.gen-ed-codes-group').text).gsub('GenEd:', '').gsub(/\s+/, ' ').strip,
         description: description,
         relationships: relationships
       })
