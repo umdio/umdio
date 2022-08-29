@@ -62,35 +62,13 @@ class Course < Sequel::Model
   end
 
   def to_v1
-    # if `gen_ed` is `"DSHS or DSSP, SCIS"`, we will return:
-    # [
-    #   "SCIS",
-    #   "DSHS"
-    #   ],
-    #   [
-    #   "SCIS",
-    #   "DSSP"
-    #   ]
-    # ]
-
-    # doing `gen_ed = gen_ed.gsub(/\s/, '')` here throws `undefined method `gsub' for nil:NilClass`,
-    # even though gen_ed.class is definitely not nil. I don't know why this occurs nor how to fix it,
-    # so I've avoided the issue by assigning to `gen_ed_` instead, which doesn't appear to error.
-    gen_ed_ = gen_ed.gsub(/\s/, '')
-    ge = []
-    choose_from = []
-    always_given = []
-
-    if gen_ed_.include?('or')
-      choose_from = gen_ed_.split(',')[0].split('or')
-      always_given = gen_ed_.split(',')[1..-1]
-    end
-
-    if choose_from == []
-      ge << always_given
-    else
-      choose_from.each do |ge_chosen|
-        ge << always_given + [ge_chosen]
+    ge = gen_ed.gsub(/\s/, '').split('or').map do |s|
+      s.split(',').map do |s2|
+        ret = s2
+        if m = s2.match(/^(.{4})\(iftakenwith(.*)\)$/)
+          ret = "#{m[1]}|#{m[2]}"
+        end
+        ret
       end
     end
 
