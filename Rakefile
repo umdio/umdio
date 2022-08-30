@@ -116,11 +116,7 @@ namespace :scrape do
 
   desc 'Run course scrapers'
   task :courses do
-    # Testudo updated in September for Spring, Fed for fall
-    # if fall is updated, we want to get the next year's courses
-    year = Time.now.month <= 9 ? Time.now.year : Time.now.year + 1
-    years = ((year - 3)..year).to_a.join ' '
-    scrape_courses(years)
+    scrape_courses(current_and_next_semesters.join(' '))
   end
 
   desc 'Run course seat updater'
