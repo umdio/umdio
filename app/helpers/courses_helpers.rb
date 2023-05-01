@@ -7,13 +7,30 @@ module Sinatra
       # generalize logic for checking if semester param valid
       def check_semester(_app, semester)
         # check for semester formatting
-        unless (semester.length == 6) && semester.is_number?
-          halt 400, { error_code: 400, message: 'Invalid semester parameter! semester must be 6 digits' }.to_json
+        if semester.length == 6
+          unless semester.is_number?
+            halt 400, { error_code: 400, message: 'Invalid semester parameter! semester must be 6 digits' }.to_json
+          end
+          if Course.where(semester: semester).to_a.length == 0
+            halt 400, { error_code: 400, message: "We don't have data for this semester!" }.to_json
+          end
         end
 
-        if Course.where(semester: semester).to_a.length == 0
-          halt 400, { error_code: 400, message: "We don't have data for this semester!" }.to_json
+        if (semester.length == 9 || semester.length == 10) && semester.include?('|')
+          res = semester.split '|'
+
+          unless res[0].is_number?
+            halt 400, { error_code: 400, message: 'Invalid semester parameter! semester code must be 6 digits' }.to_json
+          end
+
+          delim = parse_delim res[1].to_sym
+
+          if Course.where(Sequel.lit("semester #{delim} #{res[0]}")).to_a.length == 0
+            halt 400, { error_code: 400, message: "We don't have data for this semester!" }.to_json
+          end
         end
+
+        halt 400, { error_code: 400, message: 'Invalid semester parameter!' }.to_json
       end
 
       # helper method for printing json-formatted sections based on a sections collection and a list of section_ids
