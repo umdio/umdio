@@ -69,9 +69,9 @@ module Sinatra
         sorting
       end
 
-      def fix_sem
+      def fix_sem(comparators = false)
         request.update_param('semester', current_semester) unless params['semester']
-        check_semester app, request.params['semester']
+        check_semester app, request.params['semester'], comparators
       end
 
       def rename_param(from, to)

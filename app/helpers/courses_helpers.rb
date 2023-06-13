@@ -5,7 +5,7 @@ module Sinatra
       # Generic course helpers
 
       # generalize logic for checking if semester param valid
-      def check_semester(_app, semester)
+      def check_semester(_app, semester, comparators = false)
         # check for semester formatting
         if semester.length == 6
           unless semester.is_number?
@@ -16,7 +16,7 @@ module Sinatra
           end
         end
 
-        if (semester.length == 9 || semester.length == 10) && semester.include?('|')
+        if comparators && (semester.length == 9 || semester.length == 10) && semester.include?('|')
           res = semester.split '|'
 
           unless res[0].is_number?

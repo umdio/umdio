@@ -19,7 +19,8 @@ module Sinatra
                 rename_param "meetings.#{p}", p
               end
 
-              fix_sem
+              comparators_disallowed = ['/sections']
+              fix_sem !(comparators_disallowed.include? request.path_info)
 
               # TODO: This could be more concise
               if request.params['expand']
