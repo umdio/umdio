@@ -14,6 +14,7 @@ module Sinatra
           if Course.where(semester: semester).to_a.length == 0
             halt 400, { error_code: 400, message: "We don't have data for this semester!" }.to_json
           end
+          return true
         end
 
         if comparators && (semester.length == 9 || semester.length == 10) && semester.include?('|')
@@ -28,6 +29,7 @@ module Sinatra
           if Course.where(Sequel.lit("semester #{delim} #{res[0]}")).to_a.length == 0
             halt 400, { error_code: 400, message: "We don't have data for this semester!" }.to_json
           end
+          return true
         end
 
         halt 400, { error_code: 400, message: 'Invalid semester parameter!' }.to_json
