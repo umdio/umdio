@@ -87,7 +87,7 @@ module Sinatra
 
       def find_sections_for_course_v1(semester, course_id, expand)
         if semester == "most_recent"
-          []
+          return []
         end
 
         sections = if expand
