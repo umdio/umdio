@@ -153,9 +153,13 @@ module Sinatra
               sorting = parse_sorting_params 'course_id'
               std_params = parse_query_v1 @course_params
 
+              puts std_params
+              puts @course_params
+
               res =
                 Course
                 .where { Sequel.&(*std_params) }
+                .where { id: Course.max(:semester) }
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1) * @limit)

@@ -6,6 +6,9 @@ module Sinatra
 
       # generalize logic for checking if semester param valid
       def check_semester(_app, semester)
+        if semester == "most_recent"
+          return
+        end
         # check for semester formatting
         unless (semester.length == 6) && semester.is_number?
           halt 400, { error_code: 400, message: 'Invalid semester parameter! semester must be 6 digits' }.to_json
