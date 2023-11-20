@@ -152,7 +152,7 @@ module Sinatra
 
               sorting = parse_sorting_params 'course_id'
 
-              most_recent_where = "1"
+              most_recent_where = true
               if request.params["semester"] == "most_recent"
                 @course_params.delete("semester")
                 most_recent_where = Sequel.lit('(course_id, semester) in (SELECT course_id, MAX(semester) FROM courses GROUP BY course_id)')
