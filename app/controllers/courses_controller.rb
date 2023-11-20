@@ -159,7 +159,8 @@ module Sinatra
               res =
                 Course
                 .where { Sequel.&(*std_params) }
-                .where(semester: Course.max(:semester))
+                # .where(semester: Course.max(:semester))
+                .where(Sequel.lit('semester in (SELECT MAX(semester) FROM courses GROUP BY course_id)'))
                 .order(*sorting)
                 .limit(@limit)
                 .offset((@page - 1) * @limit)
