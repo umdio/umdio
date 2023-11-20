@@ -69,7 +69,17 @@ module Sinatra
 
         validate_course_ids course_ids
 
-        courses = Course.where(semester: semester, course_id: course_ids).map { |c| c.to_v1 }
+        if semester == "most_recent"
+          courses = Course
+                    .where(Sequel.lit('(course_id, semester) in (SELECT course_id, MAX(semester) FROM courses GROUP BY course_id)')
+                    .where(course_id: course_ids)
+                    .map { |c| c.to_v1 }
+        else
+          courses = Course
+                    .where(semester: semester)
+                    .where(course_id: course_ids)
+                    .map { |c| c.to_v1 }
+        end
         # check if found
         if courses.empty?
           s = course_ids.length > 1 ? 's' : ''
