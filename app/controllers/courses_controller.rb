@@ -153,18 +153,20 @@ module Sinatra
               sorting = parse_sorting_params 'course_id'
               std_params = parse_query_v1 @course_params
 
-              puts std_params
-              puts @course_params
+              if request.params["semester"] == "most_recent"
+                std_params.delete("semester")
+              end
 
               res =
-                Course
-                .where { Sequel.&(*std_params) }
-                # .where(semester: Course.max(:semester))
-                .where(Sequel.lit('semester in (SELECT MAX(semester) FROM courses GROUP BY course_id)'))
-                .order(*sorting)
-                .limit(@limit)
-                .offset((@page - 1) * @limit)
-                .map { |c| c.to_v1 }
+              Course
+              # .where { Sequel.&(*std_params) }
+              .where(Sequel.lit('semester in (SELECT MAX(semester) FROM courses GROUP BY course_id)'))
+              .order(*sorting)
+              .limit(@limit)
+              .offset((@page - 1) * @limit)
+              .map { |c| c.to_v1 }
+
+
 
               end_paginate! res
 
