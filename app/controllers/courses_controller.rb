@@ -162,7 +162,7 @@ module Sinatra
 
               res =
               Course
-              .where { Sequel.&(*std_params) }
+              .where { std_params.empty? ? true : Sequel.&(*std_params) }
               .where(most_recent_where)
               .order(*sorting)
               .limit(@limit)
