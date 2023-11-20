@@ -91,7 +91,7 @@ module Sinatra
           }.to_json
         end
 
-        courses.each { |c| c['sections'] = find_sections_for_course_v1 semester, c[:course_id], params['expand'] }
+        courses.each { |c| c['sections'] = find_sections_for_course_v1 c["semester"], c[:course_id], params['expand'] }
         courses
       end
 
