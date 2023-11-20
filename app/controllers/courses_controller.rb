@@ -151,13 +151,14 @@ module Sinatra
               upper_param 'dept_id'
 
               sorting = parse_sorting_params 'course_id'
-              std_params = parse_query_v1 @course_params
 
               most_recent_where = "1"
               if request.params["semester"] == "most_recent"
-                std_params.delete("semester")
+                @course_params.delete("semester")
                 most_recent_where = Sequel.lit('(course_id, semester) in (SELECT course_id, MAX(semester) FROM courses GROUP BY course_id)')
               end
+
+              std_params = parse_query_v1 @course_params
 
               res =
               Course
