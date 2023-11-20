@@ -6,6 +6,9 @@ module Sinatra
 
       # generalize logic for checking if semester param valid
       def check_semester(_app, semester)
+        if semester == "most_recent"
+          return
+        end
         # check for semester formatting
         unless (semester.length == 6) && semester.is_number?
           halt 400, { error_code: 400, message: 'Invalid semester parameter! semester must be 6 digits' }.to_json
@@ -66,7 +69,17 @@ module Sinatra
 
         validate_course_ids course_ids
 
-        courses = Course.where(semester: semester, course_id: course_ids).map { |c| c.to_v1 }
+        if semester == "most_recent"
+          courses = Course
+                    .where(Sequel.lit('(course_id, semester) in (SELECT course_id, MAX(semester) FROM courses GROUP BY course_id)'))
+                    .where(course_id: course_ids)
+                    .map { |c| c.to_v1 }
+        else
+          courses = Course
+                    .where(semester: semester)
+                    .where(course_id: course_ids)
+                    .map { |c| c.to_v1 }
+        end
         # check if found
         if courses.empty?
           s = course_ids.length > 1 ? 's' : ''
@@ -78,7 +91,7 @@ module Sinatra
           }.to_json
         end
 
-        courses.each { |c| c['sections'] = find_sections_for_course_v1 semester, c[:course_id], params['expand'] }
+        courses.each { |c| c['sections'] = find_sections_for_course_v1 c["semester"], c[:course_id], params['expand'] }
         courses
       end
 

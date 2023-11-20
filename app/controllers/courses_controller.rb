@@ -151,20 +151,30 @@ module Sinatra
               upper_param 'dept_id'
 
               sorting = parse_sorting_params 'course_id'
+
+              most_recent_where = true
+              if request.params["semester"] == "most_recent"
+                @course_params.delete("semester")
+                most_recent_where = Sequel.lit('(course_id, semester) in (SELECT course_id, MAX(semester) FROM courses GROUP BY course_id)')
+              end
+
               std_params = parse_query_v1 @course_params
 
               res =
-                Course
-                .where { Sequel.&(*std_params) }
-                .order(*sorting)
-                .limit(@limit)
-                .offset((@page - 1) * @limit)
-                .map { |c| c.to_v1 }
+              Course
+              .where { std_params.empty? ? true : Sequel.&(*std_params) }
+              .where(most_recent_where)
+              .order(*sorting)
+              .limit(@limit)
+              .offset((@page - 1) * @limit)
+              .map { |c| c.to_v1 }
+
+
 
               end_paginate! res
 
               res.each do |c|
-                c[:sections] = find_sections_for_course_v1 request.params['semester'], c[:course_id], request.params['expand']
+                c[:sections] = find_sections_for_course_v1 c[:semester], c[:course_id], request.params['expand']
               end
 
               return json res
