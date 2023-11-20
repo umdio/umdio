@@ -171,7 +171,7 @@ module Sinatra
               end_paginate! res
 
               res.each do |c|
-                c[:sections] = find_sections_for_course_v1 request.params['semester'], c[:course_id], request.params['expand']
+                c[:sections] = find_sections_for_course_v1 c[:semester], c[:course_id], request.params['expand']
               end
 
               return json res
