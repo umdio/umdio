@@ -3,6 +3,13 @@
 module Sinatra
   module UMDIO
     module Helpers
+      ##
+      # Gets buildings by their numerical ids or buildling codes.
+      #
+      # @param [String] id a comma-separated list of building ids or codes
+      #
+      # @return [Array] The query result
+      #
       def get_buildings_by_id(id)
         bad_id_message = 'Check the building id in the url.'
         doc_url = 'https://beta.umd.io/#tag/map'
